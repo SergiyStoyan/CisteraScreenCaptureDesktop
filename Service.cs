@@ -45,7 +45,9 @@ namespace Cliver.CisteraScreenCapture
                 running = value;
                 //set_hot_keys(value);
                 //set_reboot_notificator(value);          
-                UserSessionRoutines.SessionEventHandler = value ? userSessionEventHandler : (UserSessionRoutines.SessionEventDelegate)null;
+                //UserSessionRoutines.SessionEventHandler = value ? userSessionEventHandler : (UserSessionRoutines.SessionEventDelegate)null;
+
+                Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
                 StateChanged?.Invoke();
             }
             get
@@ -56,6 +58,10 @@ namespace Cliver.CisteraScreenCapture
         static bool running = false;
 
         static ManualResetEvent stop = new ManualResetEvent(false);
+        
+        private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
+        {
+        }
 
         static void userSessionEventHandler(int session_type)
         {
@@ -70,6 +76,10 @@ namespace Cliver.CisteraScreenCapture
                             Log.Error("Session's user name is NULL.");
                             return;
                         }
+
+
+
+
                         HttpClient hc = new HttpClient();
                         string url = "/screenCapture/register?username=" + user_name + "&ipaddress=" + Cliver.NetworkRoutines.GetLocalIpAsString() + "&port=" + Settings.General.ClientPort;
                         Log.Inform("GETing: " + url);
