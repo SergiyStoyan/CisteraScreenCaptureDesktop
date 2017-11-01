@@ -40,7 +40,7 @@ namespace Cliver.CisteraScreenCapture
         {
             set
             {
-                running = true;
+                running = value;
                 //set_hot_keys(value);
                 //set_reboot_notificator(value);
                 StateChanged?.Invoke();

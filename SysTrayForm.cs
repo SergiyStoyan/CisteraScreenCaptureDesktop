@@ -24,19 +24,18 @@ namespace Cliver.CisteraScreenCapture
         {
             InitializeComponent();
 
-            icon = this.Icon.ToBitmap();
+            Icon = AssemblyRoutines.GetAppIcon();
             Service.StateChanged += delegate
             {
                 if (!IsHandleCreated)
                     CreateHandle();
                 this.Invoke(() => { StartStop.Checked = Service.Running; });
                 if (Service.Running)
-                    notifyIcon.Icon = Icon.FromHandle(icon.GetHicon());
+                    notifyIcon.Icon = Icon;
                 else
-                    notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetGreyScale(icon).GetHicon());
+                    notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetGreyScale(Icon.ToBitmap()).GetHicon());
             };
         }
-        readonly Bitmap icon;
 
         public static readonly SysTray This = new SysTray();
 
