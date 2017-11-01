@@ -24,6 +24,8 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Windows.Input;
 using GlobalHotKey;
+using System.Net.Http;
+
 
 namespace Cliver.CisteraScreenCapture
 {
@@ -42,7 +44,8 @@ namespace Cliver.CisteraScreenCapture
             {
                 running = value;
                 //set_hot_keys(value);
-                //set_reboot_notificator(value);
+                //set_reboot_notificator(value);          
+                UserSessionRoutines.SessionEventHandler = value ? userSessionEventHandler : (UserSessionRoutines.SessionEventDelegate)null;
                 StateChanged?.Invoke();
             }
             get
@@ -53,6 +56,38 @@ namespace Cliver.CisteraScreenCapture
         static bool running = false;
 
         static ManualResetEvent stop = new ManualResetEvent(false);
+
+        static void userSessionEventHandler(int session_type)
+        {
+            switch (session_type)
+            {
+                case Cliver.Win32.WtsEvents.WTS_SESSION_LOGON:
+                    ThreadRoutines.StartTry(async () =>
+                    {
+                        string user_name = UserSessionRoutines.GetWindowsUserName();
+                        if (user_name == null)
+                        {
+                            Log.Error("Session's user name is NULL.");
+                            return;
+                        }
+                        HttpClient hc = new HttpClient();
+                        string url = "/screenCapture/register?username=" + user_name + "&ipaddress=" + Cliver.NetworkRoutines.GetLocalIpAsString() + "&port=" + Settings.General.ClientPort;
+                        Log.Inform("GETing: " + url);
+                        HttpResponseMessage rm = await hc.GetAsync(url);
+                        if (!rm.IsSuccessStatusCode)
+                            throw new Exception(rm.ReasonPhrase);
+                        if (rm.Content != null)
+                        {
+                            string responseContent = await rm.Content.ReadAsStringAsync();
+                            if (responseContent.Trim() != "OK")
+                                throw new Exception("Response: " + responseContent);
+                        }
+                    });
+                    break;
+                case Cliver.Win32.WtsEvents.WTS_SESSION_LOGOFF:
+                    break;
+            }
+        }
 
         static void set_reboot_notificator(bool on)
         {
