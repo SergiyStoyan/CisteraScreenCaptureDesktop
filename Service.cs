@@ -17,7 +17,6 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Cliver;
 using System.Configuration;
 using System.Windows.Forms;
@@ -25,6 +24,7 @@ using Microsoft.Win32;
 using System.Windows.Input;
 using GlobalHotKey;
 using System.Net.Http;
+using Zeroconf;
 
 
 namespace Cliver.CisteraScreenCapture
@@ -47,7 +47,11 @@ namespace Cliver.CisteraScreenCapture
                 //set_reboot_notificator(value);          
                 //UserSessionRoutines.SessionEventHandler = value ? userSessionEventHandler : (UserSessionRoutines.SessionEventDelegate)null;
 
-                Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
+                if(value)
+                    Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
+                else
+                    Microsoft.Win32.SystemEvents.SessionSwitch -= SystemEvents_SessionSwitch;
+
                 StateChanged?.Invoke();
             }
             get
@@ -56,124 +60,66 @@ namespace Cliver.CisteraScreenCapture
             }
         }
         static bool running = false;
-
-        static ManualResetEvent stop = new ManualResetEvent(false);
         
         private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
+        {
+            string user_name = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            string g = System.Windows.Forms.SystemInformation.UserName;
+            string h = System.Windows.Forms.SystemInformation.UserDomainName;
+            if (string.IsNullOrWhiteSpace(user_name))
+                userLoggedOff();
+            else
+                userLoggedOn();
+        }
+
+        static void userLoggedOn()
+        {
+            ThreadRoutines.StartTry(async () =>
+            {
+                string user_name = UserSessionRoutines.GetWindowsUserName();
+                if (user_name == null)
+                {
+                    Log.Error("Session's user name is NULL.");
+                    return;
+                }
+
+                //IReadOnlyList<IZeroconfHost> results = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");
+                IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(Settings.General.ServiceName);
+                //IObservable<IZeroconfHost> zhs = ZeroconfResolver.Resolve(Settings.General.ServiceName);
+                if (zhs.Count < 1)
+                    throw new Exception("Service could not be resolved: " + Settings.General.ServiceName);
+                string server_ip = zhs[0].IPAddress;
+
+                HttpClient hc = new HttpClient();
+                string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + Cliver.NetworkRoutines.GetLocalIpAsString(IPAddress.Parse(server_ip)) + "&port=" + Settings.General.ClientPort;
+                Log.Inform("GETing: " + url);
+                HttpResponseMessage rm = await hc.GetAsync(url);
+                if (!rm.IsSuccessStatusCode)
+                    throw new Exception(rm.ReasonPhrase);
+                if (rm.Content != null)
+                {
+                    string responseContent = await rm.Content.ReadAsStringAsync();
+                    if (responseContent.Trim() != "OK")
+                        throw new Exception("Response: " + responseContent);
+                }
+            });
+        }
+
+        static void userLoggedOff()
         {
         }
 
         static void userSessionEventHandler(int session_type)
         {
-            switch (session_type)
+                switch (session_type)
             {
                 case Cliver.Win32.WtsEvents.WTS_SESSION_LOGON:
-                    ThreadRoutines.StartTry(async () =>
-                    {
-                        string user_name = UserSessionRoutines.GetWindowsUserName();
-                        if (user_name == null)
-                        {
-                            Log.Error("Session's user name is NULL.");
-                            return;
-                        }
-
-
-
-
-                        HttpClient hc = new HttpClient();
-                        string url = "/screenCapture/register?username=" + user_name + "&ipaddress=" + Cliver.NetworkRoutines.GetLocalIpAsString() + "&port=" + Settings.General.ClientPort;
-                        Log.Inform("GETing: " + url);
-                        HttpResponseMessage rm = await hc.GetAsync(url);
-                        if (!rm.IsSuccessStatusCode)
-                            throw new Exception(rm.ReasonPhrase);
-                        if (rm.Content != null)
-                        {
-                            string responseContent = await rm.Content.ReadAsStringAsync();
-                            if (responseContent.Trim() != "OK")
-                                throw new Exception("Response: " + responseContent);
-                        }
-                    });
+                    userLoggedOn();
                     break;
                 case Cliver.Win32.WtsEvents.WTS_SESSION_LOGOFF:
+                    userLoggedOn();
                     break;
             }
         }
-
-        static void set_reboot_notificator(bool on)
-        {
-            if (!on)
-            {
-                if (reboot_notifier_t != null && reboot_notifier_t.IsAlive)
-                {
-                    stop.Set();
-                    if (!reboot_notifier_t.Join(1000))
-                        reboot_notifier_t.Abort();
-                }
-                return;
-            }
-            if (reboot_notifier_t != null && reboot_notifier_t.IsAlive)
-                return;
-            stop.Reset();
-            //reboot_notifier_t = ThreadRoutines.StartTry(() =>
-            //{
-            //    DateTime next_notification_time = DateTime.MinValue;
-            //    while (true)
-            //    {
-            //        TimeSpan ut = SystemInfo.GetUpTime();                  
-            //        if (next_notification_time < DateTime.Now)
-            //        {
-            //            next_notification_time = DateTime.Now.AddSeconds(Settings.General.InfoToastLifeTimeInSecs * 2);
-            //            InfoWindow.Create(ProgramRoutines.GetAppName(), "It's time to reboot the system...", null, "Reboot", ()=> {
-            //                {
-            //                    System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
-            //                    //StartShutDown("-f -r -t 5");
-            //                }
-            //            });
-            //        }
-            //        if (stop.WaitOne(1000))
-            //            return;
-            //    }
-            //});
-        }
-        static Thread reboot_notifier_t = null;
-        
-        static void StartShutDown(string param)
-        {
-            ProcessStartInfo psi = new ProcessStartInfo();
-            psi.FileName = "cmd";
-            psi.WindowStyle = ProcessWindowStyle.Hidden;
-            psi.Arguments = "/C shutdown " + param;
-            Process.Start(psi);
-        }
-
-        //static void set_hot_keys(bool listen)
-        //{
-        //    if (key_manager != null)
-        //    {
-        //        key_manager.Dispose();
-        //        key_manager = null;
-        //    }
-        //    if (!listen)
-        //        return;
-            //if (Settings.General.TicketKey != System.Windows.Input.Key.None)
-            //{
-            //    key_manager = new HotKeyManager();
-            //    System.Windows.Input.ModifierKeys mks;
-            //    if (Settings.General.TicketModifierKey1 != ModifierKeys.None)
-            //    {
-            //        mks = Settings.General.TicketModifierKey1;
-            //        if (Settings.General.TicketModifierKey2 != ModifierKeys.None)
-            //            mks |= Settings.General.TicketModifierKey2;
-            //    }
-            //    else
-            //        mks = ModifierKeys.None;
-            //    var hotKey = key_manager.Register(Settings.General.TicketKey, mks);
-            //    key_manager.KeyPressed += delegate (object sender, KeyPressedEventArgs e)
-            //    {
-            //        CreateTicket();
-            //    };
-            //}
-        //}
-        //static HotKeyManager key_manager = null;
     }
 }
