@@ -46,10 +46,12 @@ namespace Cliver.CisteraScreenCapture
                 switch (m.Name)
                 {
                     case Message.FfmpegStart:
-                        InfoWindow.Create("Mpeg Stream", "Mpeg streaming started to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
+                        MpegStream.Start(m.Body);
+                        InfoWindow.Create("Mpeg Stream", "Mpeg stream started to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
                         break;
                     case Message.FfmpegStop:
-                        InfoWindow.Create("Mpeg Stream", "Stopping mpeg streaming to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
+                        InfoWindow.Create("Mpeg Stream", "Stopping mpeg stream to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
+                        MpegStream.Stop();
                         break;
                     default:
                         throw new Exception("Unknown message: " + m.Name);

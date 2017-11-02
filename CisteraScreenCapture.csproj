@@ -153,6 +153,7 @@
     <Compile Include="BonjourService.cs" />
     <Compile Include="InfoControl.xaml.cs" />
     <Compile Include="InfoWindow.xaml.cs" />
+    <Compile Include="MpegStream.cs" />
     <Compile Include="TcpServer.cs" />
     <Compile Include="Service.cs" />
     <Compile Include="Program.cs" />
