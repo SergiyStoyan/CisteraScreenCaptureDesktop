@@ -46,9 +46,10 @@ namespace Cliver.CisteraScreenCapture
                 switch (m.Name)
                 {
                     case Message.FfmpegStart:
-
+                        InfoWindow.Create("Mpeg Stream", "Mpeg streaming started to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
                         break;
                     case Message.FfmpegStop:
+                        InfoWindow.Create("Mpeg Stream", "Stopping mpeg streaming to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
                         break;
                     default:
                         throw new Exception("Unknown message: " + m.Name);
@@ -186,8 +187,11 @@ namespace Cliver.CisteraScreenCapture
             while (thread != null)
             {
                 Socket socket = listeningSocket.Accept();
-                TcpConnection tc = new TcpConnection(socket);
+                if (tcpConnection != null)
+                    tcpConnection.Close();
+                tcpConnection = new TcpConnection(socket);
             }
         }
+        static TcpConnection tcpConnection = null;
     }
 }
