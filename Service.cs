@@ -98,7 +98,9 @@ namespace Cliver.CisteraScreenCapture
                     string server_ip;
                     if (zhs.Count < 1)
                     {
-                        Log.Warning("Service could not be resolved: " + Settings.General.ServiceName + ". Using default ip: " + Settings.General.DefaultServerIp);
+                        string m = "Service could not be resolved: " + Settings.General.ServiceName + ". Using default ip: " + Settings.General.DefaultServerIp;
+                        Log.Warning(m);
+                        InfoWindow.Create(m, null, "OK", null, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
                         server_ip = Settings.General.DefaultServerIp.ToString();
                     }
                     else

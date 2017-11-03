@@ -64,7 +64,7 @@
             this.localPort.Name = "localPort";
             this.localPort.Size = new System.Drawing.Size(67, 20);
             this.localPort.TabIndex = 2;
-            this.localPort.Text = "5900";
+            this.localPort.Text = "5700";
             // 
             // label1
             // 
@@ -90,7 +90,7 @@
             this.remotePort.Name = "remotePort";
             this.remotePort.Size = new System.Drawing.Size(67, 20);
             this.remotePort.TabIndex = 4;
-            this.remotePort.Text = "5800";
+            this.remotePort.Text = "5900";
             // 
             // label3
             // 

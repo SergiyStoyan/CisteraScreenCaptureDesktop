@@ -26,14 +26,10 @@ namespace Cliver.CisteraScreenCaptureTestServer
             socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             socket.Bind(localEndPoint);
             
-            // URI prefixes are required,
-            // for example "http://127.0.0.1:5800/screenCapture/".
-            string[] prefixes = new string[] { "http://127.0.0.1:5800/screenCapture/" };
-            if (prefixes == null || prefixes.Length == 0)
-                throw new ArgumentException("prefixes");
             HttpListener listener = new HttpListener();
-            foreach (string s in prefixes)
-                listener.Prefixes.Add(s);
+            // URI prefixes are required,
+            // for example "http://127.0.0.1:5800/screenCapture/" (does not work in LAN)
+            listener.Prefixes.Add("http://192.168.2.15:800/");
             listener.Start();
             listener.BeginGetContext(http_callback, listener);
             

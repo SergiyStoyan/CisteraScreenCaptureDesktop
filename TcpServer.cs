@@ -205,7 +205,10 @@ namespace Cliver.CisteraScreenCapture
         {
             if (thread != null && thread.IsAlive)
                 return;
-            thread = ThreadRoutines.StartTry(() => { run(port); });
+            thread = ThreadRoutines.StartTry(() => { run(port); }, (Exception e) => {
+                Log.Error(e);
+                InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
+            });
         }
         static Thread thread = null;
 
@@ -221,28 +224,20 @@ namespace Cliver.CisteraScreenCapture
 
         static void run(int port)
         {
-            try
-            {
-                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-                IPAddress ipAddress = ipHostInfo.AddressList[0];
-                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
-                listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                listeningSocket.Bind(localEndPoint);
-                listeningSocket.Listen(100);
+            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress ipAddress = ipHostInfo.AddressList[0];
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
+            listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            listeningSocket.Bind(localEndPoint);
+            listeningSocket.Listen(100);
 
-                while (thread != null)
-                {
-                    //var r = listeningSocket.BeginAccept(accepted, listeningSocket);
-                    Socket socket = listeningSocket.Accept();
-                    if (connection != null)
-                        connection.Dispose();
-                    connection = TcpServerConnection.Start(socket);
-                }
-            }
-            catch (Exception e)
+            while (thread != null)
             {
-                Log.Error(e);
-                InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
+                //var r = listeningSocket.BeginAccept(accepted, listeningSocket);
+                Socket socket = listeningSocket.Accept();
+                if (connection != null)
+                    connection.Dispose();
+                connection = TcpServerConnection.Start(socket);
             }
         }
         static Socket listeningSocket;

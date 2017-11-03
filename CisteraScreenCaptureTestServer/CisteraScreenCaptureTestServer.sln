@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CisteraScreenCaptureTestServer", "CisteraScreenCaptureTestServer.csproj", "{3923FE21-9ED0-4787-995F-6C0701C2E9E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CisteraScreenCapture", "..\CisteraScreenCapture.csproj", "{99BD0A06-0D5E-4EC0-BFE2-B88BEEBB9568}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CliverRoutines", "..\..\..\CLIVER\CliverBot\CliverRoutines\CliverRoutines.csproj", "{ACA94788-BED1-4B8E-94EF-E54293E8D139}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3923FE21-9ED0-4787-995F-6C0701C2E9E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3923FE21-9ED0-4787-995F-6C0701C2E9E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3923FE21-9ED0-4787-995F-6C0701C2E9E3}.Debug|x86.ActiveCfg = Debug|x86
+		{3923FE21-9ED0-4787-995F-6C0701C2E9E3}.Debug|x86.Build.0 = Debug|x86
+		{3923FE21-9ED0-4787-995F-6C0701C2E9E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3923FE21-9ED0-4787-995F-6C0701C2E9E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3923FE21-9ED0-4787-995F-6C0701C2E9E3}.Release|x86.ActiveCfg = Release|x86
+		{3923FE21-9ED0-4787-995F-6C0701C2E9E3}.Release|x86.Build.0 = Release|x86
+		{99BD0A06-0D5E-4EC0-BFE2-B88BEEBB9568}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99BD0A06-0D5E-4EC0-BFE2-B88BEEBB9568}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99BD0A06-0D5E-4EC0-BFE2-B88BEEBB9568}.Debug|x86.ActiveCfg = Debug|x86
+		{99BD0A06-0D5E-4EC0-BFE2-B88BEEBB9568}.Debug|x86.Build.0 = Debug|x86
+		{99BD0A06-0D5E-4EC0-BFE2-B88BEEBB9568}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99BD0A06-0D5E-4EC0-BFE2-B88BEEBB9568}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99BD0A06-0D5E-4EC0-BFE2-B88BEEBB9568}.Release|x86.ActiveCfg = Release|x86
+		{99BD0A06-0D5E-4EC0-BFE2-B88BEEBB9568}.Release|x86.Build.0 = Release|x86
+		{ACA94788-BED1-4B8E-94EF-E54293E8D139}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACA94788-BED1-4B8E-94EF-E54293E8D139}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACA94788-BED1-4B8E-94EF-E54293E8D139}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ACA94788-BED1-4B8E-94EF-E54293E8D139}.Debug|x86.Build.0 = Debug|Any CPU
+		{ACA94788-BED1-4B8E-94EF-E54293E8D139}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACA94788-BED1-4B8E-94EF-E54293E8D139}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACA94788-BED1-4B8E-94EF-E54293E8D139}.Release|x86.ActiveCfg = Release|Any CPU
+		{ACA94788-BED1-4B8E-94EF-E54293E8D139}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3548E2C8-5AEE-46E4-AF64-65B7CDDA88B4}
+	EndGlobalSection
+EndGlobal
