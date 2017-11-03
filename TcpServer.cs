@@ -172,6 +172,7 @@ namespace Cliver.CisteraScreenCapture
         {
             if (thread == null)
                 return;
+            listeningSocket.Close();
             while (thread.IsAlive)
                 thread.Abort();
             thread = null;
@@ -182,7 +183,7 @@ namespace Cliver.CisteraScreenCapture
             IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             IPAddress ipAddress = ipHostInfo.AddressList[0];
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
-            Socket listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             listeningSocket.Bind(localEndPoint);
             listeningSocket.Listen(100);
 
@@ -194,6 +195,7 @@ namespace Cliver.CisteraScreenCapture
                 tcpConnection = new TcpConnection(socket);
             }
         }
+        Socket listeningSocket;
         static TcpConnection tcpConnection = null;
     }
 }

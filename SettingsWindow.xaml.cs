@@ -25,13 +25,14 @@ namespace Cliver.CisteraScreenCapture
         SettingsWindow()
         {
             InitializeComponent();
-            
+            System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(this);
+
             Icon = AssemblyRoutines.GetAppIconImageSource();
 
             //WindowStartupLocation = WindowStartupLocation.CenterScreen;
             
             ServerPort.Text = Settings.General.ServerPort.ToString();
-            DefaultServerIp.Text = Settings.General.DefaultServerIp;
+            DefaultServerIp.Text = Settings.General.DefaultServerIp.ToString();
             ClientPort.Text = Settings.General.ClientPort.ToString();
             Ssl.IsChecked = Settings.General.Ssl;
             ServiceName.Text = Settings.General.ServiceName;
@@ -42,7 +43,10 @@ namespace Cliver.CisteraScreenCapture
             if (w == null)
             {
                 w = new SettingsWindow();
-                w.Closed += delegate { w = null; };
+                w.Closed += delegate 
+                {
+                    w = null;
+                };
             }
             w.Show();
             w.Activate();
@@ -64,9 +68,12 @@ namespace Cliver.CisteraScreenCapture
                     throw new Exception("Server port must be positive integer.");
                 Settings.General.ServerPort = v;
 
-                if (string.IsNullOrWhiteSpace(Settings.General.DefaultServerIp))
+                if (string.IsNullOrWhiteSpace(DefaultServerIp.Text))
                     throw new Exception("Default server ip is not specified.");
-                Settings.General.DefaultServerIp = DefaultServerIp.Text;
+                IPAddress ia;
+                if(!IPAddress.TryParse(DefaultServerIp.Text, out ia))
+                    throw new Exception("Default server ip could not be parsed.");
+                Settings.General.DefaultServerIp = ia.ToString(); ;
 
                 if (!ushort.TryParse(ClientPort.Text, out v))
                     throw new Exception("Client port must be positive integer.");

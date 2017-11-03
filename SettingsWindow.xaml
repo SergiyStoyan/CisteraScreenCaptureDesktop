@@ -1,4 +1,5 @@
 ﻿<Window x:Class="Cliver.CisteraScreenCapture.SettingsWindow"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,13 +8,70 @@
              mc:Ignorable="d" 
         Title="Cistera Screen Capture Settings" Height="auto" Width="auto" 
         WindowStyle="SingleBorderWindow" 
-        Background="#afadff" Topmost="False" ShowInTaskbar="True" SizeToContent="WidthAndHeight" 
+        ResizeMode="CanResize" 
+        Background="#dee1ff" Topmost="False" ShowInTaskbar="True" SizeToContent="WidthAndHeight" 
         FontFamily="Microsoft Sans Serif"
         FontSize="10pt" 
             >
+    <Window.Resources>
+        <Style TargetType="{x:Type ComboBox}">
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="Margin" Value="0,10,0,0"/>
+            <Setter Property="Padding" Value="0, 0, 0, 0"/>
+            <Setter Property="MinWidth" Value="30"/>
+        </Style>
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin"  Value="0,10,10,0"/>
+            <Setter Property="Padding" Value="{Binding Padding, ElementName=CapturedVideoSource}"/>
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="MinHeight" Value="{Binding ActualHeight, ElementName=CapturedVideoSource}"/>
+            <Setter Property="VerticalAlignment" Value="{Binding VerticalAlignment, ElementName=CapturedVideoSource}"/>
+            <Setter Property="HorizontalAlignment" Value="{Binding HorizontalAlignment, ElementName=CapturedVideoSource}"/>
+            <Setter Property="Margin" Value="{Binding Margin, ElementName=CapturedVideoSource}"/>
+            <Setter Property="Padding" Value="{Binding Padding, ElementName=CapturedVideoSource}"/>
+            <Setter Property="MinWidth" Value="{Binding MinWidth, ElementName=CapturedVideoSource}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="AcceptsReturn" Value="True"/>
+        </Style>
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="MinHeight" Value="{Binding ActualHeight, ElementName=CapturedVideoSource}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="{Binding HorizontalAlignment, ElementName=CapturedVideoSource}"/>
+            <Setter Property="Margin" Value="0,10,0,-5"/>
+            <Setter Property="Padding" Value="{Binding Padding, ElementName=CapturedVideoSource}"/>
+            <Setter Property="MinWidth" Value="{Binding MinWidth, ElementName=CapturedVideoSource}"/>
+        </Style>
+        <Style TargetType="{x:Type xctk:MaskedTextBox}">
+            <Setter Property="MinHeight" Value="{Binding ActualHeight, ElementName=CapturedVideoSource}"/>
+            <Setter Property="VerticalAlignment" Value="{Binding VerticalAlignment, ElementName=CapturedVideoSource}"/>
+            <Setter Property="HorizontalAlignment" Value="{Binding HorizontalAlignment, ElementName=CapturedVideoSource}"/>
+            <Setter Property="Margin" Value="{Binding Margin, ElementName=CapturedVideoSource}"/>
+            <Setter Property="Padding" Value="{Binding Padding, ElementName=CapturedVideoSource}"/>
+            <Setter Property="MinWidth" Value="{Binding MinWidth, ElementName=CapturedVideoSource}"/>
+        </Style>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Margin" Value="10,0,0,0"/>
+            <Setter Property="Padding" Value="10,1,10,1"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        <StackPanel Orientation="Vertical">
-            <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="20"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="10" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="1" Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
@@ -24,25 +82,24 @@
                 </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"></ColumnDefinition>
-            <ColumnDefinition Width="auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" >Server port:</Label>
-                <TextBox Grid.Row="0" Grid.Column="1" Name="ServerPort" HorizontalAlignment="Left" MinWidth="30"/>
-        <Label Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" >Server ip:</Label>
-                <TextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp" HorizontalAlignment="Left" MinWidth="100"/>
-        <Label Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right"  >Client port:</Label>
-                <TextBox Grid.Row="2" Grid.Column="1" Name="ClientPort" HorizontalAlignment="Left" MinWidth="30"/>
-        <Label Grid.Row="3" Grid.Column="0" HorizontalAlignment="Right" >SSL:</Label>
-                <CheckBox Grid.Row="3" Grid.Column="1" Name="Ssl" HorizontalAlignment="Left" MinWidth="30"/>
-                <Label Grid.Row="4" Grid.Column="0" HorizontalAlignment="Right" >Service name:</Label>
-                <TextBox Grid.Row="4" Grid.Column="1" Name="ServiceName" HorizontalAlignment="Left" Text="_cisterascreencapturecontroller._tcp"/>
-        <Label Grid.Row="5" Grid.Column="0" HorizontalAlignment="Right"  >Service name:</Label>
-        <ComboBox Grid.Row="5" Grid.Column="1" ></ComboBox>
+                <Label Grid.Row="0" Grid.Column="0">Server port:</Label>
+            <TextBox Grid.Row="0" Grid.Column="1" Name="ServerPort" />
+        <Label Grid.Row="1" Grid.Column="0" >Server ip:</Label>
+                <TextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp"  MinWidth="100"/>
+        <Label Grid.Row="2" Grid.Column="0"   >Client port:</Label>
+                <TextBox Grid.Row="2" Grid.Column="1" Name="ClientPort"/>
+        <Label Grid.Row="3" Grid.Column="0"  >SSL:</Label>
+                <CheckBox Grid.Row="3" Grid.Column="1" Name="Ssl" />
+                <Label Grid.Row="4" Grid.Column="0"  >Service name:</Label>
+            <TextBox Grid.Row="4" Grid.Column="1" Name="ServiceName" MinWidth="100" Text="_cisterascreencapturecontroller._tcp"/>
+        <Label Grid.Row="5" Grid.Column="0"   >Service name:</Label>
+                <ComboBox Grid.Row="5" Grid.Column="1" Name="CapturedVideoSource" Height="20" HorizontalContentAlignment="Stretch" ></ComboBox>
             </Grid>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                <Button Name="ok" Click="save">OK</Button>
-                <Button Name="cancel" Click="close">Cancel</Button>
-            </StackPanel>
-        </StackPanel>
+        <UniformGrid HorizontalAlignment="Right" Grid.Row="2" Grid.Column="1" Rows="1" Margin="0, 20, 0, 0">
+            <Button x:Name="ok" Click="save" Content="OK"/>
+            <Button x:Name="cancel" Click="close" Content="Cancel"/>
+        </UniformGrid>
     </Grid>
 </Window>

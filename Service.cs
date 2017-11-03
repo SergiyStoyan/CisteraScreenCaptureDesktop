@@ -47,8 +47,7 @@ namespace Cliver.CisteraScreenCapture
 
                 if (value)
                 {
-                    SystemEvents_SessionSwitch(null, null);
-
+                   // SystemEvents_SessionSwitch(null, null);
                     tcpServer.Start(Settings.General.ServerPort);
                     Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
                 }
@@ -71,7 +70,7 @@ namespace Cliver.CisteraScreenCapture
         private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
         {
             //string user_name = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            string user_name = System.Windows.Forms.SystemInformation.UserName;
+            string user_name = SystemRoutines.GetWindowsUserName();
             if (string.IsNullOrWhiteSpace(user_name))
                 userLoggedOff();
             else
@@ -96,8 +95,7 @@ namespace Cliver.CisteraScreenCapture
                 if (zhs.Count < 1)
                 {
                     Log.Warning("Service could not be resolved: " + Settings.General.ServiceName + ". Using default ip: " + Settings.General.DefaultServerIp);
-                    server_ip = Settings.General.DefaultServerIp;
-
+                    server_ip = Settings.General.DefaultServerIp.ToString();
                 }
                 else
                     server_ip = zhs[0].IPAddress;

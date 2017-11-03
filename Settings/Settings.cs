@@ -8,6 +8,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web.Script.Serialization;
+using System.Net;
 
 namespace Cliver.CisteraScreenCapture
 {
@@ -19,7 +20,7 @@ namespace Cliver.CisteraScreenCapture
         public class GeneralSettings : Cliver.Settings
         {
             public ushort ServerPort = 5900;
-            public string DefaultServerIp = "";
+            public string DefaultServerIp = (new IPAddress(new byte[] {127, 0, 0, 1})).ToString();
             public ushort ClientPort = 5700;
             public bool Ssl = false;
             public string ServiceName = "_cisterascreencapturecontroller._tcp";
