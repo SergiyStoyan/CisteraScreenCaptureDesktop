@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="500" >
     <Grid>
         <StackPanel>
-            <RichTextBox Height="auto" Background="Beige" BorderThickness="0">
+            <RichTextBox Name="box" Height="auto" Background="WhiteSmoke" BorderThickness="0">
                 <FlowDocument>
                     <Paragraph>
                         <Floater Name="image_container" HorizontalAlignment="Left" Width="60" Margin="0,0,5,0" Padding="0">
@@ -35,7 +35,7 @@
                     </Paragraph>
                 </FlowDocument>
             </RichTextBox>
-            <Button BorderThickness="0" Background="#905080" Foreground="#ffffff" Name="button" Content="Button" HorizontalAlignment="Stretch" Height="23" Margin="0,0,0,0" VerticalAlignment="Bottom"/>
+            <Button BorderThickness="0" Background="#008000" Foreground="#ffffff" Name="button" Content="Button" HorizontalAlignment="Stretch" Height="23" Margin="0,0,0,0" VerticalAlignment="Bottom"/>
         </StackPanel>
     </Grid>
 </UserControl>

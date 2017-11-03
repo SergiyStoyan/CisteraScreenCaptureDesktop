@@ -58,7 +58,7 @@ namespace Cliver.CisteraScreenCapture
         public  static void Stop()
         {
             if (mpeg_stream_process != null)
-                mpeg_stream_process.Kill();
+                ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
             mpeg_stream_process = null;
         }
     }

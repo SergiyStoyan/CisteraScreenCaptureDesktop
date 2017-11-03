@@ -26,11 +26,6 @@ namespace Cliver.CisteraScreenCapture
             public string ServiceName = "_cisterascreencapturecontroller._tcp";
             public string CapturedVideoSource = "";
             
-            public int InfoToastLifeTimeInSecs = 5;
-            public string InfoSoundFile = "alert.wav";
-            public int InfoToastBottom = 100;
-            public int InfoToastRight = 0;
-
             //[Newtonsoft.Json.JsonIgnore]
             //public System.Text.Encoding Encoding = System.Text.Encoding.Unicode;
 
@@ -40,7 +35,6 @@ namespace Cliver.CisteraScreenCapture
 
             public override void Saving()
             {
-                //UserEmail = string.IsNullOrWhiteSpace(UserEmail) ? null : UserEmail.Trim();
             }
         }
     }

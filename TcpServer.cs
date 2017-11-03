@@ -21,19 +21,59 @@ using System.Net.Sockets;
 
 namespace Cliver.CisteraScreenCapture
 {
-    public class TcpConnection
+    public class TcpServerConnection : IDisposable
     {
-        public TcpConnection(Socket socket)
+        static readonly Dictionary<ushort, TcpServerConnection> connections = new Dictionary<ushort, TcpServerConnection>();
+
+        static public TcpServerConnection Start(Socket socket)
+        {
+            lock (connections)
+            {
+                IPEndPoint iep = (IPEndPoint)socket.LocalEndPoint;
+                if (connections.ContainsKey((ushort)iep.Port))
+                    return null;
+                return new TcpServerConnection(socket);
+            }
+        }
+
+        static public void Stop(Socket socket)
+        {
+            lock (connections)
+            {
+                IPEndPoint iep = (IPEndPoint)socket.LocalEndPoint;
+                TcpServerConnection tsc;
+                if (!connections.TryGetValue((ushort)iep.Port, out tsc))
+                    return;
+                tsc.Dispose();
+            }
+        }
+
+        TcpServerConnection(Socket socket)
         {
             this.socket = socket;
+            IPEndPoint iep = (IPEndPoint)socket.LocalEndPoint;
+            connections[(ushort)iep.Port] = this;
             thread = ThreadRoutines.StartTry(run);
         }
         Socket socket = null;
         Thread thread = null;
 
-        public void Close()
+        ~TcpServerConnection()
         {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            if (socket == null)
+                return;
+            lock (connections)
+            {
+                IPEndPoint iep = (IPEndPoint)socket.LocalEndPoint;
+                connections.Remove((ushort)iep.Port);
+            }
             socket.Close();
+            socket = null;
             thread.Abort();
             thread = null;
         }
@@ -47,10 +87,10 @@ namespace Cliver.CisteraScreenCapture
                 {
                     case TcpMessage.FfmpegStart:
                         MpegStream.Start(m.Body);
-                        InfoWindow.Create("Mpeg Stream", "Mpeg stream started to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
+                        InfoWindow.Create("Mpeg stream started to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
                         break;
                     case TcpMessage.FfmpegStop:
-                        InfoWindow.Create("Mpeg Stream", "Stopping mpeg stream to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
+                        InfoWindow.Create("Stopping mpeg stream to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
                         MpegStream.Stop();
                         break;
                     default:
@@ -157,58 +197,61 @@ namespace Cliver.CisteraScreenCapture
         }
     }
 
-    public class TcpServer
+    static public class TcpServer
     {
         //static Dictionary<ushort, TcpServer> servers = new Dictionary<ushort, TcpServer>(); 
 
-        public class StateObject
-        {
-            public Socket workSocket = null;
-            public const int BufferSize = 1024;
-            public byte[] buffer = new byte[BufferSize];
-            public StringBuilder sb = new StringBuilder();
-        }
-
-        public TcpServer()
-        {
-        }
-
-        public void Start(int port)
+        static public void Start(int port)
         {
             if (thread != null && thread.IsAlive)
                 return;
-            thread = ThreadRoutines.StartTry(() => { start(port); });
+            thread = ThreadRoutines.StartTry(() => { run(port); });
         }
-        Thread thread = null;
+        static Thread thread = null;
 
-        public void Stop()
+        static public void Stop()
         {
             if (thread == null)
                 return;
-            listeningSocket.Close();
+            listeningSocket.Close(0);
             while (thread.IsAlive)
                 thread.Abort();
             thread = null;
         }
 
-        void start(int port)
+        static void run(int port)
         {
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
-            listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            listeningSocket.Bind(localEndPoint);
-            listeningSocket.Listen(100);
-
-            while (thread != null)
+            try
             {
-                Socket socket = listeningSocket.Accept();
-                if (tcpConnection != null)
-                    tcpConnection.Close();
-                tcpConnection = new TcpConnection(socket);
+                IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+                IPAddress ipAddress = ipHostInfo.AddressList[0];
+                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
+                listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                listeningSocket.Bind(localEndPoint);
+                listeningSocket.Listen(100);
+
+                while (thread != null)
+                {
+                    //var r = listeningSocket.BeginAccept(accepted, listeningSocket);
+                    Socket socket = listeningSocket.Accept();
+                    if (connection != null)
+                        connection.Dispose();
+                    connection = TcpServerConnection.Start(socket);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+                InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
             }
         }
-        Socket listeningSocket;
-        static TcpConnection tcpConnection = null;
+        static Socket listeningSocket;
+        static TcpServerConnection connection = null;
+
+        //static void accepted(System.IAsyncResult result)
+        //{            
+        //    Socket socket = listeningSocket.EndAccept(result);
+        //    TcpServerConnection.Start(socket);
+        //}
     }
 }

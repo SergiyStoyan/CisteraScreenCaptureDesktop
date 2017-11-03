@@ -1,4 +1,9 @@
-﻿using System;
+﻿/********************************************************************************************
+        Author: Sergey Stoyan
+        sergey.stoyan@gmail.com
+        http://www.cliversoft.com
+********************************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +37,12 @@ namespace Cliver.CisteraScreenCapture
         static System.Windows.Threading.Dispatcher dispatcher = null;
         static object lock_object = new object();
 
-        public static InfoWindow Create(string title, string text, string image_url, string action_name, Action action)
+        public static InfoWindow Create(string text, string image_url, string action_name, Action action, Brush box_brush = null, Brush button_brush = null)
+        {
+            return Create(ProgramRoutines.GetAppName(), text, image_url, action_name, action, box_brush, button_brush);
+        }
+
+        public static InfoWindow Create(string title, string text, string image_url, string action_name, Action action, Brush box_brush = null, Brush button_brush = null)
         {
             lock (lock_object)
             {
@@ -41,17 +51,18 @@ namespace Cliver.CisteraScreenCapture
                 Action a = () =>
                 {
                     w = new InfoWindow(title, text, image_url, action_name, action);
+                    w.SetAppearance(box_brush, button_brush);
                     WindowInteropHelper h = new WindowInteropHelper(w);
                     h.EnsureHandle();
                     w.Show();
                     ThreadRoutines.StartTry(() =>
                     {
-                        Thread.Sleep(Settings.General.InfoToastLifeTimeInSecs * 1000);
+                        Thread.Sleep(Settings.View.InfoToastLifeTimeInSecs * 1000);
                         w.Dispatcher.BeginInvoke((Action)(() => { w.Close(); }));
                     });
-                    if (!string.IsNullOrWhiteSpace(Settings.General.InfoSoundFile))
+                    if (!string.IsNullOrWhiteSpace(Settings.View.InfoSoundFile))
                     {
-                        SoundPlayer sp = new SoundPlayer(Settings.General.InfoSoundFile);
+                        SoundPlayer sp = new SoundPlayer(Settings.View.InfoSoundFile);
                         sp.Play();
                     }
                 };
@@ -88,6 +99,16 @@ namespace Cliver.CisteraScreenCapture
             InitializeComponent();
         }
 
+        internal void SetAppearance(Brush box_brush, Brush button_brush)
+        {
+            //InfoControl ic = (InfoControl)FindName("InfoControl");
+            InfoControl ic = (InfoControl)grid.Children[0];
+            if (box_brush != null)
+                ic.box.Background = box_brush;
+            if (button_brush != null)
+                ic.button.Background = button_brush;
+        }
+
         InfoWindow(string title, string text, string image_url, string action_name, Action action)
         {
             InitializeComponent();
@@ -107,7 +128,9 @@ namespace Cliver.CisteraScreenCapture
             Topmost = true;
             Owner = invisible_owner_w;
 
-            this.grid.Children.Add(new InfoControl(title, text, image_url, action_name, action, true));
+            InfoControl ic = new InfoControl(title, text, image_url, action_name, action, true);
+            ic.Name = "InfoControl";
+            grid.Children.Add(ic);
 
             //LayoutTransform = new ScaleTransform(0.1, 0.1);
             //UpdateLayout();
@@ -129,7 +152,7 @@ namespace Cliver.CisteraScreenCapture
                     this.Top = w.Top - this.ActualHeight;
                 }
                 else
-                    this.Top = wa.Bottom - this.ActualHeight - Settings.General.InfoToastBottom;
+                    this.Top = wa.Bottom - this.ActualHeight - Settings.View.InfoToastBottom;
 
                 ws.Add(this);
 
@@ -146,7 +169,7 @@ namespace Cliver.CisteraScreenCapture
                 }
             }
             sb = new Storyboard();
-            da = new DoubleAnimation(wa.Right, wa.Right - Width - Settings.General.InfoToastRight, (Duration)TimeSpan.FromMilliseconds(300));
+            da = new DoubleAnimation(wa.Right, wa.Right - Width - Settings.View.InfoToastRight, (Duration)TimeSpan.FromMilliseconds(300));
             Storyboard.SetTargetProperty(da, new PropertyPath("(Left)")); //Do not miss the '(' and ')'
             sb.Children.Add(da);
             BeginStoryboard(sb);

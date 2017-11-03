@@ -7,7 +7,7 @@
         mc:Ignorable="d" 
         Title="InfoWindow" Height="auto" Width="400" 
         WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" 
-        Background="Beige" Topmost="False" ShowInTaskbar="False" SizeToContent="Height" >
+        Background="WhiteSmoke" Topmost="False" ShowInTaskbar="False" SizeToContent="Height" >
     <Grid x:Name="grid">
     </Grid>
 </Window>
