@@ -42,105 +42,118 @@ namespace Cliver.CisteraScreenCapture
         {
             while (thread != null)
             {
-                Message m = Message.Receive(socket);
+                TcpMessage m = TcpMessage.Receive(socket);
                 switch (m.Name)
                 {
-                    case Message.FfmpegStart:
+                    case TcpMessage.FfmpegStart:
                         MpegStream.Start(m.Body);
                         InfoWindow.Create("Mpeg Stream", "Mpeg stream started to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
                         break;
-                    case Message.FfmpegStop:
+                    case TcpMessage.FfmpegStop:
                         InfoWindow.Create("Mpeg Stream", "Stopping mpeg stream to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
                         MpegStream.Stop();
                         break;
                     default:
                         throw new Exception("Unknown message: " + m.Name);
                 }
-                Message m2 = new Message(m.Name, Message.Success);
-                m2.Send(socket);
+                m.Reply(socket, TcpMessage.Success);
             }
         }
+    }
 
-        public class Message
+    public class TcpMessage
+    {
+        public const string FfmpegStart = "FfmpegStart";
+        public const string FfmpegStop = "FfmpegStop";
+        public const string Success = "OK";
+
+        public readonly ushort Size;
+        public string Name
         {
-            public const string FfmpegStart = "FfmpegStart";
-            public const string FfmpegStop = "FfmpegStop";
-            public const string Success = "OK";
+            get
+            {
+                for (int i = 2; i < NameBodyAsBytes.Length; i++)
+                    if (NameBodyAsBytes[i] == '\0')
+                        return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, 0, i);
+                return null;
+            }
+        }
+        public string Body
+        {
+            get
+            {
+                for (int i = 2; i < NameBodyAsBytes.Length; i++)
+                    if (NameBodyAsBytes[i] == '\0')
+                        return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, i + 1, NameBodyAsBytes.Length - i);
+                return null;
+            }
+        }
+        public byte[] BodyAsBytes
+        {
+            get
+            {
+                for (int i = 2; i < NameBodyAsBytes.Length; i++)
+                    if (NameBodyAsBytes[i] == '\0')
+                    {
+                        i++;
+                        byte[] body = new byte[NameBodyAsBytes.Length - i];
+                        NameBodyAsBytes.CopyTo(body, i);
+                        return body;
+                    }
+                return null;
+            }
+        }
+        public readonly byte[] NameBodyAsBytes;
 
-            public readonly ushort Size;
-            public string Name
-            {
-                get
-                {
-                    for (int i = 2; i < NameBodyAsBytes.Length; i++)
-                        if (NameBodyAsBytes[i] == '\0')
-                            return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, 0, i);
-                    return null;
-                }
-            }
-            public string Body
-            {
-                get
-                {
-                    for (int i = 2; i < NameBodyAsBytes.Length; i++)
-                        if (NameBodyAsBytes[i] == '\0')
-                            return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, i + 1, NameBodyAsBytes.Length - i);
-                    return null;
-                }
-            }
-            public byte[] BodyAsBytes
-            {
-                get
-                {
-                    for (int i = 2; i < NameBodyAsBytes.Length; i++)
-                        if (NameBodyAsBytes[i] == '\0')
-                        {
-                            i++;
-                            byte[] body = new byte[NameBodyAsBytes.Length - i];
-                            NameBodyAsBytes.CopyTo(body, i);
-                            return body;
-                        }
-                    return null;
-                }
-            }
-            public readonly byte[] NameBodyAsBytes;
+        public TcpMessage(byte[] name_body_as_bytes)
+        {
+            Size = (ushort)name_body_as_bytes.Length;
+            NameBodyAsBytes = name_body_as_bytes;
+        }
 
-            public Message(byte[] name_body_as_bytes)
-            {
-                Size = (ushort)name_body_as_bytes.Length;
-                NameBodyAsBytes = name_body_as_bytes;
-            }
+        public TcpMessage(string name, string body)
+        {
+            if (body == null)
+                body = ""; 
+            NameBodyAsBytes = new byte[name.Length + 1 + body.Length + 1];
+            Size = (ushort)(NameBodyAsBytes.Length);
+            int i = 0;
+            Encoding.ASCII.GetBytes(name).CopyTo(NameBodyAsBytes, i);
+            i += name.Length + 1;
+            Encoding.ASCII.GetBytes(body).CopyTo(NameBodyAsBytes, i);
+        }
 
-            public Message(string name, string body)
-            {
-                NameBodyAsBytes = new byte[name.Length + 1 + body.Length + 1];
-                Size = (ushort)(NameBodyAsBytes.Length);
-                int i = 0;
-                Encoding.ASCII.GetBytes(name).CopyTo(NameBodyAsBytes, i);
-                i += name.Length + 1;
-                Encoding.ASCII.GetBytes(body).CopyTo(NameBodyAsBytes, i);
-            }
+        static public TcpMessage Receive(Socket socket)
+        {
+            byte[] message_size_buffer = new byte[2];
+            if (socket.Receive(message_size_buffer, message_size_buffer.Length, SocketFlags.None) < message_size_buffer.Length)
+                throw new Exception("Could not read from socket the required count of bytes: " + message_size_buffer.Length);
+            ushort message_size = BitConverter.ToUInt16(message_size_buffer, 0);
+            byte[] message_buffer = new byte[message_size];
+            if (socket.Receive(message_buffer, message_buffer.Length, SocketFlags.None) < message_buffer.Length)
+                throw new Exception("Could not read from socket the required count of bytes: " + message_buffer.Length);
+            return new TcpMessage(message_buffer);
+        }
 
-            static public Message Receive(Socket socket)
-            {
-                byte[] message_size_buffer = new byte[2];
-                if (socket.Receive(message_size_buffer, message_size_buffer.Length, SocketFlags.None) < message_size_buffer.Length)
-                    throw new Exception("Could not read from socket the required count of bytes: " + message_size_buffer.Length);
-                ushort message_size = BitConverter.ToUInt16(message_size_buffer, 0);
-                byte[] message_buffer = new byte[message_size];
-                if (socket.Receive(message_buffer, message_buffer.Length, SocketFlags.None) < message_buffer.Length)
-                    throw new Exception("Could not read from socket the required count of bytes: " + message_buffer.Length);
-                return new Message(message_buffer);
-            }
+        public void Reply(Socket socket, string body)
+        {
+            TcpMessage m = new TcpMessage(Name, body);
+            m.send(socket);
+        }
 
-            public void Send(Socket socket)
-            {
-                byte[] sizeAsBytes = BitConverter.GetBytes(Size);
-                if (socket.Send(sizeAsBytes) < sizeAsBytes.Length)
-                    throw new Exception("Could not send to socket the required count of bytes: " + sizeAsBytes.Length);
-                if (socket.Send(NameBodyAsBytes) < NameBodyAsBytes.Length)
-                    throw new Exception("Could not send to socket the required count of bytes: " + NameBodyAsBytes.Length);
-            }
+        void send(Socket socket)
+        {
+            byte[] sizeAsBytes = BitConverter.GetBytes(Size);
+            if (socket.Send(sizeAsBytes) < sizeAsBytes.Length)
+                throw new Exception("Could not send to socket the required count of bytes: " + sizeAsBytes.Length);
+            if (socket.Send(NameBodyAsBytes) < NameBodyAsBytes.Length)
+                throw new Exception("Could not send to socket the required count of bytes: " + NameBodyAsBytes.Length);
+        }
+
+        public TcpMessage SendAndReceiveReply(Socket socket)
+        {
+            send(socket);
+            return Receive(socket);
         }
     }
 
