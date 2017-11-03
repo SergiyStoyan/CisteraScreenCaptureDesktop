@@ -50,7 +50,7 @@ namespace Cliver.CisteraScreenCapture
                 if (value)
                 {
                     SystemEvents_SessionSwitch(null, null);
-                    TcpServer.Start(Settings.General.ServerPort);
+                    TcpServer.Start(Settings.General.TcpServerPort);
                     Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
                 }
                 else
@@ -98,16 +98,16 @@ namespace Cliver.CisteraScreenCapture
                     string server_ip;
                     if (zhs.Count < 1)
                     {
-                        string m = "Service could not be resolved: " + Settings.General.ServiceName + ". Using default ip: " + Settings.General.DefaultServerIp;
+                        string m = "Service could not be resolved: " + Settings.General.ServiceName + ". Using default ip: " + Settings.General.DefaultTcpClientIp;
                         Log.Warning(m);
                         InfoWindow.Create(m, null, "OK", null, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
-                        server_ip = Settings.General.DefaultServerIp.ToString();
+                        server_ip = Settings.General.DefaultTcpClientIp.ToString();
                     }
                     else
                         server_ip = zhs[0].IPAddress;
 
                     HttpClient hc = new HttpClient();
-                    string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + Cliver.NetworkRoutines.GetLocalIpAsString(IPAddress.Parse(server_ip)) + "&port=" + Settings.General.ClientPort;
+                    string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + Cliver.NetworkRoutines.GetLocalIpAsString(IPAddress.Parse(server_ip)) + "&port=" + Settings.General.TcpServerPort;
                     Log.Inform("GETing: " + url);
                     HttpResponseMessage rm = await hc.GetAsync(url);
                     if (!rm.IsSuccessStatusCode)

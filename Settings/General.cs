@@ -19,9 +19,9 @@ namespace Cliver.CisteraScreenCapture
 
         public class GeneralSettings : Cliver.Settings
         {
-            public ushort ServerPort = 5900;
-            public string DefaultServerIp = (new IPAddress(new byte[] {127, 0, 0, 1})).ToString();
-            public ushort ClientPort = 5700;
+            public ushort TcpServerPort = 5900;//in general design TcpServer runs on Client
+            public string DefaultTcpClientIp = (new IPAddress(new byte[] {127, 0, 0, 1})).ToString();
+            public ushort TcpClientPort = 5700;//in general design TcpClient runs on Server
             public bool Ssl = false;
             public string ServiceName = "_cisterascreencapturecontroller._tcp";
             public string CapturedVideoSource = "";

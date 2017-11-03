@@ -19,17 +19,11 @@ namespace Cliver.CisteraScreenCaptureTestServer
         public MainForm()
         {
             InitializeComponent();
-
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, int.Parse(localPort.Text));
-            socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Bind(localEndPoint);
-            
+                        
             HttpListener listener = new HttpListener();
             // URI prefixes are required,
             // for example "http://127.0.0.1:5800/screenCapture/" (does not work in LAN)
-            listener.Prefixes.Add("http://192.168.2.15:800/");
+            listener.Prefixes.Add("http://192.168.2.15:80/");
             listener.Start();
             listener.BeginGetContext(http_callback, listener);
             
@@ -50,13 +44,27 @@ namespace Cliver.CisteraScreenCaptureTestServer
         }
         Socket socket;
 
+        private void bind()
+        {
+            if (socket != null)
+                return;
+            //IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            //IPAddress ipAddress = ipHostInfo.AddressList[0];
+            IPAddress ipAddress = NetworkRoutines.GetLocalIp(IPAddress.Parse("127.0.0.1"));
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, int.Parse(localPort.Text));
+            socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            socket.Bind(localEndPoint);
+        }
+
         private void start_Click(object sender, EventArgs e)
         {
+            bind();
+
             socket.Connect(remoteHost.Text, int.Parse(remotePort.Text));
 
             TcpMessage m = new TcpMessage(TcpMessage.FfmpegStart, "test 123");
             TcpMessage m2 = m.SendAndReceiveReply(socket);
-            
+
             socket.Disconnect(true);
         }
 

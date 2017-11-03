@@ -31,9 +31,9 @@ namespace Cliver.CisteraScreenCapture
 
             //WindowStartupLocation = WindowStartupLocation.CenterScreen;
             
-            ServerPort.Text = Settings.General.ServerPort.ToString();
-            DefaultServerIp.Text = Settings.General.DefaultServerIp.ToString();
-            ClientPort.Text = Settings.General.ClientPort.ToString();
+            ServerPort.Text = Settings.General.TcpClientPort.ToString();
+            DefaultServerIp.Text = Settings.General.DefaultTcpClientIp.ToString();
+            ClientPort.Text = Settings.General.TcpServerPort.ToString();
             Ssl.IsChecked = Settings.General.Ssl;
             ServiceName.Text = Settings.General.ServiceName;
         }
@@ -66,18 +66,18 @@ namespace Cliver.CisteraScreenCapture
 
                 if (!ushort.TryParse(ServerPort.Text, out v))
                     throw new Exception("Server port must be positive integer.");
-                Settings.General.ServerPort = v;
+                Settings.General.TcpClientPort = v;
 
                 if (string.IsNullOrWhiteSpace(DefaultServerIp.Text))
                     throw new Exception("Default server ip is not specified.");
                 IPAddress ia;
                 if(!IPAddress.TryParse(DefaultServerIp.Text, out ia))
                     throw new Exception("Default server ip could not be parsed.");
-                Settings.General.DefaultServerIp = ia.ToString(); ;
+                Settings.General.DefaultTcpClientIp = ia.ToString(); ;
 
                 if (!ushort.TryParse(ClientPort.Text, out v))
                     throw new Exception("Client port must be positive integer.");
-                Settings.General.ClientPort = v;
+                Settings.General.TcpServerPort = v;
 
                 Settings.General.Ssl = Ssl.IsChecked ?? false;
 
