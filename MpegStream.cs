@@ -49,8 +49,11 @@ namespace Cliver.CisteraScreenCapture
                 mpeg_stream_process.Kill();
             mpeg_stream_process = new Process();
             mpeg_stream_process.StartInfo = new ProcessStartInfo("ffmpeg", arguments);
+            job.MakeProcessLiveNoLongerThanJob(mpeg_stream_process);
+            mpeg_stream_process.Start();
         }
         static Process mpeg_stream_process = null;
+        static ProcessRoutines.Job job = new ProcessRoutines.Job();
 
         public  static void Stop()
         {

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Net;
 using Cliver.CisteraScreenCapture;
+using Zeroconf;
 
 namespace Cliver.CisteraScreenCaptureTestServer
 {
@@ -35,6 +36,9 @@ namespace Cliver.CisteraScreenCaptureTestServer
                 listener.Prefixes.Add(s);
             listener.Start();
             listener.BeginGetContext(http_callback, listener);
+            
+            
+            //Zeroconf..
 
             FormClosed += delegate
               {
@@ -49,7 +53,6 @@ namespace Cliver.CisteraScreenCaptureTestServer
               };
         }
         Socket socket;
-        HttpListener listener;
 
         private void start_Click(object sender, EventArgs e)
         {
@@ -85,4 +88,9 @@ namespace Cliver.CisteraScreenCaptureTestServer
             output.Close();
         }
     }
+
+    //public class ZeroConf: IZeroconfHost
+    //{
+
+    //}
 }
