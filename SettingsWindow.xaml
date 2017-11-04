@@ -6,9 +6,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Cliver.CisteraScreenCapture"
              mc:Ignorable="d" 
-        Title="Cistera Screen Capture Settings" Height="auto" Width="auto" 
+        Title="Cistera Screen Capture Settings" 
         WindowStyle="SingleBorderWindow" 
-        ResizeMode="CanResize" 
+        ResizeMode="CanResize"  
         Background="#dee1ff" Topmost="False" ShowInTaskbar="True" SizeToContent="WidthAndHeight" 
         FontFamily="Microsoft Sans Serif"
         FontSize="10pt" 
@@ -16,7 +16,7 @@
     <Window.Resources>
         <Style TargetType="{x:Type ComboBox}">
             <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Margin" Value="0,10,0,0"/>
             <Setter Property="Padding" Value="0, 0, 0, 0"/>
             <Setter Property="MinWidth" Value="30"/>
@@ -59,6 +59,19 @@
         </Style>
     </Window.Resources>
 
+    <!--Window.Triggers>
+        <EventTrigger RoutedEvent="Window.Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation 
+                        Storyboard.TargetName="opacityAnimatedButton"
+                        Storyboard.TargetProperty="(Window.Opacity)" 
+                        From="1" To="0" Duration="0:0:5" AutoReverse="True"  />
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </-->
+    
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"></ColumnDefinition>
@@ -81,21 +94,31 @@
                     <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
                 <Label Grid.Row="0" Grid.Column="0">Server port:</Label>
-            <TextBox Grid.Row="0" Grid.Column="1" Name="ServerPort" />
-        <Label Grid.Row="1" Grid.Column="0" >Server ip:</Label>
-                <TextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp"  MinWidth="100"/>
-        <Label Grid.Row="2" Grid.Column="0"   >Client port:</Label>
-                <TextBox Grid.Row="2" Grid.Column="1" Name="ClientPort"/>
+            <TextBox Grid.Row="0" Grid.Column="1" Name="ServerPort" MinWidth="60" HorizontalAlignment="Left"/>
+            <Label Grid.Row="1" Grid.Column="0" >Server ip:</Label>
+            <!--StackPanel Grid.Row="1" Grid.Column="1"  Orientation="Horizontal">
+                <TextBox Name="DefaultServerIp1"  MinWidth="20" MaxLength="3" HorizontalAlignment="Left"/>
+                <Label VerticalAlignment="Bottom" Margin="0">.</Label>
+                <TextBox Name="DefaultServerIp2"  MinWidth="20" MaxLength="3" HorizontalAlignment="Left"/>
+                <Label VerticalAlignment="Bottom" Margin="0">.</Label>
+                <TextBox Name="DefaultServerIp3"  MinWidth="20" MaxLength="3" HorizontalAlignment="Left"/>
+                <Label VerticalAlignment="Bottom" Margin="0">.</Label>
+                <TextBox Name="DefaultServerIp4"  MinWidth="20" MaxLength="3" HorizontalAlignment="Left"/>
+            </-->
+            <!--xctk:MaskedTextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp" Mask="000\.000\.000\.000" HorizontalAlignment="Left"></-->
+            <TextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp" MinWidth="100" HorizontalAlignment="Left"></TextBox>            
+            <Label Grid.Row="2" Grid.Column="0"   >Client port:</Label>
+            <TextBox Grid.Row="2" Grid.Column="1" Name="ClientPort" MinWidth="60" HorizontalAlignment="Left"/>
         <Label Grid.Row="3" Grid.Column="0"  >SSL:</Label>
                 <CheckBox Grid.Row="3" Grid.Column="1" Name="Ssl" />
                 <Label Grid.Row="4" Grid.Column="0"  >Service name:</Label>
             <TextBox Grid.Row="4" Grid.Column="1" Name="ServiceName" MinWidth="100" Text="_cisterascreencapturecontroller._tcp"/>
         <Label Grid.Row="5" Grid.Column="0"   >Service name:</Label>
-                <ComboBox Grid.Row="5" Grid.Column="1" Name="CapturedVideoSource" Height="20" HorizontalContentAlignment="Stretch" ></ComboBox>
+                <ComboBox Grid.Row="5" Grid.Column="1" Name="CapturedVideoSource" Height="20"></ComboBox>
             </Grid>
         <UniformGrid HorizontalAlignment="Right" Grid.Row="2" Grid.Column="1" Rows="1" Margin="0, 20, 0, 0">
             <Button x:Name="ok" Click="save" Content="OK"/>
