@@ -14,12 +14,17 @@
         FontSize="10pt" 
             >
     <Window.Resources>
+        <Style TargetType="{x:Type GroupBox}">
+            <Setter Property="Margin" Value="0,10,0,10"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
         <Style TargetType="{x:Type ComboBox}">
             <Setter Property="VerticalAlignment" Value="Top"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="Margin" Value="0,10,0,0"/>
             <Setter Property="Padding" Value="0, 0, 0, 0"/>
             <Setter Property="MinWidth" Value="30"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
         <Style TargetType="{x:Type Label}">
             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -41,7 +46,7 @@
             <Setter Property="MinHeight" Value="{Binding ActualHeight, ElementName=Monitors}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="HorizontalAlignment" Value="{Binding HorizontalAlignment, ElementName=Monitors}"/>
-            <Setter Property="Margin" Value="0,10,0,-5"/>
+            <Setter Property="Margin" Value="{Binding Margin, ElementName=Monitors}"/>
             <Setter Property="Padding" Value="{Binding Padding, ElementName=Monitors}"/>
             <Setter Property="MinWidth" Value="{Binding MinWidth, ElementName=Monitors}"/>
         </Style>
@@ -84,7 +89,9 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="10" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="1" Grid.Column="1">
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
+        <GroupBox Header="Network">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
@@ -92,15 +99,17 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
                 </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
                 <Label Grid.Row="0" Grid.Column="0">Server port:</Label>
-            <TextBox Grid.Row="0" Grid.Column="1" Name="ServerPort" MinWidth="60" HorizontalAlignment="Left"/>
-            <Label Grid.Row="1" Grid.Column="0" >Server ip:</Label>
-            <!--StackPanel Grid.Row="1" Grid.Column="1"  Orientation="Horizontal">
+                <TextBox Grid.Row="0" Grid.Column="1" Name="ServerPort" MinWidth="60" HorizontalAlignment="Left"/>
+                <Label Grid.Row="1" Grid.Column="0" >Server default ip:</Label>
+                <!--StackPanel Grid.Row="1" Grid.Column="1"  Orientation="Horizontal">
                 <TextBox Name="DefaultServerIp1"  MinWidth="20" MaxLength="3" HorizontalAlignment="Left"/>
                 <Label VerticalAlignment="Bottom" Margin="0">.</Label>
                 <TextBox Name="DefaultServerIp2"  MinWidth="20" MaxLength="3" HorizontalAlignment="Left"/>
@@ -109,18 +118,44 @@
                 <Label VerticalAlignment="Bottom" Margin="0">.</Label>
                 <TextBox Name="DefaultServerIp4"  MinWidth="20" MaxLength="3" HorizontalAlignment="Left"/>
             </-->
-            <!--xctk:MaskedTextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp" Mask="000\.000\.000\.000" HorizontalAlignment="Left"></-->
-            <TextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp" MinWidth="100" HorizontalAlignment="Left"></TextBox>            
-            <Label Grid.Row="2" Grid.Column="0"   >Client port:</Label>
-            <TextBox Grid.Row="2" Grid.Column="1" Name="ClientPort" MinWidth="60" HorizontalAlignment="Left"/>
-        <Label Grid.Row="3" Grid.Column="0"  >SSL:</Label>
+                <!--xctk:MaskedTextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp" Mask="000\.000\.000\.000" HorizontalAlignment="Left"></-->
+                <TextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp" MinWidth="100" HorizontalAlignment="Left"></TextBox>
+                <Label Grid.Row="2" Grid.Column="0"   >Client port:</Label>
+                <TextBox Grid.Row="2" Grid.Column="1" Name="ClientPort" MinWidth="60" HorizontalAlignment="Left"/>
+                <Label Grid.Row="3" Grid.Column="0"  >SSL:</Label>
                 <CheckBox Grid.Row="3" Grid.Column="1" Name="Ssl" />
                 <Label Grid.Row="4" Grid.Column="0"  >Service name:</Label>
-            <TextBox Grid.Row="4" Grid.Column="1" Name="ServiceName" MinWidth="100" Text="_cisterascreencapturecontroller._tcp"/>
-            <Label Grid.Row="5" Grid.Column="0">Video Source:</Label>
-                <ComboBox Grid.Row="5" Grid.Column="1" Name="Monitors" Height="20"></ComboBox>
+                <TextBox Grid.Row="4" Grid.Column="1" Name="ServiceName" MinWidth="100" Text="_cisterascreencapturecontroller._tcp"/>
             </Grid>
+        </GroupBox>
+        <GroupBox Header="Mpeg Stream">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="5" Grid.Column="0">Video Source:</Label>
+                <ComboBox Grid.Row="5" Grid.Column="1" Name="Monitors" Height="20"></ComboBox>
+                <Label Grid.Row="6" Grid.Column="0"  >Show proceess window:</Label>
+                <CheckBox Grid.Row="6" Grid.Column="1" Name="ShowMpegWindow" />
+                <Label Grid.Row="7" Grid.Column="0"  >Write output to log:</Label>
+                <CheckBox Grid.Row="7" Grid.Column="1" Name="WriteMpegOutput2Log" />
+            </Grid>
+            </GroupBox>
+        </StackPanel>
         <UniformGrid HorizontalAlignment="Right" Grid.Row="2" Grid.Column="1" Rows="1" Margin="0, 20, 0, 0">
+            <Button x:Name="logs" Click="show_log" Content="Logs"/>
+            <Button x:Name="reset" Click="reset_settings" Content="Reset"/>
             <Button x:Name="ok" Click="save" Content="OK"/>
             <Button x:Name="cancel" Click="close" Content="Cancel"/>
         </UniformGrid>

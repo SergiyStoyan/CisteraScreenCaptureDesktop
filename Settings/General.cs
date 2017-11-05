@@ -25,7 +25,9 @@ namespace Cliver.CisteraScreenCapture
             public bool Ssl = false;
             public string ServiceName = "_cisterascreencapturecontroller._tcp";
             public string CapturedMonitor = "";
-            
+            public bool ShowMpegWindow = false;
+            public bool WriteMpegOutput2Log = false;
+
             //[Newtonsoft.Json.JsonIgnore]
             //public System.Text.Encoding Encoding = System.Text.Encoding.Unicode;
 

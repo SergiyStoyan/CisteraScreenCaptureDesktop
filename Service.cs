@@ -49,9 +49,12 @@ namespace Cliver.CisteraScreenCapture
 
                 if (value)
                 {
-                    SystemEvents_SessionSwitch(null, null);
+                    //SystemEvents_SessionSwitch(null, null);
                     TcpServer.Start(Settings.General.TcpServerPort);
                     Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
+                    string user_name = SystemRoutines.GetWindowsUserName();
+                    if (!string.IsNullOrWhiteSpace(user_name))
+                        userLoggedOn();
                 }
                 else
                 {
@@ -91,6 +94,7 @@ namespace Cliver.CisteraScreenCapture
                         Log.Error("Session's user name is NULL.");
                         return;
                     }
+                    Log.Inform("User logged in: " + user_name);
 
                     //IReadOnlyList<IZeroconfHost> results = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");
                     IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(Settings.General.ServiceName);
@@ -129,6 +133,7 @@ namespace Cliver.CisteraScreenCapture
 
         static void userLoggedOff()
         {
+            Log.Inform("User logged off");
             TcpServer.Stop();
             MpegStream.Stop();
         }

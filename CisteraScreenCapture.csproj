@@ -155,12 +155,12 @@
     <Compile Include="InfoControl.xaml.cs" />
     <Compile Include="InfoWindow.xaml.cs" />
     <Compile Include="MpegStream.cs" />
+    <Compile Include="Settings\General.cs" />
     <Compile Include="Settings\View.cs" />
     <Compile Include="TcpServer.cs" />
     <Compile Include="Service.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings\General.cs" />
     <Compile Include="SysTrayForm.cs">
       <SubType>Form</SubType>
     </Compile>

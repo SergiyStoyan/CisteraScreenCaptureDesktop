@@ -19,6 +19,7 @@ using System.Management;
 using System.Threading;
 using System.Windows.Media.Animation;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace Cliver.CisteraScreenCapture
 {
@@ -63,6 +64,11 @@ namespace Cliver.CisteraScreenCapture
             //WindowStartupLocation = WindowStartupLocation.CenterScreen;
             //DefaultServerIp.ValueDataType = typeof(IPAddress);
 
+            set();
+        }
+
+        void set()
+        { 
             ServerPort.Text = Settings.General.TcpClientPort.ToString();
             DefaultServerIp.Text = Settings.General.DefaultTcpClientIp.ToString();
             ClientPort.Text = Settings.General.TcpServerPort.ToString();
@@ -76,7 +82,6 @@ namespace Cliver.CisteraScreenCapture
             //        MonitorName.Items.Add(monitor["Name"].ToString() + "|" + monitor["DeviceId"].ToString());// + "(" + monitor["ScreenHeight"].ToString() +"x"+ monitor["ScreenWidth"].ToString() + ")");
             //    }
             //}
-
             //foreach (var screen in System.Windows.Forms.Screen.AllScreens)
             //{
             //    // For each screen, add the screen properties to a list box.
@@ -86,7 +91,6 @@ namespace Cliver.CisteraScreenCapture
             //    //MonitorName.Items.Add("Working Area: " + screen.WorkingArea.ToString());
             //    MonitorName.Items.Add("Primary Screen: " + screen.Primary.ToString());
             //}
-
             Monitors.DisplayMemberPath = "Text";
             Monitors.SelectedValuePath = "Value";
             Win32.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32.RECT lprcMonitor, IntPtr dwData) =>
@@ -111,6 +115,9 @@ namespace Cliver.CisteraScreenCapture
                     Monitors.SelectedValue = Settings.General.CapturedMonitor;
                 else
                     Monitors.SelectedIndex = 0;
+            
+            ShowMpegWindow.IsChecked = Settings.General.ShowMpegWindow;
+            WriteMpegOutput2Log.IsChecked = Settings.General.WriteMpegOutput2Log;
         }
 
         static public void Open()
@@ -164,21 +171,36 @@ namespace Cliver.CisteraScreenCapture
                     throw new Exception("Captured Video Source is not specified.");
                 Settings.General.CapturedMonitor = (string)Monitors.SelectedValue;
 
+                Settings.General.ShowMpegWindow = ShowMpegWindow.IsChecked ?? false;
+
+                Settings.General.WriteMpegOutput2Log = WriteMpegOutput2Log.IsChecked ?? false;
+
                 Settings.General.Save();
                 Config.Reload();
 
                 bool running = Service.Running;
                 Service.Running = false;
                 Service.Running = running;
+
+                Close();
             }
             catch (Exception ex)
             {
                 Message.Exclaim(ex.Message);
             }
-            finally
-            {
-                Close();
-            }
+        }
+
+        void show_log(object sender, RoutedEventArgs e)
+        {
+            Process.Start(Log.WorkDir);
+        }
+
+        void reset_settings(object sender, RoutedEventArgs e)
+        {
+            if (!Message.YesNo("Do you want to reset settings to their initial state?"))
+                return;
+            Settings.General.Reset();
+            set();
         }
     }
 }
