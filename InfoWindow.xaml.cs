@@ -41,12 +41,15 @@ namespace Cliver.CisteraScreenCapture
         {
             return Create(ProgramRoutines.GetAppName(), text, image_url, action_name, action, box_brush, button_brush);
         }
-
+        
         public static InfoWindow Create(string title, string text, string image_url, string action_name, Action action, Brush box_brush = null, Brush button_brush = null)
         {
             lock (lock_object)
             {
                 InfoWindow w = null;
+
+                if (text.Length > Settings.View.InfoToastMaxTextLength)
+                    text = text.Remove(Settings.View.InfoToastMaxTextLength, text.Length - Settings.View.InfoToastMaxTextLength) + "<...>";
 
                 Action a = () =>
                 {
@@ -141,7 +144,7 @@ namespace Cliver.CisteraScreenCapture
             var a = new DoubleAnimation(0, 1, (Duration)TimeSpan.FromMilliseconds(300));
             this.BeginAnimation(UIElement.OpacityProperty, a);
 
-            Rect wa = System.Windows.SystemParameters.WorkArea;
+            Rect wa = SystemParameters.WorkArea;
             Storyboard sb;
             DoubleAnimation da;
             lock (ws)

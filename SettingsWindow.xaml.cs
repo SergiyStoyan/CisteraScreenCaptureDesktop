@@ -190,11 +190,11 @@ namespace Cliver.CisteraScreenCapture
             }
         }
 
-        void show_log(object sender, RoutedEventArgs e)
-        {
-            Process.Start(Log.WorkDir);
-        }
+        //class ValidationException:Exception
+        //{
 
+        //}
+               
         void reset_settings(object sender, RoutedEventArgs e)
         {
             if (!Message.YesNo("Do you want to reset settings to their initial state?"))

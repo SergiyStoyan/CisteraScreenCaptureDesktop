@@ -45,6 +45,8 @@ namespace Cliver.CisteraScreenCapture
 
         public static void Start(string arguments)
         {
+            if(job == null)
+                job = new ProcessRoutines.Job();
             if (mpeg_stream_process != null)
                 mpeg_stream_process.Kill();
             mpeg_stream_process = new Process();
@@ -53,12 +55,17 @@ namespace Cliver.CisteraScreenCapture
             mpeg_stream_process.Start();
         }
         static Process mpeg_stream_process = null;
-        static ProcessRoutines.Job job = new ProcessRoutines.Job();
+        static ProcessRoutines.Job job = null;
 
         public  static void Stop()
         {
             if (mpeg_stream_process != null)
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
+            if (job != null)
+            {
+                job.Dispose();
+                job = null;
+            }
             mpeg_stream_process = null;
         }
     }

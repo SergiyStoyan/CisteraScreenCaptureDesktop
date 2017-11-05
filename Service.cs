@@ -98,7 +98,7 @@ namespace Cliver.CisteraScreenCapture
 
                     //IReadOnlyList<IZeroconfHost> results = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");
                     IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(Settings.General.ServiceName);
-                    //IObservable<IZeroconfHost> zhs = ZeroconfResolver.Resolve(Settings.General.ServiceName);
+                    //IObservable<IZeroconfHost> zhs = ZeroconfResolver.Resolve(Settings.General.ServiceName);                    
                     string server_ip;
                     if (zhs.Count < 1)
                     {
@@ -111,7 +111,8 @@ namespace Cliver.CisteraScreenCapture
                         server_ip = zhs[0].IPAddress;
 
                     HttpClient hc = new HttpClient();
-                    string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + Cliver.NetworkRoutines.GetLocalIpAsString(IPAddress.Parse(server_ip)) + "&port=" + Settings.General.TcpServerPort;
+                    //string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + Cliver.NetworkRoutines.GetLocalIpAsString(IPAddress.Parse(server_ip)) + "&port=" + Settings.General.TcpServerPort;
+                    string url = "http://google.com";
                     Log.Inform("GETing: " + url);
                     HttpResponseMessage rm = await hc.GetAsync(url);
                     if (!rm.IsSuccessStatusCode)

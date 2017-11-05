@@ -23,6 +23,7 @@ namespace Cliver.CisteraScreenCapture
             public string InfoSoundFile = "alert.wav";
             public int InfoToastBottom = 100;
             public int InfoToastRight = 0;
+            public int InfoToastMaxTextLength = 200;
 
             //[Newtonsoft.Json.JsonIgnore]
             //public System.Text.Encoding Encoding = System.Text.Encoding.Unicode;

@@ -154,7 +154,6 @@
             </GroupBox>
         </StackPanel>
         <UniformGrid HorizontalAlignment="Right" Grid.Row="2" Grid.Column="1" Rows="1" Margin="0, 20, 0, 0">
-            <Button x:Name="logs" Click="show_log" Content="Logs"/>
             <Button x:Name="reset" Click="reset_settings" Content="Reset"/>
             <Button x:Name="ok" Click="save" Content="OK"/>
             <Button x:Name="cancel" Click="close" Content="Cancel"/>

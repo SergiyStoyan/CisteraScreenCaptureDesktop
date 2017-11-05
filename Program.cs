@@ -31,6 +31,9 @@ namespace Cliver.CisteraScreenCapture
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            
+            //Log.Initialize(Log.Mode.ONLY_LOG, null, true, 3);
+            //Config.Initialize()
 
             AppDomain.CurrentDomain.UnhandledException += delegate (object sender, UnhandledExceptionEventArgs args)
             {
