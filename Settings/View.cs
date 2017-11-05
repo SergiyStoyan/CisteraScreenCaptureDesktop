@@ -20,7 +20,8 @@ namespace Cliver.CisteraScreenCapture
         public class ViewSettings : Cliver.Settings
         {            
             public int InfoToastLifeTimeInSecs = 5;
-            public string InfoSoundFile = "alert.wav";
+            public string InfoSoundFile = "inform.wav";
+            public string ErrorSoundFile = "alert.wav";
             public int InfoToastBottom = 100;
             public int InfoToastRight = 0;
             public int InfoToastMaxTextLength = 200;

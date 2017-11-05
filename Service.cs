@@ -50,7 +50,7 @@ namespace Cliver.CisteraScreenCapture
                 if (value)
                 {
                     //SystemEvents_SessionSwitch(null, null);
-                    TcpServer.Start(Settings.General.TcpServerPort);
+                    //TcpServer.Start(Settings.General.TcpServerPort);
                     Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
                     string user_name = SystemRoutines.GetWindowsUserName();
                     if (!string.IsNullOrWhiteSpace(user_name))
@@ -58,8 +58,7 @@ namespace Cliver.CisteraScreenCapture
                 }
                 else
                 {
-                    TcpServer.Stop();
-                    MpegStream.Stop();
+                    userLoggedOff();
                     Microsoft.Win32.SystemEvents.SessionSwitch -= SystemEvents_SessionSwitch;
                 }
 
@@ -76,10 +75,10 @@ namespace Cliver.CisteraScreenCapture
         {
             //string user_name = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
             string user_name = SystemRoutines.GetWindowsUserName();
-            if (string.IsNullOrWhiteSpace(user_name))
-                userLoggedOff();
-            else
+            if (!string.IsNullOrWhiteSpace(user_name))
                 userLoggedOn();
+            else
+                userLoggedOff();
         }
 
         static void userLoggedOn()
@@ -104,15 +103,17 @@ namespace Cliver.CisteraScreenCapture
                     {
                         string m = "Service could not be resolved: " + Settings.General.ServiceName + ". Using default ip: " + Settings.General.DefaultTcpClientIp;
                         Log.Warning(m);
-                        InfoWindow.Create(m, null, "OK", null, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
+                        InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
                         server_ip = Settings.General.DefaultTcpClientIp.ToString();
                     }
                     else
                         server_ip = zhs[0].IPAddress;
 
+                    TcpServer.Start(IPAddress.Parse(server_ip), Settings.General.TcpServerPort);
+
                     HttpClient hc = new HttpClient();
-                    //string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + Cliver.NetworkRoutines.GetLocalIpAsString(IPAddress.Parse(server_ip)) + "&port=" + Settings.General.TcpServerPort;
-                    string url = "http://google.com";
+                    string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.Ip + "&port=" + Settings.General.TcpServerPort;
+                    //string url = "http://google.com";
                     Log.Inform("GETing: " + url);
                     HttpResponseMessage rm = await hc.GetAsync(url);
                     if (!rm.IsSuccessStatusCode)
@@ -127,7 +128,7 @@ namespace Cliver.CisteraScreenCapture
                 catch (Exception e)
                 {
                     Log.Error(e);
-                    InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
+                    InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
                 }
             });
         }

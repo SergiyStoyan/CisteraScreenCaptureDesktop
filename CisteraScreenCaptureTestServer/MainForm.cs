@@ -50,7 +50,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
                 return;
             //IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             //IPAddress ipAddress = ipHostInfo.AddressList[0];
-            IPAddress ipAddress = NetworkRoutines.GetLocalIp(IPAddress.Parse("127.0.0.1"));
+            IPAddress ipAddress = NetworkRoutines.GetLocalIpForDestination(IPAddress.Parse("127.0.0.1"));
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, int.Parse(localPort.Text));
             socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             socket.Bind(localEndPoint);

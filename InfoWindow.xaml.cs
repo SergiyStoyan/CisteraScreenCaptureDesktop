@@ -37,12 +37,12 @@ namespace Cliver.CisteraScreenCapture
         static System.Windows.Threading.Dispatcher dispatcher = null;
         static object lock_object = new object();
 
-        public static InfoWindow Create(string text, string image_url, string action_name, Action action, Brush box_brush = null, Brush button_brush = null)
+        public static InfoWindow Create(string text, string image_url, string action_name, Action action, string sound_file = null, Brush box_brush = null, Brush button_brush = null)
         {
-            return Create(ProgramRoutines.GetAppName(), text, image_url, action_name, action, box_brush, button_brush);
+            return Create(ProgramRoutines.GetAppName(), text, image_url, action_name, action, sound_file, box_brush, button_brush);
         }
         
-        public static InfoWindow Create(string title, string text, string image_url, string action_name, Action action, Brush box_brush = null, Brush button_brush = null)
+        public static InfoWindow Create(string title, string text, string image_url, string action_name, Action action, string sound_file = null, Brush box_brush = null, Brush button_brush = null)
         {
             lock (lock_object)
             {
@@ -63,11 +63,10 @@ namespace Cliver.CisteraScreenCapture
                         Thread.Sleep(Settings.View.InfoToastLifeTimeInSecs * 1000);
                         w.Dispatcher.BeginInvoke((Action)(() => { w.Close(); }));
                     });
-                    if (!string.IsNullOrWhiteSpace(Settings.View.InfoSoundFile))
-                    {
-                        SoundPlayer sp = new SoundPlayer(Settings.View.InfoSoundFile);
-                        sp.Play();
-                    }
+                    if (string.IsNullOrWhiteSpace(sound_file))
+                        sound_file = Settings.View.InfoSoundFile;
+                    SoundPlayer sp = new SoundPlayer(sound_file);
+                    sp.Play();
                 };
 
                 lock (ws)

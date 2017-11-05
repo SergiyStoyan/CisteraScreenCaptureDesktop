@@ -201,46 +201,77 @@ namespace Cliver.CisteraScreenCapture
     {
         //static Dictionary<ushort, TcpServer> servers = new Dictionary<ushort, TcpServer>(); 
 
-        static public void Start(int port)
+        static public void Start(IPAddress destination_ip, int port)
         {
             if (thread != null && thread.IsAlive)
                 return;
-            thread = ThreadRoutines.StartTry(() => { run(port); }, (Exception e) => {
-                Log.Error(e);
-                InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
+
+            if (!NetworkRoutines.IsNetworkAvailable())
+                throw new Exception("No network available.");
+            IPAddress ipAddress = NetworkRoutines.GetLocalIpForDestination(destination_ip);
+            //listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            //listeningSocket.Bind(localEndPoint);
+            ////listeningSocket.Listen(100);
+            server = new TcpListener(ipAddress, port);
+            server.Start();
+
+            thread = ThreadRoutines.StartTry(() => { run(destination_ip, port); }, (Exception e) =>
+            {
+                if (e is SocketException)
+                {
+                    Log.Warning(e);
+                }
+                else
+                {
+                    Log.Error(e);
+                    InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
+                }
             });
         }
         static Thread thread = null;
+
+        public  static IPAddress Ip
+        {
+            get
+            {
+                if (server == null)
+                    return null;
+                return ((IPEndPoint)server.LocalEndpoint).Address;
+            }
+        }
 
         static public void Stop()
         {
             if (thread == null)
                 return;
-            listeningSocket.Close(0);
+            //listeningSocket.Close(0);
+            server?.Stop();
             while (thread.IsAlive)
                 thread.Abort();
             thread = null;
         }
 
-        static void run(int port)
+        static void run(IPAddress destination_ip, int port)
         {
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostInfo.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, port);
-            listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            listeningSocket.Bind(localEndPoint);
-            listeningSocket.Listen(100);
+            //while (thread != null)
+            //{
+            //    //var r = listeningSocket.BeginAccept(accepted, listeningSocket);
+            //    Socket socket = listeningSocket.Accept();
+            //    if (connection != null)
+            //        connection.Dispose();
+            //    connection = TcpServerConnection.Start(socket);
+            //}
 
             while (thread != null)
             {
-                //var r = listeningSocket.BeginAccept(accepted, listeningSocket);
-                Socket socket = listeningSocket.Accept();
+                Socket socket = server.AcceptSocket();                
                 if (connection != null)
                     connection.Dispose();
                 connection = TcpServerConnection.Start(socket);
             }
         }
-        static Socket listeningSocket;
+        static TcpListener server = null;
+        //static Socket listeningSocket;
         static TcpServerConnection connection = null;
 
         //static void accepted(System.IAsyncResult result)

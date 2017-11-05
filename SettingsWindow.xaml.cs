@@ -178,9 +178,10 @@ namespace Cliver.CisteraScreenCapture
                 Settings.General.Save();
                 Config.Reload();
 
-                bool running = Service.Running;
-                Service.Running = false;
-                Service.Running = running;
+                //bool running = Service.Running;
+                //Service.Running = false;
+                //Service.Running = running;
+                Message.Exclaim("To engage the last changes, you should restart the service.");
 
                 Close();
             }

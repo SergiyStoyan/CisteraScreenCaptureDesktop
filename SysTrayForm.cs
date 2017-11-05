@@ -81,6 +81,7 @@ namespace Cliver.CisteraScreenCapture
 
         private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
-        }     
+            //settingsToolStripMenuItem_Click(null, null);
+        }
     }
 }
