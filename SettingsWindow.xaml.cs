@@ -18,7 +18,7 @@ using System.IO;
 using System.Management;
 using System.Threading;
 using System.Windows.Media.Animation;
-
+using System.Runtime.InteropServices;
 
 namespace Cliver.CisteraScreenCapture
 {
@@ -36,11 +36,11 @@ namespace Cliver.CisteraScreenCapture
                 this.MinHeight = this.ActualHeight;
                 this.MaxHeight = this.ActualHeight;
                 this.MinWidth = this.ActualWidth;
-             };
+            };
 
             IsVisibleChanged += (object sender, DependencyPropertyChangedEventArgs e) =>
             {
-                if(Visibility == Visibility.Visible)
+                if (Visibility == Visibility.Visible)
                 {
                     DoubleAnimation da = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300));
                     this.BeginAnimation(UIElement.OpacityProperty, da);
@@ -68,6 +68,49 @@ namespace Cliver.CisteraScreenCapture
             ClientPort.Text = Settings.General.TcpServerPort.ToString();
             Ssl.IsChecked = Settings.General.Ssl;
             ServiceName.Text = Settings.General.ServiceName;
+
+            //using (ManagementObjectSearcher monitors = new ManagementObjectSearcher("SELECT * FROM Win32_DesktopMonitor"))
+            //{
+            //    foreach (ManagementObject monitor in monitors.Get())
+            //    {
+            //        MonitorName.Items.Add(monitor["Name"].ToString() + "|" + monitor["DeviceId"].ToString());// + "(" + monitor["ScreenHeight"].ToString() +"x"+ monitor["ScreenWidth"].ToString() + ")");
+            //    }
+            //}
+
+            //foreach (var screen in System.Windows.Forms.Screen.AllScreens)
+            //{
+            //    // For each screen, add the screen properties to a list box.
+            //    MonitorName.Items.Add("Device Name: " + screen.DeviceName);
+            //    MonitorName.Items.Add("Bounds: " + screen.Bounds.ToString());
+            //    //MonitorName.Items.Add("Type: " + screen.GetType().ToString());
+            //    //MonitorName.Items.Add("Working Area: " + screen.WorkingArea.ToString());
+            //    MonitorName.Items.Add("Primary Screen: " + screen.Primary.ToString());
+            //}
+
+            Monitors.DisplayMemberPath = "Text";
+            Monitors.SelectedValuePath = "Value";
+            Win32.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32.RECT lprcMonitor, IntPtr dwData) =>
+              {
+                  Win32.MONITORINFOEX mi = new Win32.MONITORINFOEX();
+                  mi.Size = Marshal.SizeOf(mi.GetType());
+                  if (Win32.GetMonitorInfo(hMonitor, ref mi))
+                  {
+                      Win32.DISPLAY_DEVICE dd = new Win32.DISPLAY_DEVICE();
+                      dd.cb = Marshal.SizeOf(dd.GetType());
+                      Win32.EnumDisplayDevices(mi.DeviceName, 0, ref dd, 0);
+                      Monitors.Items.Add(new {
+                          Text = dd.DeviceString + " (" + (lprcMonitor.Bottom - lprcMonitor.Top) + "x" + (lprcMonitor.Right - lprcMonitor.Left) + ")",
+                          Value = dd.DeviceName
+                      });
+                  }
+                  return true;
+              };
+            Win32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
+            if (Monitors.Items.Count > 0)
+                if (Settings.General.CapturedMonitor != null)
+                    Monitors.SelectedValue = Settings.General.CapturedMonitor;
+                else
+                    Monitors.SelectedIndex = 0;
         }
 
         static public void Open()
@@ -103,9 +146,9 @@ namespace Cliver.CisteraScreenCapture
                 if (string.IsNullOrWhiteSpace(DefaultServerIp.Text))
                     throw new Exception("Default server ip is not specified.");
                 IPAddress ia;
-                if(!IPAddress.TryParse(DefaultServerIp.Text, out ia))
+                if (!IPAddress.TryParse(DefaultServerIp.Text, out ia))
                     throw new Exception("Default server ip is not a valid value.");
-                Settings.General.DefaultTcpClientIp = ia.ToString(); 
+                Settings.General.DefaultTcpClientIp = ia.ToString();
 
                 if (!ushort.TryParse(ClientPort.Text, out v))
                     throw new Exception("Client port must be an between 0 and " + ushort.MaxValue);
@@ -113,14 +156,16 @@ namespace Cliver.CisteraScreenCapture
 
                 Settings.General.Ssl = Ssl.IsChecked ?? false;
 
-                if (string.IsNullOrWhiteSpace(Settings.General.ServiceName))
+                if (string.IsNullOrWhiteSpace(ServiceName.Text))
                     throw new Exception("Service name is not specified.");
                 Settings.General.ServiceName = ServiceName.Text.Trim();
 
+                if (Monitors.SelectedIndex < 0)
+                    throw new Exception("Captured Video Source is not specified.");
+                Settings.General.CapturedMonitor = (string)Monitors.SelectedValue;
+
                 Settings.General.Save();
                 Config.Reload();
-
-                Close();
 
                 bool running = Service.Running;
                 Service.Running = false;
@@ -129,6 +174,10 @@ namespace Cliver.CisteraScreenCapture
             catch (Exception ex)
             {
                 Message.Exclaim(ex.Message);
+            }
+            finally
+            {
+                Close();
             }
         }
     }
