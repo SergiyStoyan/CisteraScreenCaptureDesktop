@@ -197,10 +197,6 @@
       <Project>{aca94788-bed1-4b8e-94ef-e54293e8d139}</Project>
       <Name>CliverRoutines</Name>
     </ProjectReference>
-    <ProjectReference Include="GlobalHotKey\GlobalHotKey.csproj">
-      <Project>{309c707f-4dfa-4412-9f54-4c0627b626af}</Project>
-      <Name>GlobalHotKey</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AboutForm.resx">

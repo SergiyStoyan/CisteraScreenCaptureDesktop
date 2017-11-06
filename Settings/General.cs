@@ -24,7 +24,7 @@ namespace Cliver.CisteraScreenCapture
             public ushort TcpClientPort = 5700;//in general design TcpClient runs on Server
             public bool Ssl = false;
             public string ServiceName = "_cisterascreencapturecontroller._tcp";
-            public string CapturedMonitor = "";
+            public string CapturedMonitorDeviceName = "";
             public bool ShowMpegWindow = false;
             public bool WriteMpegOutput2Log = false;
 

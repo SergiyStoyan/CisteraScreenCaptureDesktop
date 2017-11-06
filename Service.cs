@@ -22,7 +22,6 @@ using System.Configuration;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Windows.Input;
-using GlobalHotKey;
 using System.Net.Http;
 using Zeroconf;
 using System.Diagnostics;

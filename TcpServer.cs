@@ -50,10 +50,16 @@ namespace Cliver.CisteraScreenCapture
 
         TcpServerConnection(Socket socket)
         {
+            Log.Inform("Starting connection from " + ((IPEndPoint)socket.RemoteEndPoint).Address + ":" + ((IPEndPoint)socket.RemoteEndPoint).Port);
+
             this.socket = socket;
             IPEndPoint iep = (IPEndPoint)socket.LocalEndPoint;
             connections[(ushort)iep.Port] = this;
-            thread = ThreadRoutines.StartTry(run);
+            thread = ThreadRoutines.StartTry(
+                run,
+                (Exception e) => { Log.Error(e); },
+                () => { Dispose(); }
+                );
         }
         Socket socket = null;
         Thread thread = null;
@@ -67,11 +73,15 @@ namespace Cliver.CisteraScreenCapture
         {
             if (socket == null)
                 return;
+
+            Log.Inform("Closing connection from " + ((IPEndPoint)socket.RemoteEndPoint).Address + ":" + ((IPEndPoint)socket.RemoteEndPoint).Port);
+
             lock (connections)
             {
                 IPEndPoint iep = (IPEndPoint)socket.LocalEndPoint;
                 connections.Remove((ushort)iep.Port);
             }
+            socket.Disconnect(false);
             socket.Close();
             socket = null;
             thread.Abort();
@@ -83,20 +93,28 @@ namespace Cliver.CisteraScreenCapture
             while (thread != null)
             {
                 TcpMessage m = TcpMessage.Receive(socket);
-                switch (m.Name)
+                string reply = TcpMessage.Success;
+                try
                 {
-                    case TcpMessage.FfmpegStart:
-                        MpegStream.Start(m.Body);
-                        InfoWindow.Create("Mpeg stream started to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
-                        break;
-                    case TcpMessage.FfmpegStop:
-                        InfoWindow.Create("Stopping mpeg stream to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
-                        MpegStream.Stop();
-                        break;
-                    default:
-                        throw new Exception("Unknown message: " + m.Name);
+                    switch (m.Name)
+                    {
+                        case TcpMessage.FfmpegStart:
+                            MpegStream.Start(m.BodyAsText);
+                            InfoWindow.Create("Mpeg stream started to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
+                            break;
+                        case TcpMessage.FfmpegStop:
+                            InfoWindow.Create("Stopping mpeg stream to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
+                            MpegStream.Stop();
+                            break;
+                        default:
+                            throw new Exception("Unknown message: " + m.Name);
+                    }
                 }
-                m.Reply(socket, TcpMessage.Success);
+                catch(Exception e)
+                {
+                    reply = e.Message;
+                }
+                m.Reply(socket, reply);
             }
         }
     }
@@ -112,19 +130,24 @@ namespace Cliver.CisteraScreenCapture
         {
             get
             {
-                for (int i = 2; i < NameBodyAsBytes.Length; i++)
+                for (int i = 0; i < NameBodyAsBytes.Length; i++)
                     if (NameBodyAsBytes[i] == '\0')
                         return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, 0, i);
                 return null;
             }
         }
-        public string Body
+        public string BodyAsText
         {
             get
             {
-                for (int i = 2; i < NameBodyAsBytes.Length; i++)
+                for (int i = 0; i < NameBodyAsBytes.Length; i++)
                     if (NameBodyAsBytes[i] == '\0')
-                        return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, i + 1, NameBodyAsBytes.Length - i);
+                    {
+                        i++;
+                        if (i < NameBodyAsBytes.Length)
+                            return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, i, NameBodyAsBytes.Length - i);
+                        return "";
+                    }
                 return null;
             }
         }
@@ -137,7 +160,8 @@ namespace Cliver.CisteraScreenCapture
                     {
                         i++;
                         byte[] body = new byte[NameBodyAsBytes.Length - i];
-                        NameBodyAsBytes.CopyTo(body, i);
+                        if (i < NameBodyAsBytes.Length)
+                            NameBodyAsBytes.CopyTo(body, i);
                         return body;
                     }
                 return null;

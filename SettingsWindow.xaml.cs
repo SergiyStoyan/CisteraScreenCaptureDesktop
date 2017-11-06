@@ -111,8 +111,8 @@ namespace Cliver.CisteraScreenCapture
               };
             Win32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
             if (Monitors.Items.Count > 0)
-                if (Settings.General.CapturedMonitor != null)
-                    Monitors.SelectedValue = Settings.General.CapturedMonitor;
+                if (Settings.General.CapturedMonitorDeviceName != null)
+                    Monitors.SelectedValue = Settings.General.CapturedMonitorDeviceName;
                 else
                     Monitors.SelectedIndex = 0;
             
@@ -169,7 +169,7 @@ namespace Cliver.CisteraScreenCapture
 
                 if (Monitors.SelectedIndex < 0)
                     throw new Exception("Captured Video Source is not specified.");
-                Settings.General.CapturedMonitor = (string)Monitors.SelectedValue;
+                Settings.General.CapturedMonitorDeviceName = (string)Monitors.SelectedValue;
 
                 Settings.General.ShowMpegWindow = ShowMpegWindow.IsChecked ?? false;
 
