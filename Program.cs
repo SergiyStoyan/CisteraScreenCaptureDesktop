@@ -32,9 +32,6 @@ namespace Cliver.CisteraScreenCapture
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             
-            //Log.Initialize(Log.Mode.ONLY_LOG, null, true, 3);
-            //Config.Initialize()
-
             AppDomain.CurrentDomain.UnhandledException += delegate (object sender, UnhandledExceptionEventArgs args)
             {
                 Exception e = (Exception)args.ExceptionObject;
@@ -45,8 +42,12 @@ namespace Cliver.CisteraScreenCapture
             Message.TopMost = true;
 
             Log.Initialize(Log.Mode.ONLY_LOG);
-            //Cliver.Config.Initialize(new string[] { "General" });
+            //Config.Initialize(new string[] { "General" });
             Cliver.Config.Reload();
+
+            //ProcessRoutines.Protection.Protect
+            //SystemEvents.SessionEnding += delegate
+            //  { };
         }        
 
         [STAThread]

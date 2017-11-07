@@ -33,11 +33,20 @@ namespace Cliver.CisteraScreenCapture
                 if (Service.Running)
                     notifyIcon.Icon = Icon;
                 else
-                    notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetGreyScale(Icon.ToBitmap()).GetHicon());
+                    //notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetGreyScale(Icon.ToBitmap()).GetHicon());
+                    notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetInverted(Icon.ToBitmap()).GetHicon());
             };
         }
 
         public static readonly SysTray This = new SysTray();
+
+        bool isAllowed()
+        {
+            if (WindowsUserRoutines.CurrentUserIsAdministrator())
+                return true;
+            Message.Exclaim("This action is permitted for Administrators only.");
+            return false;
+        }
 
         private void notifyIcon1_DoubleClick(object sender, EventArgs e)
         {
@@ -46,6 +55,8 @@ namespace Cliver.CisteraScreenCapture
 
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!isAllowed())
+                return;
             SettingsWindow.Open();
         }
 
@@ -56,6 +67,8 @@ namespace Cliver.CisteraScreenCapture
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (!isAllowed())
+                return;
             //Program.Exit();
             Environment.Exit(0);
         }
@@ -71,7 +84,7 @@ namespace Cliver.CisteraScreenCapture
 
         private void StartStop_CheckedChanged(object sender, EventArgs e)
         {
-            Service.Running = StartStop.Checked;
+            //Service.Running = StartStop.Checked;
         }
 
         private void workDirToolStripMenuItem_Click(object sender, EventArgs e)
@@ -82,6 +95,16 @@ namespace Cliver.CisteraScreenCapture
         private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
             //settingsToolStripMenuItem_Click(null, null);
+        }
+
+        private void StartStop_Click(object sender, EventArgs e)
+        {
+            if (!isAllowed())
+            {
+                StartStop.Checked = Service.Running;
+                return;
+            }
+            Service.Running = StartStop.Checked;
         }
     }
 }

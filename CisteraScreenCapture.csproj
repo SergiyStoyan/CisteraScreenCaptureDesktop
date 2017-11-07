@@ -12,7 +12,7 @@
     <AssemblyName>CisteraScreenCapture</AssemblyName>
     <StartupObject>
     </StartupObject>
-    <ApplicationIcon>Resources\3RINGS~1.ICO</ApplicationIcon>
+    <ApplicationIcon>cistera.ico</ApplicationIcon>
     <IsWebBootstrapper>true</IsWebBootstrapper>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileUpgradeFlags>
@@ -190,6 +190,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="cistera.ico" />
     <Content Include="Resources\3RINGS~1.ICO" />
   </ItemGroup>
   <ItemGroup>

@@ -51,7 +51,7 @@ namespace Cliver.CisteraScreenCapture
                     //SystemEvents_SessionSwitch(null, null);
                     //TcpServer.Start(Settings.General.TcpServerPort);
                     Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
-                    string user_name = SystemRoutines.GetWindowsUserName();
+                    string user_name = WindowsUserRoutines.GetUserName();
                     if (!string.IsNullOrWhiteSpace(user_name))
                         userLoggedOn();
                 }
@@ -73,7 +73,7 @@ namespace Cliver.CisteraScreenCapture
         private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
         {
             //string user_name = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            string user_name = SystemRoutines.GetWindowsUserName();
+            string user_name = WindowsUserRoutines.GetUserName();
             if (!string.IsNullOrWhiteSpace(user_name))
                 userLoggedOn();
             else
@@ -86,7 +86,7 @@ namespace Cliver.CisteraScreenCapture
             {
                 try
                 {
-                    string user_name = SystemRoutines.GetWindowsUserName();
+                    string user_name = WindowsUserRoutines.GetUserName();
                     if (user_name == null)
                     {
                         Log.Error("Session's user name is NULL.");

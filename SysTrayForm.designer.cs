@@ -78,6 +78,7 @@
             this.StartStop.Size = new System.Drawing.Size(152, 22);
             this.StartStop.Text = "Run";
             this.StartStop.CheckedChanged += new System.EventHandler(this.StartStop_CheckedChanged);
+            this.StartStop.Click += new System.EventHandler(this.StartStop_Click);
             // 
             // workDirToolStripMenuItem
             // 
