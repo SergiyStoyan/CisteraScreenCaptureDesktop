@@ -116,7 +116,6 @@ namespace Cliver.CisteraScreenCapture
 
                     HttpClient hc = new HttpClient();
                     string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
-                    //string url = "http://google.com";
                     Log.Inform("GETing: " + url);
                     HttpResponseMessage rm = await hc.GetAsync(url);
                     if (!rm.IsSuccessStatusCode)

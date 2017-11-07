@@ -111,7 +111,7 @@ namespace Cliver.CisteraScreenCapture
         async private void stateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             List<string> ls = new List<string>();
-            ls.Add("Service: " + (Service.Running ? "Started" : "Stopped"));
+            ls.Add("Monitor: " + (Service.Running ? "started" : "stopped"));
             ls.Add("Logged in user: " + WindowsUserRoutines.GetUserName());
 
             //var domains = await ZeroconfResolver.BrowseDomainsAsync();
@@ -120,9 +120,9 @@ namespace Cliver.CisteraScreenCapture
             string service = Settings.General.ServiceType + Settings.General.ServiceDomain;
             IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service);
             if (zhs.Count < 1)
-                ls.Add("Server name '" + service + "' could not be resolved.");
+                ls.Add("Service '" + service + "' could not be resolved.");
             else
-                ls.Add("Server name '" + service + "' has been resolved to: " + zhs[0].IPAddress);
+                ls.Add("Service '" + service + "' has been resolved to: " + zhs[0].IPAddress);
 
             if (!TcpServer.Running)
                 ls.Add("Tcp listening: -");
