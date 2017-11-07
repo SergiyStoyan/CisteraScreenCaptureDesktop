@@ -37,8 +37,6 @@ namespace Cliver.CisteraScreenCapture
 
         public static void Start(string arguments)
         {
-            if (antiZombieJob == null)
-                antiZombieJob = new ProcessRoutines.AntiZombieJob();
             if (mpeg_stream_process != null)
                 try
                 {
@@ -105,10 +103,9 @@ namespace Cliver.CisteraScreenCapture
                 };
             }
             mpeg_stream_process.Start();
-            antiZombieJob.MakeProcessLiveNoLongerThanJob(mpeg_stream_process);
+            ProcessRoutines.AntiZombieTracker.Track(mpeg_stream_process);
         }
         static Process mpeg_stream_process = null;
-        static ProcessRoutines.AntiZombieJob antiZombieJob = null;
         static string commandLine = null;
 
         public static void Stop()
@@ -118,11 +115,7 @@ namespace Cliver.CisteraScreenCapture
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
             }
-            if (antiZombieJob != null)
-            {
-                antiZombieJob.Dispose();
-                antiZombieJob = null;
-            }
+            ProcessRoutines.AntiZombieTracker.KillTrackedProcesses();
             commandLine = null;
         }
 

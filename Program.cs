@@ -73,8 +73,10 @@ namespace Cliver.CisteraScreenCapture
         {
             try
             {
-               //MpegStream.Start("-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
-               
+                //MpegStream.Start("-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
+                //Thread.Sleep(2000);
+                //MpegStream.Stop();
+
                 ProcessRoutines.RunSingleProcessOnly();
 
                 Service.Running = true;
