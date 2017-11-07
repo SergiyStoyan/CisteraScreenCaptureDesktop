@@ -120,9 +120,9 @@ namespace Cliver.CisteraScreenCapture
             string service = Settings.General.ServiceType + Settings.General.ServiceDomain;
             IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service);
             if (zhs.Count < 1)
-                ls.Add("Server: " + service + " could not be resolved");
+                ls.Add("Server name '" + service + "' could not be resolved.");
             else
-                ls.Add("Server: " + service + " has been resolved to " + zhs[0].IPAddress);
+                ls.Add("Server name '" + service + "' has been resolved to: " + zhs[0].IPAddress);
 
             if (!TcpServer.Running)
                 ls.Add("Tcp listening: -");
@@ -139,7 +139,7 @@ namespace Cliver.CisteraScreenCapture
             else
                 ls.Add("Mpeg stream: " + MpegStream.CommandLine);
 
-            Message.Inform(string.Join("\r\n", ls));
+            Message.Inform(string.Join("\r\n\r\n", ls));
         }
     }
 }
