@@ -45,14 +45,14 @@ namespace Cliver.CisteraScreenCapture
 
         public static void Start(string arguments)
         {
-            if(job == null)
-                job = new ProcessRoutines.Job();
+            if (antiZombieJob == null)
+                antiZombieJob = new ProcessRoutines.AntiZombieJob();
             if (mpeg_stream_process != null)
                 try
                 {
                     ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Log.Warning(e);
                 }
@@ -79,24 +79,49 @@ namespace Cliver.CisteraScreenCapture
             Log.Inform("Launching:\r\n" + "ffmpeg " + arguments);
 
             mpeg_stream_process = new Process();
-            mpeg_stream_process.StartInfo = new ProcessStartInfo("ffmpeg", arguments);
-            job.MakeProcessLiveNoLongerThanJob(mpeg_stream_process);
+            mpeg_stream_process.StartInfo = new ProcessStartInfo("ffmpeg.exe", arguments)
+            {
+                ErrorDialog = false,
+                UseShellExecute = false,
+                CreateNoWindow = !Settings.General.ShowMpegWindow
+                //WindowStyle = ProcessWindowStyle.Hidden;
+            };
+            if (Settings.General.WriteMpegOutput2Log)
+            {
+                mpeg_stream_process.StartInfo.RedirectStandardOutput = true;
+                mpeg_stream_process.StartInfo.RedirectStandardError = true;
+
+                string file0 = Log.WorkDir + "ffmpeg_" + DateTime.Now.ToString("yyMMddHHmmss");
+                string file = file0;
+                for (int count = 1; File.Exists(file); count++)
+                    file = file0 + "_" + count.ToString();
+                TextWriter tw = new StreamWriter(file, false);
+                mpeg_stream_process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                {
+                    tw.Write(e.Data);
+                };
+                mpeg_stream_process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                {
+                    tw.Write(e.Data);
+                };
+            }
             mpeg_stream_process.Start();
+            antiZombieJob.MakeProcessLiveNoLongerThanJob(mpeg_stream_process);
         }
         static Process mpeg_stream_process = null;
-        static ProcessRoutines.Job job = null;
+        static ProcessRoutines.AntiZombieJob antiZombieJob = null;
 
-        public  static void Stop()
+        public static void Stop()
         {
             if (mpeg_stream_process != null)
             {
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
             }
-            if (job != null)
+            if (antiZombieJob != null)
             {
-                job.Dispose();
-                job = null;
+                antiZombieJob.Dispose();
+                antiZombieJob = null;
             }
         }
     }
