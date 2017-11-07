@@ -45,9 +45,11 @@ namespace Cliver.CisteraScreenCapture
             //Config.Initialize(new string[] { "General" });
             Cliver.Config.Reload();
 
-            //ProcessRoutines.Protection.Protect
+            //ProcessRoutines.CurrentProcessProtection.On = true;
             //SystemEvents.SessionEnding += delegate
-            //  { };
+            //  {
+            //      ProcessRoutines.CurrentProcessProtection.On = false;
+            //  };
         }        
 
         [STAThread]

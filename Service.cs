@@ -48,8 +48,8 @@ namespace Cliver.CisteraScreenCapture
 
                 if (value)
                 {
-                    //SystemEvents_SessionSwitch(null, null);
-                    //TcpServer.Start(Settings.General.TcpServerPort);
+                    Log.Inform("Starting...");
+                    
                     Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
                     string user_name = WindowsUserRoutines.GetUserName();
                     if (!string.IsNullOrWhiteSpace(user_name))
@@ -57,6 +57,8 @@ namespace Cliver.CisteraScreenCapture
                 }
                 else
                 {
+                    Log.Inform("Stopping...");
+
                     userLoggedOff();
                     Microsoft.Win32.SystemEvents.SessionSwitch -= SystemEvents_SessionSwitch;
                 }
