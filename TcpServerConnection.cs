@@ -115,14 +115,17 @@ namespace Cliver.CisteraScreenCapture
             while (thread != null)
             {
                 TcpMessage m = TcpMessage.Receive(socket);
+
+                Log.Inform("Tcp message received: " + m.Name + "\r\n" + m.BodyAsText);
+
                 string reply = TcpMessage.Success;
                 try
                 {
                     switch (m.Name)
                     {
                         case TcpMessage.FfmpegStart:
+                            InfoWindow.Create("Starting mpeg stream to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
                             MpegStream.Start(m.BodyAsText);
-                            InfoWindow.Create("Mpeg stream started to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
                             break;
                         case TcpMessage.FfmpegStop:
                             InfoWindow.Create("Stopping mpeg stream to " + socket.RemoteEndPoint.ToString() + " by server request.", null, "OK", null);
@@ -136,6 +139,9 @@ namespace Cliver.CisteraScreenCapture
                 {
                     reply = e.Message;
                 }
+
+                Log.Inform("Tcp message sending: " + m.Name + "\r\n" + reply);
+
                 m.Reply(socket, reply);
             }
         }

@@ -19,16 +19,22 @@ namespace Cliver.CisteraScreenCaptureTestServer
         public MainForm()
         {
             InitializeComponent();
-                        
+
             HttpListener listener = new HttpListener();
-            // URI prefixes are required,
-            // for example "http://127.0.0.1:5800/screenCapture/" (does not work in LAN)
-            //listener.Prefixes.Add("http://192.168.2.15:80/");
-            listener.Prefixes.Add("http://127.0.0.1:80/");
-            listener.Prefixes.Add("http://localhost:80/");
-            listener.Start();
-            listener.BeginGetContext(http_callback, listener);
-            
+            try
+            {
+                // URI prefixes are required,
+                // for example "http://127.0.0.1:5800/screenCapture/" (does not work in LAN)
+                //listener.Prefixes.Add("http://192.168.2.15:80/");
+                listener.Prefixes.Add("http://127.0.0.1:80/");
+                listener.Prefixes.Add("http://localhost:80/");
+                listener.Start();
+                listener.BeginGetContext(http_callback, listener);
+            }
+            catch(Exception e)
+            {
+
+            }
             
             //Zeroconf..
 

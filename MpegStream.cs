@@ -84,18 +84,24 @@ namespace Cliver.CisteraScreenCapture
                 mpeg_stream_process.StartInfo.RedirectStandardOutput = true;
                 mpeg_stream_process.StartInfo.RedirectStandardError = true;
 
-                string file0 = Log.WorkDir + "ffmpeg_" + DateTime.Now.ToString("yyMMddHHmmss");
+                string file0 = Log.WorkDir + "\\ffmpeg_" + DateTime.Now.ToString("yyMMddHHmmss");
                 string file = file0;
                 for (int count = 1; File.Exists(file); count++)
                     file = file0 + "_" + count.ToString();
                 TextWriter tw = new StreamWriter(file, false);
+                tw.WriteLine("STARTED: " + DateTime.Now.ToString());
+                tw.WriteLine(">" + commandLine);
+                tw.WriteLine("\r\n");
+                tw.FlushAsync();
                 mpeg_stream_process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
                 {
                     tw.Write(e.Data);
+                    tw.FlushAsync();
                 };
                 mpeg_stream_process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
                 {
                     tw.Write(e.Data);
+                    tw.FlushAsync();
                 };
             }
             mpeg_stream_process.Start();

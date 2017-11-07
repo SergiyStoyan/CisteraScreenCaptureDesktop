@@ -23,6 +23,13 @@ using System.Configuration;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
+/// <summary>
+/// TBD:
+/// - SSL;
+/// - service;
+/// - check logins;
+/// - add display area;
+/// </summary>
 namespace Cliver.CisteraScreenCapture
 {
     public class Program
@@ -66,6 +73,8 @@ namespace Cliver.CisteraScreenCapture
         {
             try
             {
+               //MpegStream.Start("-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
+               
                 ProcessRoutines.RunSingleProcessOnly();
 
                 Service.Running = true;
