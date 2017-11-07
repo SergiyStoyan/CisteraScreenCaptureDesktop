@@ -38,14 +38,8 @@ namespace Cliver.CisteraScreenCapture
         public static void Start(string arguments)
         {
             if (mpeg_stream_process != null)
-                try
-                {
-                    ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
-                }
-                catch (Exception e)
-                {
-                    Log.Warning(e);
-                }
+                Log.Warning("The previous MpegStream was not stopped!");
+            Stop();
 
             int x = 0, y = 0, w = 0, h = 0;
             Win32.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32.RECT lprcMonitor, IntPtr dwData) =>
@@ -112,10 +106,11 @@ namespace Cliver.CisteraScreenCapture
         {
             if (mpeg_stream_process != null)
             {
+                Log.Inform("Terminating:\r\n" + commandLine);
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
             }
-            ProcessRoutines.AntiZombieTracker.KillTrackedProcesses();
+            ProcessRoutines.AntiZombieTracker.KillTrackedProcesses();//to close the job object
             commandLine = null;
         }
 
