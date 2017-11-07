@@ -96,26 +96,26 @@ namespace Cliver.CisteraScreenCapture
                     }
                     Log.Inform("User logged in: " + user_name);
 
-                    //var domains = await ZeroconfResolver.BrowseDomainsAsync();
-                    //var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
-                    //IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");//worked for server: "_printer._tcp"
-                    IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(Settings.General.ServiceName);
-                    //IObservable<IZeroconfHost> zhs = ZeroconfResolver.Resolve(Settings.General.ServiceName);                    
+                    string service = Settings.General.ServiceType + Settings.General.ServiceDomain;
+                    IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service);
                     string server_ip;
                     if (zhs.Count < 1)
                     {
-                        string m = "Service could not be resolved: " + Settings.General.ServiceName + ". Using default ip: " + Settings.General.DefaultTcpClientIp;
+                        server_ip = Settings.General.TcpClientDefaultIp.ToString();
+                        string m = "Service could not be resolved: " + service + ". Using default ip: " + server_ip;
                         Log.Warning(m);
                         InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
-                        server_ip = Settings.General.DefaultTcpClientIp.ToString();
                     }
                     else
+                    {
                         server_ip = zhs[0].IPAddress;
+                        Log.Inform("Service: " + service + " has been resolved to: " + server_ip);
+                    }
 
-                    TcpServer.Start(IPAddress.Parse(server_ip), Settings.General.TcpServerPort);
+                    TcpServer.Start(Settings.General.TcpServerPort, IPAddress.Parse(server_ip));
 
                     HttpClient hc = new HttpClient();
-                    string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.Ip + "&port=" + Settings.General.TcpServerPort;
+                    string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
                     //string url = "http://google.com";
                     Log.Inform("GETing: " + url);
                     HttpResponseMessage rm = await hc.GetAsync(url);

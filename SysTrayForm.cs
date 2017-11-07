@@ -15,10 +15,11 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
+using Zeroconf;
 
 namespace Cliver.CisteraScreenCapture
 {
-    public partial class SysTray : Form 
+    public partial class SysTray : Form
     {
         SysTray()
         {
@@ -105,6 +106,40 @@ namespace Cliver.CisteraScreenCapture
                 return;
             }
             Service.Running = StartStop.Checked;
+        }
+
+        async private void stateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<string> ls = new List<string>();
+            ls.Add("Service: " + (Service.Running ? "Started" : "Stopped"));
+            ls.Add("Logged in user: " + WindowsUserRoutines.GetUserName());
+
+            //var domains = await ZeroconfResolver.BrowseDomainsAsync();
+            //var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
+            //IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");//worked for server: "_printer._tcp"
+            string service = Settings.General.ServiceType + Settings.General.ServiceDomain;
+            IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service);
+            if (zhs.Count < 1)
+                ls.Add("Server: " + service + " could not be resolved");
+            else
+                ls.Add("Server: " + service + " has been resolved to " + zhs[0].IPAddress);
+
+            if (!TcpServer.Running)
+                ls.Add("Tcp listening: -");
+            else
+                ls.Add("Tcp listening on: " + TcpServer.LocalIp + ":" + TcpServer.LocalPort);
+
+            if (TcpServer.Connection == null)
+                ls.Add("Tcp connection: -");
+            else
+                ls.Add("Tcp connection to: " + TcpServer.Connection.RemoteIp + ":" + TcpServer.Connection.RemotePort);
+
+            if (!MpegStream.Running)
+                ls.Add("Mpeg stream: -");
+            else
+                ls.Add("Mpeg stream: " + MpegStream.CommandLine);
+
+            Message.Inform(string.Join("\r\n", ls));
         }
     }
 }

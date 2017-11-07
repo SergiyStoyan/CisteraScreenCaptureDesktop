@@ -157,6 +157,8 @@
     <Compile Include="MpegStream.cs" />
     <Compile Include="Settings\General.cs" />
     <Compile Include="Settings\View.cs" />
+    <Compile Include="TcpMessage.cs" />
+    <Compile Include="TcpServerConnection.cs" />
     <Compile Include="TcpServer.cs" />
     <Compile Include="Service.cs" />
     <Compile Include="Program.cs" />

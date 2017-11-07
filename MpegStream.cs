@@ -35,14 +35,6 @@ namespace Cliver.CisteraScreenCapture
         {
         }
 
-        public static bool Running
-        {
-            get
-            {
-                return mpeg_stream_process != null; 
-            }
-        }
-
         public static void Start(string arguments)
         {
             if (antiZombieJob == null)
@@ -75,8 +67,9 @@ namespace Cliver.CisteraScreenCapture
             Win32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
             string source = " -offset_x " + x + " -offset_y " + y + " -video_size " + w + "x" + h + " -show_region 1 -i desktop ";
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);
+            commandLine = "ffmpeg " + arguments;
 
-            Log.Inform("Launching:\r\n" + "ffmpeg " + arguments);
+            Log.Inform("Launching:\r\n" + commandLine);
 
             mpeg_stream_process = new Process();
             mpeg_stream_process.StartInfo = new ProcessStartInfo("ffmpeg.exe", arguments)
@@ -110,6 +103,7 @@ namespace Cliver.CisteraScreenCapture
         }
         static Process mpeg_stream_process = null;
         static ProcessRoutines.AntiZombieJob antiZombieJob = null;
+        static string commandLine = null;
 
         public static void Stop()
         {
@@ -122,6 +116,23 @@ namespace Cliver.CisteraScreenCapture
             {
                 antiZombieJob.Dispose();
                 antiZombieJob = null;
+            }
+            commandLine = null;
+        }
+
+        public static bool Running
+        {
+            get
+            {
+                return mpeg_stream_process != null;
+            }
+        }
+
+        public static string CommandLine
+        {
+            get
+            {
+                return commandLine;
             }
         }
     }

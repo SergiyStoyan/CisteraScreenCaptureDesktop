@@ -90,7 +90,7 @@
             <RowDefinition Height="10" />
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical">
-        <GroupBox Header="Network">
+        <GroupBox Header="TCP Communication">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />
@@ -106,8 +106,8 @@
                     <ColumnDefinition Width="auto"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Row="0" Grid.Column="0">Server port:</Label>
-                <TextBox Grid.Row="0" Grid.Column="1" Name="ServerPort" MinWidth="60" HorizontalAlignment="Left"/>
+                    <!--Label Grid.Row="0" Grid.Column="0">Server default port:</>
+                    <TextBox Grid.Row="0" Grid.Column="1" Name="ServerDefaultPort" MinWidth="60" HorizontalAlignment="Left"/-->
                 <Label Grid.Row="1" Grid.Column="0" >Server default ip:</Label>
                 <!--StackPanel Grid.Row="1" Grid.Column="1"  Orientation="Horizontal">
                 <TextBox Name="DefaultServerIp1"  MinWidth="20" MaxLength="3" HorizontalAlignment="Left"/>
@@ -119,16 +119,34 @@
                 <TextBox Name="DefaultServerIp4"  MinWidth="20" MaxLength="3" HorizontalAlignment="Left"/>
             </-->
                 <!--xctk:MaskedTextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp" Mask="000\.000\.000\.000" HorizontalAlignment="Left"></-->
-                <TextBox Grid.Row="1" Grid.Column="1" Name="DefaultServerIp" MinWidth="100" HorizontalAlignment="Left"></TextBox>
+                <TextBox Grid.Row="1" Grid.Column="1" Name="ServerDefaultIp" MinWidth="100" HorizontalAlignment="Left"></TextBox>
                 <Label Grid.Row="2" Grid.Column="0"   >Client port:</Label>
-                <TextBox Grid.Row="2" Grid.Column="1" Name="ClientPort" MinWidth="60" HorizontalAlignment="Left"/>
-                <Label Grid.Row="3" Grid.Column="0"  >SSL:</Label>
-                <CheckBox Grid.Row="3" Grid.Column="1" Name="Ssl" />
-                <Label Grid.Row="4" Grid.Column="0"  >Service name:</Label>
-                <TextBox Grid.Row="4" Grid.Column="1" Name="ServiceName" MinWidth="100" Text="_cisterascreencapturecontroller._tcp"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" Name="ClientPort" MinWidth="60" HorizontalAlignment="Left"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="mDNS Request">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Row="3" Grid.Column="0"  >Service domain:</Label>
+                    <TextBox Grid.Row="3" Grid.Column="1" Name="ServiceDomain" MinWidth="100" Text=".local"/>
+                    <Label Grid.Row="4" Grid.Column="0"  >Service type:</Label>
+                <TextBox Grid.Row="4" Grid.Column="1" Name="ServiceType" MinWidth="100" Text="_cisterascreencapturecontroller._tcp"/>
             </Grid>
         </GroupBox>
-        <GroupBox Header="Mpeg Stream">
+        <GroupBox Header="MPEG Stream">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto" />

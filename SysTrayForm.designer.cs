@@ -38,6 +38,7 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RightClickMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,11 +58,12 @@
             this.settingsToolStripMenuItem,
             this.StartStop,
             this.workDirToolStripMenuItem,
+            this.stateToolStripMenuItem,
             this.aboutToolStripMenuItem,
             this.toolStripSeparator1,
             this.exitToolStripMenuItem});
             this.RightClickMenu.Name = "Menu";
-            this.RightClickMenu.Size = new System.Drawing.Size(153, 142);
+            this.RightClickMenu.Size = new System.Drawing.Size(153, 164);
             // 
             // settingsToolStripMenuItem
             // 
@@ -106,6 +108,13 @@
             this.exitToolStripMenuItem.Text = "Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
+            // stateToolStripMenuItem
+            // 
+            this.stateToolStripMenuItem.Name = "stateToolStripMenuItem";
+            this.stateToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.stateToolStripMenuItem.Text = "State";
+            this.stateToolStripMenuItem.Click += new System.EventHandler(this.stateToolStripMenuItem_Click);
+            // 
             // SysTray
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -133,5 +142,6 @@
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem StartStop;
         private System.Windows.Forms.ToolStripMenuItem workDirToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stateToolStripMenuItem;
     }
 }

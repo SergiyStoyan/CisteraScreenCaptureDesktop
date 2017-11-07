@@ -69,11 +69,11 @@ namespace Cliver.CisteraScreenCapture
 
         void set()
         { 
-            ServerPort.Text = Settings.General.TcpClientPort.ToString();
-            DefaultServerIp.Text = Settings.General.DefaultTcpClientIp.ToString();
+            //ServerDefaultPort.Text = Settings.General.TcpClientDefaultPort.ToString();
+            ServerDefaultIp.Text = Settings.General.TcpClientDefaultIp.ToString();
             ClientPort.Text = Settings.General.TcpServerPort.ToString();
-            Ssl.IsChecked = Settings.General.Ssl;
-            ServiceName.Text = Settings.General.ServiceName;
+            ServiceDomain.Text = Settings.General.ServiceDomain;
+            ServiceType.Text = Settings.General.ServiceType;
 
             //using (ManagementObjectSearcher monitors = new ManagementObjectSearcher("SELECT * FROM Win32_DesktopMonitor"))
             //{
@@ -146,26 +146,28 @@ namespace Cliver.CisteraScreenCapture
             {
                 ushort v;
 
-                if (!ushort.TryParse(ServerPort.Text, out v))
-                    throw new Exception("Server port must be an integer between 0 and " + ushort.MaxValue);
-                Settings.General.TcpClientPort = v;
+                //if (!ushort.TryParse(ServerDefaultPort.Text, out v))
+                //    throw new Exception("Server port must be an integer between 0 and " + ushort.MaxValue);
+                //Settings.General.TcpClientDefaultPort = v;
 
-                if (string.IsNullOrWhiteSpace(DefaultServerIp.Text))
+                if (string.IsNullOrWhiteSpace(ServerDefaultIp.Text))
                     throw new Exception("Default server ip is not specified.");
                 IPAddress ia;
-                if (!IPAddress.TryParse(DefaultServerIp.Text, out ia))
+                if (!IPAddress.TryParse(ServerDefaultIp.Text, out ia))
                     throw new Exception("Default server ip is not a valid value.");
-                Settings.General.DefaultTcpClientIp = ia.ToString();
+                Settings.General.TcpClientDefaultIp = ia.ToString();
 
                 if (!ushort.TryParse(ClientPort.Text, out v))
                     throw new Exception("Client port must be an between 0 and " + ushort.MaxValue);
                 Settings.General.TcpServerPort = v;
 
-                Settings.General.Ssl = Ssl.IsChecked ?? false;
+                if (string.IsNullOrWhiteSpace(ServiceDomain.Text))
+                    throw new Exception("Service domian is not specified.");
+                Settings.General.ServiceDomain = ServiceDomain.Text.Trim();
 
-                if (string.IsNullOrWhiteSpace(ServiceName.Text))
-                    throw new Exception("Service name is not specified.");
-                Settings.General.ServiceName = ServiceName.Text.Trim();
+                if (string.IsNullOrWhiteSpace(ServiceType.Text))
+                    throw new Exception("Service type is not specified.");
+                Settings.General.ServiceType = ServiceType.Text.Trim();
 
                 if (Monitors.SelectedIndex < 0)
                     throw new Exception("Captured Video Source is not specified.");
