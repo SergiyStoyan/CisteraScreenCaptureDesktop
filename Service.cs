@@ -96,7 +96,9 @@ namespace Cliver.CisteraScreenCapture
                     }
                     Log.Inform("User logged in: " + user_name);
 
-                    //IReadOnlyList<IZeroconfHost> results = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");
+                    //var domains = await ZeroconfResolver.BrowseDomainsAsync();
+                    //var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
+                    //IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");//worked for server: "_printer._tcp"
                     IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(Settings.General.ServiceName);
                     //IObservable<IZeroconfHost> zhs = ZeroconfResolver.Resolve(Settings.General.ServiceName);                    
                     string server_ip;

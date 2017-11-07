@@ -178,10 +178,12 @@ namespace Cliver.CisteraScreenCapture
                 Settings.General.Save();
                 Config.Reload();
 
-                //bool running = Service.Running;
-                //Service.Running = false;
-                //Service.Running = running;
-                Message.Exclaim("To engage the last changes, you should restart the service.");
+                if (Message.YesNo("The last changes have been saved. However, to engage them, the service must be restarted. All the present connections if any will be broken. Proceed with restarting?", null, Message.Icons.Exclamation))
+                {
+                    bool running = Service.Running;
+                    Service.Running = false;
+                    Service.Running = running;
+                }
 
                 Close();
             }
