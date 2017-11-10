@@ -25,8 +25,10 @@ namespace Cliver.CisteraScreenCaptureTestServer
 
             mpegCommandLine.Text = "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920";
 
-            start.Enabled = false;
-            stop.Enabled = false;
+            CreateHandle();
+
+            startEnabled = false;
+            stopEnabled = false;
             
             HttpListener listener = new HttpListener();
             try
@@ -159,9 +161,19 @@ namespace Cliver.CisteraScreenCaptureTestServer
 
         void disconnect_socket()
         {
-            socket.Disconnect(false);
-            socket.Close();
-            socket = null;
+            try
+            {
+                socket.Disconnect(false);
+            }
+            catch { }
+            try
+            {
+                socket.Close();
+            }
+            finally
+            {
+                socket = null;
+            }
         }
 
         private void start_Click(object sender, EventArgs e)
@@ -176,8 +188,8 @@ namespace Cliver.CisteraScreenCaptureTestServer
 
                 //Message.Inform("Response: " + m2.BodyAsText);
                 stateText = "MPEG started";
-                start.Enabled = false;
-                stop.Enabled = true;
+                startEnabled = false;
+                stopEnabled = true;
             }
             catch (Exception ex)
             {
@@ -201,8 +213,8 @@ namespace Cliver.CisteraScreenCaptureTestServer
 
                 //Message.Inform("Response: " + m2.BodyAsText);
                 stateText = "MPEG stopped";
-                start.Enabled = true;
-                stop.Enabled = false;
+                startEnabled = true;
+                stopEnabled = false;
             }
             catch (Exception ex)
             {
@@ -263,7 +275,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
             //Message.Inform(string.Join("\r\n", ss));
 
             stateText = string.Join("\r\n", ss);
-            start.Enabled = true;
+            startEnabled = true;
         }
         string remoteHost;
         string remotePort;
@@ -275,6 +287,28 @@ namespace Cliver.CisteraScreenCaptureTestServer
                 state.BeginInvoke(() =>
                 {
                     state.Text = value;
+                });
+            }
+        }
+
+        bool startEnabled
+        {
+            set
+            {
+                start.BeginInvoke(() =>
+                {
+                    start.Enabled = value;
+                });
+            }
+        }
+
+        bool stopEnabled
+        {
+            set
+            {
+                stop.BeginInvoke(() =>
+                {
+                    stop.Enabled = value;
                 });
             }
         }
