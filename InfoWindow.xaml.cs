@@ -33,47 +33,46 @@ namespace Cliver.CisteraScreenCapture
         }
 
         static Window invisible_owner_w = null;
-        static object lock_object = new object();
+        static System.Windows.Threading.Dispatcher dispatcher = null;
 
         public static InfoWindow Create(string text, string image_url, string action_name, Action action, string sound_file = null, Brush box_brush = null, Brush button_brush = null)
         {
             return Create(ProgramRoutines.GetAppName(), text, image_url, action_name, action, sound_file, box_brush, button_brush);
         }
-        
+
         public static InfoWindow Create(string title, string text, string image_url, string action_name, Action action, string sound_file = null, Brush box_brush = null, Brush button_brush = null)
         {
-            lock (lock_object)
+            InfoWindow w = null;
+
+            if (text.Length > Settings.View.InfoToastMaxTextLength)
+                text = text.Remove(Settings.View.InfoToastMaxTextLength, text.Length - Settings.View.InfoToastMaxTextLength) + "<...>";
+
+            Action a = () =>
             {
-                InfoWindow w = null;
-
-                if (text.Length > Settings.View.InfoToastMaxTextLength)
-                    text = text.Remove(Settings.View.InfoToastMaxTextLength, text.Length - Settings.View.InfoToastMaxTextLength) + "<...>";
-
-                Action a = () =>
+                w = new InfoWindow(title, text, image_url, action_name, action);
+                w.SetAppearance(box_brush, button_brush);
+                WindowInteropHelper h = new WindowInteropHelper(w);
+                h.EnsureHandle();
+                w.Show();
+                ThreadRoutines.StartTry(() =>
                 {
-                    w = new InfoWindow(title, text, image_url, action_name, action);
-                    w.SetAppearance(box_brush, button_brush);
-                    WindowInteropHelper h = new WindowInteropHelper(w);
-                    h.EnsureHandle();
-                    w.Show();
-                    ThreadRoutines.StartTry(() =>
+                    Thread.Sleep(Settings.View.InfoToastLifeTimeInSecs * 1000);
+                    w.Dispatcher.BeginInvoke((Action)(() => { w.Close(); }));
+                });
+                if (string.IsNullOrWhiteSpace(sound_file))
+                    sound_file = Settings.View.InfoSoundFile;
+                SoundPlayer sp = new SoundPlayer(sound_file);
+                sp.Play();
+            };
+
+            lock (ws)
+            {
+                if (dispatcher == null)
+                {//!!!the following code does not work in static constructor because creates a deadlock!!!
+                    Thread t = ThreadRoutines.StartTry(() =>
                     {
-                        Thread.Sleep(Settings.View.InfoToastLifeTimeInSecs * 1000);
-                        w.Dispatcher.BeginInvoke((Action)(() => { w.Close(); }));
-                    });
-                    if (string.IsNullOrWhiteSpace(sound_file))
-                        sound_file = Settings.View.InfoSoundFile;
-                    SoundPlayer sp = new SoundPlayer(sound_file);
-                    sp.Play();
-                };
-
-                lock (ws)
-                {
-                    if (invisible_owner_w == null)
-                    {//!!!the following code does not work in static constructor because creates a deadlock!!!
-                        ThreadRoutines.StartTry(() =>
-                        {
-                            //this window is used to hide notification windows from Alt+Tab panel
+                        if (invisible_owner_w == null)
+                        {//this window is used to hide notification windows from Alt+Tab panel
                             invisible_owner_w = new Window();
                             invisible_owner_w.Width = 0;
                             invisible_owner_w.Height = 0;
@@ -81,15 +80,22 @@ namespace Cliver.CisteraScreenCapture
                             invisible_owner_w.ShowInTaskbar = false;
                             invisible_owner_w.Show();
                             invisible_owner_w.Hide();
-                        }, null, null, true, ApartmentState.STA);
-                        if (!SleepRoutines.WaitForCondition(() => { return invisible_owner_w != null && !invisible_owner_w.IsVisible; }, 3000))
-                            throw new Exception("Could not get dispatcher.");
-                    }
+                        }
+
+                        if (dispatcher == null)
+                        {
+                            dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
+                            System.Windows.Threading.Dispatcher.Run();
+                        }
+                    }, null, null, true, ApartmentState.STA);
                 }
-                invisible_owner_w.Dispatcher.Invoke(a);
-                return w;
             }
+            if (dispatcher == null && !SleepRoutines.WaitForCondition(() => { return dispatcher != null; }, 3000))
+                throw new Exception("Could not get dispatcher.");
+            dispatcher.Invoke(a);
+            return w;
         }
+        static Thread t = null;
 
         InfoWindow()
         {

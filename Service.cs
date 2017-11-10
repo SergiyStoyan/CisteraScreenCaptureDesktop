@@ -124,18 +124,14 @@ namespace Cliver.CisteraScreenCapture
                     if (!IPAddress.TryParse(server_ip, out ip))
                         throw new Exception("Server IP is not valid: " + server_ip);
                     TcpServer.Start(Settings.General.TcpServerPort, ip);
-
-                    HttpClient hc = new HttpClient();
+                    
                     string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
                     Log.Inform("GETing: " + url);
-                    HttpResponseMessage rm = await hc.GetAsync(url);
-                    if (!rm.IsSuccessStatusCode)
-                        throw new Exception(rm.ReasonPhrase);
-                    if (rm.Content == null)
-                        throw new Exception("Response is empty");
-                    string responseContent = await rm.Content.ReadAsStringAsync();
-                    if (responseContent.Trim() != "OK")
-                        throw new Exception("Response: " + responseContent);
+                     
+                    WebClient wc = new WebClient();
+                    string r =   wc.DownloadString(url);
+                    if (r.Trim() != "OK")
+                        throw new Exception("Response: " + r);
                 }
                 catch (Exception e)
                 {

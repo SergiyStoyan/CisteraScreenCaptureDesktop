@@ -44,7 +44,7 @@ namespace Cliver.CisteraScreenCapture
                         notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetInverted(Icon.ToBitmap()).GetHicon());
                         title += " stopped";
                     }
-                    notifyIcon.Text += " started";
+                    notifyIcon.Text = title + " started";
                 });
             };
         }

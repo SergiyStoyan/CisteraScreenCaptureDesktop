@@ -24,9 +24,9 @@ namespace Cliver.CisteraScreenCaptureTestServer
             InitializeComponent();
 
             mpegCommandLine.Text = "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920";
+            state.Text = "";
 
             CreateHandle();
-            stateText = "";
             startEnabled = false;
             stopEnabled = false;
             
@@ -290,7 +290,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
             {
                 state.BeginInvoke(() =>
                 {
-                    state.Text = value;
+                    state.Text += DateTime.Now.ToString("yy-MM-dd hh:mm:ss") + " " + value + "\r\n";
                 });
             }
         }

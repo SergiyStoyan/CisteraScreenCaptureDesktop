@@ -25,9 +25,10 @@ namespace Cliver.CisteraScreenCapture
     {
         public TcpServerConnection(Socket socket)
         {
+            this.socket = socket;
+
             Log.Inform("Starting connection from " + RemoteIp + ":" + RemotePort);
 
-            this.socket = socket;
             thread = ThreadRoutines.StartTry(
                 run,
                 (Exception e) => { Log.Error(e); },
