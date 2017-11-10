@@ -112,15 +112,25 @@ namespace Cliver.CisteraScreenCapture
         {
             List<string> ls = new List<string>();
             ls.Add("Monitor: " + (Service.Running ? "started" : "stopped"));
+            ls.Add("(The values are current and so may differ from those used by Service last time)\r\n");
             ls.Add("Logged in user: " + WindowsUserRoutines.GetUserName());
 
-            var domains = await ZeroconfResolver.BrowseDomainsAsync();
-            var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
+            //var domains = await ZeroconfResolver.BrowseDomainsAsync();
+            //var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
             //IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");//worked for server: "_printer._tcp"
             string service = Settings.General.GetServiceName();
             IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10);
+            string server_ip;
             if (zhs.Count < 1)
-                ls.Add("Service '" + service + "' could not be resolved.");
+            {
+                server_ip = Settings.General.TcpClientDefaultIp.ToString();
+                ls.Add("Service '" + service + "' could not be resolved. Using default ip: " + server_ip);
+            }
+            else if (zhs.Where(x => x.IPAddress != null).FirstOrDefault() == null)
+            {
+                server_ip = Settings.General.TcpClientDefaultIp.ToString();
+                ls.Add("Resolution of service '" + service + "' has no IP defined. Using default ip: " + server_ip);
+            }
             else
                 ls.Add("Service '" + service + "' has been resolved to: " + zhs[0].IPAddress);
 

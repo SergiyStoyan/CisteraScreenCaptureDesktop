@@ -51,7 +51,8 @@ namespace Cliver.CisteraScreenCapture
 
             if (socket != null)
             {
-                socket.Disconnect(false);
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Disconnect(true);
                 socket.Close();
                 socket = null;
             }

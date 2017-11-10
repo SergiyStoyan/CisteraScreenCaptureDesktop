@@ -163,7 +163,12 @@ namespace Cliver.CisteraScreenCaptureTestServer
         {
             try
             {
-                socket.Disconnect(false);
+                socket.Shutdown(SocketShutdown.Both);
+            }
+            catch { }
+            try
+            {
+                socket.Disconnect(true);
             }
             catch { }
             try
@@ -232,9 +237,9 @@ namespace Cliver.CisteraScreenCaptureTestServer
             string username = null;
             HttpListener listener = (HttpListener)result.AsyncState;
             HttpListenerContext context = listener.EndGetContext(result);
+            HttpListenerRequest request = context.Request;
             try
             {
-                HttpListenerRequest request = context.Request;
                 Match m = Regex.Match(request.Url.Query, @"username=(.+?)(&|$)");
                 if (!m.Success)
                     throw new Exception("No username in http request.");
@@ -265,13 +270,11 @@ namespace Cliver.CisteraScreenCaptureTestServer
             output.Close();
 
             List<string> ss = new List<string>();
-            ss.Add("Received HTTP request: ");
+            ss.Add("Received HTTP request: " + request.Url);
             ss.Add("username: " + username);
             ss.Add("remoteHost: " + remoteHost);
             ss.Add("remotePort: " + remotePort);
-            ss.Add("\r\n");
-            ss.Add("Sent response: ");
-            ss.Add(responseString);
+            ss.Add("Sent HTTP response: " + responseString);
             //Message.Inform(string.Join("\r\n", ss));
 
             stateText = string.Join("\r\n", ss);

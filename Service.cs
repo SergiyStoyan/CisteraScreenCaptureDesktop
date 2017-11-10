@@ -25,6 +25,7 @@ using System.Windows.Input;
 using System.Net.Http;
 using Zeroconf;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace Cliver.CisteraScreenCapture
 {
@@ -98,7 +99,7 @@ namespace Cliver.CisteraScreenCapture
 
                     string service = Settings.General.GetServiceName();
                     IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10);
-                    string server_ip;
+                    
                     if (zhs.Count < 1)
                     {
                         server_ip = Settings.General.TcpClientDefaultIp.ToString();
@@ -142,6 +143,22 @@ namespace Cliver.CisteraScreenCapture
                     InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
                 }
             });
+        }
+        static string user_name;
+        public static string UserName
+        {
+            get
+            {
+                return user_name;
+            }
+        }
+        static string server_ip;
+        public static string ServerIp
+        {
+            get
+            {
+                return server_ip;
+            }
         }
 
         static void userLoggedOff()
