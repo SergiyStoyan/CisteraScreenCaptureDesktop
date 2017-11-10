@@ -96,8 +96,8 @@ namespace Cliver.CisteraScreenCapture
                     }
                     Log.Inform("User logged in: " + user_name);
 
-                    string service = Settings.General.ServiceType + Settings.General.ServiceDomain;
-                    IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service);
+                    string service = Settings.General.GetServiceName();
+                    IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10);
                     string server_ip;
                     if (zhs.Count < 1)
                     {

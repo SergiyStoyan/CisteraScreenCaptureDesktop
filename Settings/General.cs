@@ -23,11 +23,16 @@ namespace Cliver.CisteraScreenCapture
             public string TcpClientDefaultIp = (new IPAddress(new byte[] {127, 0, 0, 1})).ToString();//in general vision TcpClient runs on Server
             //public ushort TcpClientDefaultPort = 5700;
             public bool Ssl = false;
-            public string ServiceDomain = ".local";
+            public string ServiceDomain = "cistera";
             public string ServiceType = "_cisterascreencapturecontroller._tcp";
             public string CapturedMonitorDeviceName = "";
             public bool ShowMpegWindow = false;
             public bool WriteMpegOutput2Log = false;
+
+            public string GetServiceName()
+            {
+                return ServiceType.Trim().Trim('.') + "." + ServiceDomain.Trim().Trim('.') + ".";
+            }
 
             //[Newtonsoft.Json.JsonIgnore]
             //public System.Text.Encoding Encoding = System.Text.Encoding.Unicode;

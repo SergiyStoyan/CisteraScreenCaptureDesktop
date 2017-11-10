@@ -114,11 +114,11 @@ namespace Cliver.CisteraScreenCapture
             ls.Add("Monitor: " + (Service.Running ? "started" : "stopped"));
             ls.Add("Logged in user: " + WindowsUserRoutines.GetUserName());
 
-            //var domains = await ZeroconfResolver.BrowseDomainsAsync();
-            //var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
+            var domains = await ZeroconfResolver.BrowseDomainsAsync();
+            var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
             //IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");//worked for server: "_printer._tcp"
-            string service = Settings.General.ServiceType + Settings.General.ServiceDomain;
-            IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service);
+            string service = Settings.General.GetServiceName();
+            IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10);
             if (zhs.Count < 1)
                 ls.Add("Service '" + service + "' could not be resolved.");
             else
