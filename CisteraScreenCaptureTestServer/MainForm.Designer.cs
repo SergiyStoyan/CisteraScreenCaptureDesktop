@@ -32,15 +32,17 @@
             this.stop = new System.Windows.Forms.Button();
             this.localPort = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.remotePort = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.remoteHost = new System.Windows.Forms.TextBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.mpegCommandLine = new System.Windows.Forms.TextBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // start
             // 
-            this.start.Location = new System.Drawing.Point(144, 164);
+            this.start.Location = new System.Drawing.Point(376, 114);
             this.start.Name = "start";
             this.start.Size = new System.Drawing.Size(75, 23);
             this.start.TabIndex = 0;
@@ -50,7 +52,7 @@
             // 
             // stop
             // 
-            this.stop.Location = new System.Drawing.Point(144, 193);
+            this.stop.Location = new System.Drawing.Point(457, 114);
             this.stop.Name = "stop";
             this.stop.Size = new System.Drawing.Size(75, 23);
             this.stop.TabIndex = 1;
@@ -60,7 +62,7 @@
             // 
             // localPort
             // 
-            this.localPort.Location = new System.Drawing.Point(99, 24);
+            this.localPort.Location = new System.Drawing.Point(93, 19);
             this.localPort.Name = "localPort";
             this.localPort.Size = new System.Drawing.Size(67, 20);
             this.localPort.TabIndex = 2;
@@ -69,63 +71,69 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(24, 24);
+            this.label1.Location = new System.Drawing.Point(18, 19);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(58, 13);
             this.label1.TabIndex = 3;
             this.label1.Text = "Local Port:";
             // 
-            // label2
+            // groupBox1
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(24, 50);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(69, 13);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Remote Port:";
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.mpegCommandLine);
+            this.groupBox1.Controls.Add(this.stop);
+            this.groupBox1.Controls.Add(this.start);
+            this.groupBox1.Location = new System.Drawing.Point(12, 118);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(551, 148);
+            this.groupBox1.TabIndex = 8;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "MPEG Streaming";
             // 
-            // remotePort
+            // label4
             // 
-            this.remotePort.Location = new System.Drawing.Point(99, 50);
-            this.remotePort.Name = "remotePort";
-            this.remotePort.Size = new System.Drawing.Size(67, 20);
-            this.remotePort.TabIndex = 4;
-            this.remotePort.Text = "5900";
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(12, 35);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(80, 13);
+            this.label4.TabIndex = 5;
+            this.label4.Text = "Command Line:";
             // 
-            // label3
+            // mpegCommandLine
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(24, 76);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(72, 13);
-            this.label3.TabIndex = 7;
-            this.label3.Text = "Remote Host:";
+            this.mpegCommandLine.Location = new System.Drawing.Point(15, 61);
+            this.mpegCommandLine.Multiline = true;
+            this.mpegCommandLine.Name = "mpegCommandLine";
+            this.mpegCommandLine.Size = new System.Drawing.Size(517, 47);
+            this.mpegCommandLine.TabIndex = 4;
+            this.mpegCommandLine.Text = "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -s" +
+    "rtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920";
             // 
-            // remoteHost
+            // groupBox2
             // 
-            this.remoteHost.Location = new System.Drawing.Point(99, 76);
-            this.remoteHost.Name = "remoteHost";
-            this.remoteHost.Size = new System.Drawing.Size(102, 20);
-            this.remoteHost.TabIndex = 6;
-            this.remoteHost.Text = "127.0.0.1";
+            this.groupBox2.Controls.Add(this.localPort);
+            this.groupBox2.Controls.Add(this.label1);
+            this.groupBox2.Location = new System.Drawing.Point(12, 12);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(551, 100);
+            this.groupBox2.TabIndex = 9;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "TCP";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(284, 262);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.remoteHost);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.remotePort);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.localPort);
-            this.Controls.Add(this.stop);
-            this.Controls.Add(this.start);
+            this.ClientSize = new System.Drawing.Size(575, 278);
+            this.Controls.Add(this.groupBox2);
+            this.Controls.Add(this.groupBox1);
             this.Name = "MainForm";
             this.Text = "MainForm";
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -135,9 +143,9 @@
         private System.Windows.Forms.Button stop;
         private System.Windows.Forms.TextBox localPort;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox remotePort;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox remoteHost;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox mpegCommandLine;
+        private System.Windows.Forms.GroupBox groupBox2;
     }
 }

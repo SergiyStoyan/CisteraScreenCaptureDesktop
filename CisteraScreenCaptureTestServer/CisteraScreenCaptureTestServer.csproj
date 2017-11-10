@@ -78,6 +78,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Mono.Zeroconf, Version=4.0.0.90, Culture=neutral, PublicKeyToken=e60c4f4a95e1099e, processorArchitecture=MSIL">
+      <HintPath>packages\Mono.Zeroconf.0.9.0.0\lib\Net20\Mono.Zeroconf.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Zeroconf.Providers.Bonjour, Version=4.0.0.90, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Mono.Zeroconf.0.9.0.0\lib\Net20\Mono.Zeroconf.Providers.Bonjour.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -115,10 +121,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="Zeroconf, Version=2.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Zeroconf.2.9.0\lib\net45\Zeroconf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AboutForm.cs">

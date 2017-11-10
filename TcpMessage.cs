@@ -80,7 +80,7 @@ namespace Cliver.CisteraScreenCapture
         public TcpMessage(string name, string body)
         {
             if (body == null)
-                body = ""; 
+                body = "";
             NameBodyAsBytes = new byte[name.Length + 1 + body.Length + 1];
             Size = (ushort)(NameBodyAsBytes.Length);
             int i = 0;
@@ -119,7 +119,10 @@ namespace Cliver.CisteraScreenCapture
         public TcpMessage SendAndReceiveReply(Socket socket)
         {
             send(socket);
-            return Receive(socket);
+            TcpMessage m2 = Receive(socket);
+            if (Name != m2.Name)
+                throw new Exception("Received reply has different name: " + m2.Name);
+            return m2;
         }
     }
 }

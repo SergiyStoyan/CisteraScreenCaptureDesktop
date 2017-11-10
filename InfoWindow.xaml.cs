@@ -73,20 +73,23 @@ namespace Cliver.CisteraScreenCapture
                 {
                     if (dispatcher == null)
                     {//!!!the following code does not work in static constructor because creates a deadlock!!!
-                        ThreadRoutines.StartTry(() =>
+                        if (dispatcher_t == null)
                         {
-                            //this window is used to hide notification windows from Alt+Tab panel
-                            invisible_owner_w = new Window();
-                            invisible_owner_w.Width = 0;
-                            invisible_owner_w.Height = 0;
-                            invisible_owner_w.WindowStyle = WindowStyle.ToolWindow;
-                            invisible_owner_w.ShowInTaskbar = false;
-                            invisible_owner_w.Show();
-                            invisible_owner_w.Hide();
+                            dispatcher_t = ThreadRoutines.StartTry(() =>
+                            {
+                                //this window is used to hide notification windows from Alt+Tab panel
+                                invisible_owner_w = new Window();
+                                invisible_owner_w.Width = 0;
+                                invisible_owner_w.Height = 0;
+                                invisible_owner_w.WindowStyle = WindowStyle.ToolWindow;
+                                invisible_owner_w.ShowInTaskbar = false;
+                                invisible_owner_w.Show();
+                                invisible_owner_w.Hide();
 
-                            dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
-                            System.Windows.Threading.Dispatcher.Run();
-                        }, null, null, true, ApartmentState.STA);
+                                dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
+                                System.Windows.Threading.Dispatcher.Run();
+                            }, null, null, true, ApartmentState.STA);
+                        }
                         if (!SleepRoutines.WaitForCondition(() => { return dispatcher != null; }, 3000))
                             throw new Exception("Could not get dispatcher.");
                     }
@@ -95,6 +98,7 @@ namespace Cliver.CisteraScreenCapture
                 return w;
             }
         }
+        static Thread dispatcher_t = null;
 
         InfoWindow()
         {
