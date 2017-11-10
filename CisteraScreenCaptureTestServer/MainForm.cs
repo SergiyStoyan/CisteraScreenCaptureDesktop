@@ -33,30 +33,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
             ThreadRoutines.StartTry(() => { run_http_service(); });
             stateText = "Wating for HTTP request...";
 
-            //ServiceBrowser browser = new ServiceBrowser();
-            //browser.ServiceAdded += delegate (object o, ServiceBrowseEventArgs args) {
-            //    Console.WriteLine("Found Service: {0}", args.Service.Name);
-            //    args.Service.Resolved += delegate (object o2, ServiceResolvedEventArgs args2) {
-            //        IResolvableService s = (IResolvableService)args2.Service;
-            //        Console.WriteLine("Resolved Service: {0} - {1}:{2} ({3} TXT record entries)",
-            //            s.FullName, s.HostEntry.AddressList[0], s.Port, s.TxtRecord.Count);
-            //    };
-            //    args.Service.Resolve();
-            //};
-            //browser.Browse("_daap._tcp", "local");
-
-            //RegisterService service = new RegisterService();
-            //service.Name = "Aaron's DAAP Share";
-            //service.RegType = "_daap._tcp";
-            //service.ReplyDomain = "local.";
-            //service.Port = 3689;
-            //// TxtRecords are optional
-            //TxtRecord txt_record = new TxtRecord();
-            //txt_record.Add("Password", "false");
-            //service.TxtRecord = txt_record;
-            //service.Register();
-            
-            // int t = DNSServiceRegister(ref IntPtr.Zero, 0, 0, "test",, "_cisterascreencapturecontroller._tcp", null, null, 5353, 0, null, IntPtr.Zero, IntPtr.Zero);
+            Bonjour.Start("test", "_cisterascreencapturecontroller._tcp", null, null, 123);
             
             FormClosed += delegate
               {
@@ -158,67 +135,6 @@ namespace Cliver.CisteraScreenCaptureTestServer
         }
         string remoteHost;
         string remotePort;
-
-
-
-        //     [DllImport("dnssd.dll", SetLastError = true)]
-        //     public static extern Int32 DNSServiceRegister(
-        //   ref  HandleRef sdRef, //DNSServiceRef* sdRef,
-        //Int32 flags, //DNSServiceFlags flags,
-        //UInt32 interfaceIndex, //uint32_t interfaceIndex,
-        //string name, //const char* name,         /* may be NULL */
-        //string regtype, //const char* regtype,
-        //string domain, //const char* domain,       /* may be NULL */
-        //string host, //const char* host,         /* may be NULL */
-        //UInt16 port, //uint16_t                            port,          /* In network byte order */
-        //UInt16 txtLen, //uint16_t txtLen,
-        //string txtRecord, //const void* txtRecord,    /* may be NULL */
-        // IntPtr callBack, //DNSServiceRegisterReply             callBack,      /* may be NULL */
-        //IntPtr context //void* context       /* may be NULL */
-        // );
-
-
-        //       typedef void (DNSSD_API* DNSServiceRegisterReply)
-        //   (
-        //   DNSServiceRef sdRef,
-        //   DNSServiceFlags flags,
-        //   DNSServiceErrorType errorCode,
-        //   const char* name,
-        //   const char* regtype,
-        //   const char* domain,
-        //   void* context
-        //   );
-
-        //       static void DNSSD_API serviceRegisterReply(
-        //       DNSServiceRef sdRef,
-        //       DNSServiceFlags flags,
-        //       DNSServiceErrorType errorCode,
-
-        //       const char* name,
-
-        //       const char* regtype,
-
-        //       const char* domain,
-
-        //       void* context
-        //)
-        //{
-
-        //       TCHAR name_[255];
-
-        //       mbstowcs(name_, name, sizeof(name_));
-        //	if (errorCode == kDNSServiceErr_NoError)
-        //	{
-        //		if (flags & kDNSServiceFlagsAdd)
-        //			log->info(_T("BonjourService: Service %s is registered and active."), name_);
-        //		else
-        //			log->info(_T("BonjourService: Service %s is unregistered."), name_);
-        //	}
-        //	else if (errorCode == kDNSServiceErr_NameConflict)
-        //		log->error(_T("BonjourService: Service name %s is in use, please choose another."), name_);
-        //	else
-        //		log->error(_T("BonjourService: Error: %d"), errorCode);
-        //}
 
         void connect_socket()
         {

@@ -125,8 +125,8 @@ namespace Cliver.CisteraScreenCapture
             ls.Add("(The values are current and so may differ from those used by Service last time)\r\n");
             ls.Add("Logged in user: " + WindowsUserRoutines.GetUserName());
 
-            //var domains = await ZeroconfResolver.BrowseDomainsAsync();
-            //var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
+            var domains = ZeroconfResolver.BrowseDomainsAsync().Result;
+            var responses = ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key)).Result;
             //IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");//worked for server: "_printer._tcp"
             string service = Settings.General.GetServiceName();
             IReadOnlyList<IZeroconfHost> zhs = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10).Result;
@@ -142,7 +142,7 @@ namespace Cliver.CisteraScreenCapture
                 ls.Add("Resolution of service '" + service + "' has no IP defined. Using default ip: " + server_ip);
             }
             else
-                ls.Add("Service '" + service + "' has been resolved to: " + zhs[0].IPAddress);
+                ls.Add("Service '" + service + "' has been resolved to: " + zhs.Where(x => x.IPAddress != null).FirstOrDefault().IPAddress);
 
             if (!TcpServer.Running)
                 ls.Add("Tcp listening: -");
@@ -159,7 +159,7 @@ namespace Cliver.CisteraScreenCapture
             else
                 ls.Add("Mpeg stream: " + MpegStream.CommandLine);
 
-            Message.Inform(string.Join("\r\n\r\n", ls));
+            Message.Inform(string.Join("\r\n", ls));
         }
     }
 }

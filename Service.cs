@@ -126,11 +126,22 @@ namespace Cliver.CisteraScreenCapture
                     
                     string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
                     Log.Inform("GETing: " + url);
-                     
-                    WebClient wc = new WebClient();
-                    string r =   wc.DownloadString(url);
-                    if (r.Trim() != "OK")
-                        throw new Exception("Response: " + r);
+
+                    //WebClient wc = new WebClient();
+                    //wc.ti
+                    //string r =   wc.DownloadString(url);
+                    //if (r.Trim() != "OK")
+                    //    throw new Exception("Response: " + r);
+
+                    HttpClient hc = new HttpClient();
+                    HttpResponseMessage rm = hc.GetAsync(url).Result;
+                    if (!rm.IsSuccessStatusCode)
+                        throw new Exception(rm.ReasonPhrase);
+                    if (rm.Content == null)
+                        throw new Exception("Response is empty");
+                    string responseContent = rm.Content.ReadAsStringAsync().Result;
+                    if (responseContent.Trim() != "OK")
+                        throw new Exception("Response: " + responseContent);
                 }
                 catch (Exception e)
                 {
