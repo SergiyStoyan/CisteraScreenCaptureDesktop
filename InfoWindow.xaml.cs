@@ -32,9 +32,7 @@ namespace Cliver.CisteraScreenCapture
         {
         }
 
-        static Window invisible_owner_w;
-
-        static System.Windows.Threading.Dispatcher dispatcher = null;
+        static Window invisible_owner_w = null;
         static object lock_object = new object();
 
         public static InfoWindow Create(string text, string image_url, string action_name, Action action, string sound_file = null, Brush box_brush = null, Brush button_brush = null)
@@ -71,7 +69,7 @@ namespace Cliver.CisteraScreenCapture
 
                 lock (ws)
                 {
-                    if (dispatcher == null)
+                    if (invisible_owner_w == null)
                     {//!!!the following code does not work in static constructor because creates a deadlock!!!
                         ThreadRoutines.StartTry(() =>
                         {
@@ -83,15 +81,12 @@ namespace Cliver.CisteraScreenCapture
                             invisible_owner_w.ShowInTaskbar = false;
                             invisible_owner_w.Show();
                             invisible_owner_w.Hide();
-
-                            dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
-                            System.Windows.Threading.Dispatcher.Run();
                         }, null, null, true, ApartmentState.STA);
-                        if (!SleepRoutines.WaitForCondition(() => { return dispatcher != null; }, 3000))
+                        if (!SleepRoutines.WaitForCondition(() => { return invisible_owner_w != null && !invisible_owner_w.IsVisible; }, 3000))
                             throw new Exception("Could not get dispatcher.");
                     }
                 }
-                dispatcher.Invoke(a);
+                invisible_owner_w.Dispatcher.Invoke(a);
                 return w;
             }
         }

@@ -25,17 +25,27 @@ namespace Cliver.CisteraScreenCapture
         {
             InitializeComponent();
 
+            CreateHandle();
+
             Icon = AssemblyRoutines.GetAppIcon();
             Service.StateChanged += delegate
             {
-                if (!IsHandleCreated)
-                    CreateHandle();
-                this.Invoke(() => { StartStop.Checked = Service.Running; });
-                if (Service.Running)
-                    notifyIcon.Icon = Icon;
-                else
-                    //notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetGreyScale(Icon.ToBitmap()).GetHicon());
-                    notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetInverted(Icon.ToBitmap()).GetHicon());
+                this.Invoke(() => {
+                    StartStop.Checked = Service.Running;
+                    string title = "Cistera Screen Capture";
+                    if (Service.Running)
+                    {
+                        notifyIcon.Icon = Icon;
+                        title += " started";
+                    }
+                    else
+                    {
+                        //notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetGreyScale(Icon.ToBitmap()).GetHicon());
+                        notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetInverted(Icon.ToBitmap()).GetHicon());
+                        title += " stopped";
+                    }
+                    notifyIcon.Text += " started";
+                });
             };
         }
 

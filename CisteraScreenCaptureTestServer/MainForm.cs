@@ -26,7 +26,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
             mpegCommandLine.Text = "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920";
 
             CreateHandle();
-
+            stateText = "";
             startEnabled = false;
             stopEnabled = false;
             
@@ -149,14 +149,15 @@ namespace Cliver.CisteraScreenCaptureTestServer
 
         void connect_socket()
         {
-            //IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-            //IPAddress ipAddress = ipHostInfo.AddressList[0];
-            IPAddress ipAddress = NetworkRoutines.GetLocalIpForDestination(IPAddress.Parse("127.0.0.1"));
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, int.Parse(localTcpPort.Text));
-            socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            socket.Bind(localEndPoint);
-
-            socket.Connect(remoteHost, int.Parse(remotePort));
+            if (socket == null)
+            {
+                IPAddress ipAddress = NetworkRoutines.GetLocalIpForDestination(IPAddress.Parse("127.0.0.1"));
+                IPEndPoint localEndPoint = new IPEndPoint(ipAddress, int.Parse(localTcpPort.Text));
+                socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                socket.Bind(localEndPoint);
+            }
+            if(!socket.Connected || !socket.Poll(1000, SelectMode.SelectWrite))
+                socket.Connect(remoteHost, int.Parse(remotePort));
         }
 
         void disconnect_socket()
@@ -202,7 +203,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
             }
             finally
             {
-                disconnect_socket();
+                //disconnect_socket();
             }
         }
 
@@ -227,7 +228,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
             }
             finally
             {
-                disconnect_socket();
+                //disconnect_socket();
             }
         }
 

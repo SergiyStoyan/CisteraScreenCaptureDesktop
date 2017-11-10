@@ -115,6 +115,8 @@
             this.state.Location = new System.Drawing.Point(27, 180);
             this.state.Multiline = true;
             this.state.Name = "state";
+            this.state.ReadOnly = true;
+            this.state.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.state.Size = new System.Drawing.Size(498, 117);
             this.state.TabIndex = 10;
             this.state.Text = "gddgrdfg";
