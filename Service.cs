@@ -102,17 +102,27 @@ namespace Cliver.CisteraScreenCapture
                     if (zhs.Count < 1)
                     {
                         server_ip = Settings.General.TcpClientDefaultIp.ToString();
-                        string m = "Service could not be resolved: " + service + ". Using default ip: " + server_ip;
+                        string m = "Service '" + service + "' could not be resolved.\r\nUsing default ip: " + server_ip;
                         Log.Warning(m);
                         InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
                     }
+                    else if (zhs.Where(x => x.IPAddress != null).FirstOrDefault() == null)
+                    {
+                        server_ip = Settings.General.TcpClientDefaultIp.ToString();
+                        string m = "Resolution of service '" + service + "' has no IP defined.\r\nUsing default ip: " + server_ip;
+                        Log.Error(m);
+                        InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
+                    }
                     else
                     {
-                        server_ip = zhs[0].IPAddress;
+                        server_ip = zhs.Where(x => x.IPAddress != null).FirstOrDefault().IPAddress;
                         Log.Inform("Service: " + service + " has been resolved to: " + server_ip);
                     }
 
-                    TcpServer.Start(Settings.General.TcpServerPort, IPAddress.Parse(server_ip));
+                    IPAddress ip;
+                    if (!IPAddress.TryParse(server_ip, out ip))
+                        throw new Exception("Server IP is not valid: " + server_ip);
+                    TcpServer.Start(Settings.General.TcpServerPort, ip);
 
                     HttpClient hc = new HttpClient();
                     string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
