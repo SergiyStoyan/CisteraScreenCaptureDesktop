@@ -10,9 +10,9 @@ using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Net;
 using Cliver.CisteraScreenCapture;
-using Mono.Zeroconf;
-using Bonjour;
-using System.Runtime.InteropServices;
+//using Mono.Zeroconf;
+//using Bonjour;
+//using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace Cliver.CisteraScreenCaptureTestServer
