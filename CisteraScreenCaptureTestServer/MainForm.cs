@@ -29,25 +29,9 @@ namespace Cliver.CisteraScreenCaptureTestServer
             CreateHandle();
             startEnabled = false;
             stopEnabled = false;
-            
-            HttpListener listener = new HttpListener();
-            try
-            {
-                // URI prefixes are required,
-                // for example "http://127.0.0.1:5800/screenCapture/" (does not work in LAN)
-                //listener.Prefixes.Add("http://192.168.2.15:80/");
-                //listener.Prefixes.Add("http://127.0.0.1:80/");
-                //listener.Prefixes.Add("http://localhost:80/");
-                listener.Prefixes.Add("http://*:80/");
-                listener.Start();
-                listener.BeginGetContext(http_callback, listener);
 
-                stateText = "Wating for HTTP request...";
-            }
-            catch(Exception e)
-            {
-                Message.Error(e);
-            }
+            ThreadRoutines.StartTry(() => { run_http_service(); });
+            stateText = "Wating for HTTP request...";
 
             //ServiceBrowser browser = new ServiceBrowser();
             //browser.ServiceAdded += delegate (object o, ServiceBrowseEventArgs args) {
@@ -87,6 +71,95 @@ namespace Cliver.CisteraScreenCaptureTestServer
               };
         }
         Socket socket;
+
+        void run_http_service()
+        {
+            try
+            {
+                if (listener != null)
+                {
+                    listener.Stop();
+                    listener.Close();
+                }
+                listener = new HttpListener();
+                listener.Prefixes.Add("http://*:80/");
+                listener.Start();
+                while (listener.IsListening)
+                {
+                    HttpListenerContext context = listener.GetContext();
+                    ThreadPool.QueueUserWorkItem((o) => { request_handler(context); });
+                }
+            }
+            catch (ThreadAbortException)
+            { }
+            catch (Exception e)
+            {
+                Message.Error(e);
+            }
+            finally
+            {
+                if (listener != null)
+                {
+                    listener.Stop();
+                    listener.Close();
+                    listener = null;
+                }
+            }
+        }
+        static HttpListener listener = null;
+
+        private void request_handler(object _context)
+        {
+            HttpListenerContext context = (HttpListenerContext)_context;
+            string responseString;
+            string username = null;
+            HttpListenerRequest request = context.Request;
+            try
+            {
+                Match m = Regex.Match(request.Url.Query, @"username=(.+?)(&|$)");
+                if (!m.Success)
+                    throw new Exception("No username in http request.");
+                username = m.Groups[1].Value;
+
+                m = Regex.Match(request.Url.Query, @"ipaddress=(.+?)(&|$)");
+                if (!m.Success)
+                    throw new Exception("No ipaddress in http request.");
+                remoteHost = m.Groups[1].Value;
+
+                m = Regex.Match(request.Url.Query, @"port=(.+?)(&|$)");
+                if (!m.Success)
+                    throw new Exception("No port in http request.");
+                remotePort = m.Groups[1].Value;
+
+                responseString = "OK";
+            }
+            catch (Exception e)
+            {
+                responseString = Message.GetExceptionDetails(e);
+            }
+
+            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
+            HttpListenerResponse response = context.Response;
+            response.ContentLength64 = buffer.Length;
+            System.IO.Stream output = response.OutputStream;
+            output.Write(buffer, 0, buffer.Length);
+            output.Close();
+
+            List<string> ss = new List<string>();
+            ss.Add("Received HTTP request: " + request.Url);
+            ss.Add("username: " + username);
+            ss.Add("remoteHost: " + remoteHost);
+            ss.Add("remotePort: " + remotePort);
+            ss.Add("Sent HTTP response: " + responseString);
+            //Message.Inform(string.Join("\r\n", ss));
+
+            stateText = string.Join("\r\n", ss);
+            startEnabled = true;
+        }
+        string remoteHost;
+        string remotePort;
+
+
 
         //     [DllImport("dnssd.dll", SetLastError = true)]
         //     public static extern Int32 DNSServiceRegister(
@@ -231,58 +304,6 @@ namespace Cliver.CisteraScreenCaptureTestServer
                 //disconnect_socket();
             }
         }
-
-        void http_callback(System.IAsyncResult result)
-        {
-            string responseString;
-            string username = null;
-            HttpListener listener = (HttpListener)result.AsyncState;
-            HttpListenerContext context = listener.EndGetContext(result);
-            HttpListenerRequest request = context.Request;
-            try
-            {
-                Match m = Regex.Match(request.Url.Query, @"username=(.+?)(&|$)");
-                if (!m.Success)
-                    throw new Exception("No username in http request.");
-                username = m.Groups[1].Value;
-
-                m = Regex.Match(request.Url.Query, @"ipaddress=(.+?)(&|$)");
-                if (!m.Success)
-                    throw new Exception("No ipaddress in http request.");
-                remoteHost = m.Groups[1].Value;
-
-                m = Regex.Match(request.Url.Query, @"port=(.+?)(&|$)");
-                if (!m.Success)
-                    throw new Exception("No port in http request.");
-                remotePort = m.Groups[1].Value;
-
-                responseString = "OK";
-            }
-            catch (Exception e)
-            {
-                responseString = Message.GetExceptionDetails(e);
-            }
-
-            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(responseString);
-            HttpListenerResponse response = context.Response;
-            response.ContentLength64 = buffer.Length;
-            System.IO.Stream output = response.OutputStream;
-            output.Write(buffer, 0, buffer.Length);
-            output.Close();
-
-            List<string> ss = new List<string>();
-            ss.Add("Received HTTP request: " + request.Url);
-            ss.Add("username: " + username);
-            ss.Add("remoteHost: " + remoteHost);
-            ss.Add("remotePort: " + remotePort);
-            ss.Add("Sent HTTP response: " + responseString);
-            //Message.Inform(string.Join("\r\n", ss));
-
-            stateText = string.Join("\r\n", ss);
-            startEnabled = true;
-        }
-        string remoteHost;
-        string remotePort;
 
         string stateText
         {
