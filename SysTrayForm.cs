@@ -30,19 +30,12 @@ namespace Cliver.CisteraScreenCapture
             {
                 if (!IsHandleCreated)
                     CreateHandle();
-                this.Invoke(() => { StartStop.Checked = Service.Running;
-                    if (Service.Running)
-                    {
-                        notifyIcon.Icon = Icon;
-                        notifyIcon.Text = "Cistera Screen Capture started";
-                    }
-                    else
-                    { 
-                        //notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetGreyScale(Icon.ToBitmap()).GetHicon());
-                        notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetInverted(Icon.ToBitmap()).GetHicon());
-                        notifyIcon.Text = "Cistera Screen Capture stopped";
-                    }
-                });
+                this.Invoke(() => { StartStop.Checked = Service.Running; });
+                if (Service.Running)
+                    notifyIcon.Icon = Icon;
+                else
+                    //notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetGreyScale(Icon.ToBitmap()).GetHicon());
+                    notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetInverted(Icon.ToBitmap()).GetHicon());
             };
         }
 
@@ -121,10 +114,10 @@ namespace Cliver.CisteraScreenCapture
             ls.Add("Monitor: " + (Service.Running ? "started" : "stopped"));
             ls.Add("Logged in user: " + WindowsUserRoutines.GetUserName());
 
-            var domains = await ZeroconfResolver.BrowseDomainsAsync();
-            var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
+            //var domains = await ZeroconfResolver.BrowseDomainsAsync();
+            //var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
             //IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");//worked for server: "_printer._tcp"
-            string service = Settings.General.GetServiceName();
+            string service = Settings.General.ServiceType + Settings.General.ServiceDomain;
             IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service);
             if (zhs.Count < 1)
                 ls.Add("Service '" + service + "' could not be resolved.");

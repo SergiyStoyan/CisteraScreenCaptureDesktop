@@ -25,7 +25,6 @@ using System.Windows.Input;
 using System.Net.Http;
 using Zeroconf;
 using System.Diagnostics;
-using System.Threading.Tasks;
 
 namespace Cliver.CisteraScreenCapture
 {
@@ -97,29 +96,9 @@ namespace Cliver.CisteraScreenCapture
                     }
                     Log.Inform("User logged in: " + user_name);
 
-                    string service = Settings.General.GetServiceName();
-                    string server_ip = null;
-                    //CancellationToken cancellationToken = new CancellationToken();
-                    //var t = ZeroconfResolver.ResolveAsync(service);
-                    //int timeout = 3000;
-                    //int retry = 2;
-                    //var task = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromMilliseconds(timeout / retry - 10), 2, 0, null, cancellationToken);
-                    //if (await Task.WhenAny(task, Task.Delay(timeout, cancellationToken)) == task)
-                    //{
-                    //    // Task completed within timeout.
-                    //    // Consider that the task may have faulted or been canceled.
-                    //    if (task.IsCompleted)
-                    //    {
-                    //        IReadOnlyList<IZeroconfHost> zhs = await task;
-                    //        server_ip = zhs[0].IPAddress;
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    // timeout/cancellation logic
-                    //    return;
-                    //}
-                    IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service, TimeSpan.FromMilliseconds(3000), 2, 1, null);
+                    string service = Settings.General.ServiceType + Settings.General.ServiceDomain;
+                    IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service);
+                    string server_ip;
                     if (zhs.Count < 1)
                     {
                         server_ip = Settings.General.TcpClientDefaultIp.ToString();
