@@ -40,7 +40,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
                 listener.Start();
                 listener.BeginGetContext(http_callback, listener);
 
-                state.Text = "Wating for HTTP request...";
+                stateText = "Wating for HTTP request...";
             }
             catch(Exception e)
             {
@@ -168,14 +168,14 @@ namespace Cliver.CisteraScreenCaptureTestServer
         {
             try
             {
-                state.Text = "Starting MPEG...";
+                stateText = "Starting MPEG...";
 
                 connect_socket();
                 TcpMessage m = new TcpMessage(TcpMessage.FfmpegStart, mpegCommandLine.Text);
                 TcpMessage m2 = m.SendAndReceiveReply(socket);
 
                 //Message.Inform("Response: " + m2.BodyAsText);
-                state.Text = "MPEG started";
+                stateText = "MPEG started";
                 start.Enabled = false;
                 stop.Enabled = true;
             }
@@ -193,14 +193,14 @@ namespace Cliver.CisteraScreenCaptureTestServer
         {
             try
             {
-                state.Text = "Stopping MPEG...";
+                stateText = "Stopping MPEG...";
 
                 connect_socket();
                 TcpMessage m = new TcpMessage(TcpMessage.FfmpegStop, null);
                 TcpMessage m2 = m.SendAndReceiveReply(socket);
-                
+
                 //Message.Inform("Response: " + m2.BodyAsText);
-                state.Text = "MPEG stopped";
+                stateText = "MPEG stopped";
                 start.Enabled = true;
                 stop.Enabled = false;
             }
@@ -262,10 +262,21 @@ namespace Cliver.CisteraScreenCaptureTestServer
             ss.Add(responseString);
             //Message.Inform(string.Join("\r\n", ss));
 
-            state.Text = string.Join("\r\n", ss);
+            stateText = string.Join("\r\n", ss);
             start.Enabled = true;
         }
         string remoteHost;
         string remotePort;
+
+        string stateText
+        {
+            set
+            {
+                state.BeginInvoke(() =>
+                {
+                    state.Text = value;
+                });
+            }
+        }
     }
 }

@@ -130,12 +130,11 @@ namespace Cliver.CisteraScreenCapture
                     HttpResponseMessage rm = await hc.GetAsync(url);
                     if (!rm.IsSuccessStatusCode)
                         throw new Exception(rm.ReasonPhrase);
-                    if (rm.Content != null)
-                    {
-                        string responseContent = await rm.Content.ReadAsStringAsync();
-                        if (responseContent.Trim() != "OK")
-                            throw new Exception("Response: " + responseContent);
-                    }
+                    if (rm.Content == null)
+                        throw new Exception("Response is empty");
+                    string responseContent = await rm.Content.ReadAsStringAsync();
+                    if (responseContent.Trim() != "OK")
+                        throw new Exception("Response: " + responseContent);
                 }
                 catch (Exception e)
                 {
