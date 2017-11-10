@@ -118,7 +118,7 @@ namespace Cliver.CisteraScreenCapture
             Service.Running = StartStop.Checked;
         }
 
-        async private void stateToolStripMenuItem_Click(object sender, EventArgs e)
+        private void stateToolStripMenuItem_Click(object sender, EventArgs e)
         {
             List<string> ls = new List<string>();
             ls.Add("Monitor: " + (Service.Running ? "started" : "stopped"));
@@ -129,7 +129,7 @@ namespace Cliver.CisteraScreenCapture
             //var responses = await ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key));
             //IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");//worked for server: "_printer._tcp"
             string service = Settings.General.GetServiceName();
-            IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10);
+            IReadOnlyList<IZeroconfHost> zhs = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10).Result;
             string server_ip;
             if (zhs.Count < 1)
             {

@@ -85,7 +85,7 @@ namespace Cliver.CisteraScreenCapture
 
         static void userLoggedOn()
         {
-            ThreadRoutines.StartTry(async () =>
+            ThreadRoutines.StartTry(() =>
             {
                 try
                 {
@@ -98,8 +98,7 @@ namespace Cliver.CisteraScreenCapture
                     Log.Inform("User logged in: " + user_name);
 
                     string service = Settings.General.GetServiceName();
-                    IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10);
-                    
+                    IReadOnlyList<IZeroconfHost> zhs = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10).Result;                    
                     if (zhs.Count < 1)
                     {
                         server_ip = Settings.General.TcpClientDefaultIp.ToString();
