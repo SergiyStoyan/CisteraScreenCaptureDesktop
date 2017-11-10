@@ -33,7 +33,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
             ThreadRoutines.StartTry(() => { run_http_service(); });
             stateText = "Wating for HTTP request...";
 
-            Bonjour.Start("test", "_cisterascreencapturecontroller._tcp", null, null, 123);
+            //Bonjour.Start("test", "_cisterascreencapturecontroller._tcp", null, null, 123);
             
             FormClosed += delegate
               {
