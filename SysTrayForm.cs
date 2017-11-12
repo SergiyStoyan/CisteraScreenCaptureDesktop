@@ -44,7 +44,7 @@ namespace Cliver.CisteraScreenCapture
                         notifyIcon.Icon = Icon.FromHandle(ImageRoutines.GetInverted(Icon.ToBitmap()).GetHicon());
                         title += " stopped";
                     }
-                    notifyIcon.Text = title + " started";
+                    notifyIcon.Text = title;
                 });
             };
         }
@@ -122,11 +122,11 @@ namespace Cliver.CisteraScreenCapture
         {
             List<string> ls = new List<string>();
             ls.Add("Monitor: " + (Service.Running ? "started" : "stopped"));
-            ls.Add("(The values are current and so may differ from those used by Service last time)\r\n");
+            ls.Add("(The values are fresh and may differ from those used by Service last time.)");
             ls.Add("Logged in user: " + Service.GetUserName());
 
-            var domains = ZeroconfResolver.BrowseDomainsAsync().Result;
-            var responses = ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key)).Result;
+            //var domains = ZeroconfResolver.BrowseDomainsAsync().Result;
+            //var responses = ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key)).Result;
             //IReadOnlyList<IZeroconfHost> zhs = await ZeroconfResolver.ResolveAsync("_printer._tcp.local.");//worked for server: "_printer._tcp"
             string service = Settings.General.GetServiceName();
             IReadOnlyList<IZeroconfHost> zhs = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10).Result;

@@ -33,6 +33,8 @@ namespace Cliver.CisteraScreenCapture
     {
         static Service()
         {
+            Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
+            //UserSessionRoutines.SessionEventHandler = value ? userSessionEventHandler : (UserSessionRoutines.SessionEventDelegate)null;
         }
 
         public delegate void OnStateChanged();
@@ -45,18 +47,16 @@ namespace Cliver.CisteraScreenCapture
                 if (running == value)
                     return;
                 running = value;
-                //UserSessionRoutines.SessionEventHandler = value ? userSessionEventHandler : (UserSessionRoutines.SessionEventDelegate)null;
 
                 if (value)
                 {
                     Log.Inform("Starting...");
                     
-                    Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
                     string user_name = GetUserName();
                     Log.Inform("TEST user by WindowsUserRoutines.GetUserName:" + WindowsUserRoutines.GetUserName());
                     Log.Inform("TEST user by WindowsUserRoutines.GetUserName2:" + WindowsUserRoutines.GetUserName2());
                     Log.Inform("TEST user by WindowsUserRoutines.GetUserName3:" + WindowsUserRoutines.GetUserName3());
-                    Log.Inform("TEST user by WindowsUserRoutines.GetUserName4:" + WindowsUserRoutines.GetUserName4());
+                    //Log.Inform("TEST user by WindowsUserRoutines.GetUserName4:" + WindowsUserRoutines.GetUserName4());
                     if (!string.IsNullOrWhiteSpace(user_name))
                         userLoggedOn();
                     else
@@ -67,7 +67,6 @@ namespace Cliver.CisteraScreenCapture
                     Log.Inform("Stopping...");
 
                     userLoggedOff();
-                    Microsoft.Win32.SystemEvents.SessionSwitch -= SystemEvents_SessionSwitch;
                 }
 
                 StateChanged?.Invoke();
@@ -86,103 +85,134 @@ namespace Cliver.CisteraScreenCapture
 
         private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
         {
-            //string user_name = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            string user_name = GetUserName();
-            if (!string.IsNullOrWhiteSpace(user_name))
-                userLoggedOn();
-            else
-                userLoggedOff();
+            if (!Running)
+                return;
+            switch (e.Reason)
+            {
+                case SessionSwitchReason.ConsoleConnect:
+                case SessionSwitchReason.RemoteConnect:
+                case SessionSwitchReason.SessionUnlock:
+                    userLoggedOn();
+                    break;
+                default:
+                    userLoggedOff();
+                    break;
+            }
         }
 
         static void userLoggedOn()
         {
-            ThreadRoutines.StartTry(() =>
-            {
-                try
+            string user_name = GetUserName();
+            if (currentUserName == user_name)
+                return;
+            stop_userLoggedOn_t();
+            currentUserName = user_name;
+            userLoggedOn_t = ThreadRoutines.StartTry(
+                () =>
                 {
-                    string user_name = GetUserName();
-                    if (user_name == null)
+                    try
                     {
-                        Log.Error("Session's user name is NULL.");
-                        return;
-                    }
-                    Log.Inform("User logged in: " + user_name);
+                        if (string.IsNullOrWhiteSpace(user_name))
+                        {
+                            Log.Error("Session's user name is empty.");
+                            return;
+                        }
+                        Log.Inform("User logged in: " + user_name);
 
-                    string service = Settings.General.GetServiceName();
-                    IReadOnlyList<IZeroconfHost> zhs = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10).Result;                    
-                    if (zhs.Count < 1)
+                        string service = Settings.General.GetServiceName();
+                        IReadOnlyList<IZeroconfHost> zhs = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10).Result;
+                        if (zhs.Count < 1)
+                        {
+                            currentServerIp = Settings.General.TcpClientDefaultIp.ToString();
+                            string m = "Service '" + service + "' could not be resolved.\r\nUsing default ip: " + currentServerIp;
+                            Log.Warning(m);
+                            InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
+                        }
+                        else if (zhs.Where(x => x.IPAddress != null).FirstOrDefault() == null)
+                        {
+                            currentServerIp = Settings.General.TcpClientDefaultIp.ToString();
+                            string m = "Resolution of service '" + service + "' has no IP defined.\r\nUsing default ip: " + currentServerIp;
+                            Log.Error(m);
+                            InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
+                        }
+                        else
+                        {
+                            currentServerIp = zhs.Where(x => x.IPAddress != null).FirstOrDefault().IPAddress;
+                            Log.Inform("Service: " + service + " has been resolved to: " + currentServerIp);
+                        }
+
+                        IPAddress ip;
+                        if (!IPAddress.TryParse(currentServerIp, out ip))
+                            throw new Exception("Server IP is not valid: " + currentServerIp);
+                        TcpServer.Start(Settings.General.TcpServerPort, ip);
+
+                        string url = "http://" + currentServerIp + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
+                        Log.Inform("GETing: " + url);
+
+                        //WebClient wc = new WebClient();
+                        //wc.ti
+                        //string r =   wc.DownloadString(url);
+                        //if (r.Trim() != "OK")
+                        //    throw new Exception("Response: " + r);
+
+                        HttpClient hc = new HttpClient();
+                        HttpResponseMessage rm = hc.GetAsync(url).Result;
+                        if (!rm.IsSuccessStatusCode)
+                            throw new Exception(rm.ReasonPhrase);
+                        if (rm.Content == null)
+                            throw new Exception("Response is empty");
+                        string responseContent = rm.Content.ReadAsStringAsync().Result;
+                        if (responseContent.Trim() != "OK")
+                            throw new Exception("Response: " + responseContent);
+                    }
+                    catch (Exception e)
                     {
-                        server_ip = Settings.General.TcpClientDefaultIp.ToString();
-                        string m = "Service '" + service + "' could not be resolved.\r\nUsing default ip: " + server_ip;
-                        Log.Warning(m);
-                        InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
+                        Log.Error(e);
+                        InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
                     }
-                    else if (zhs.Where(x => x.IPAddress != null).FirstOrDefault() == null)
-                    {
-                        server_ip = Settings.General.TcpClientDefaultIp.ToString();
-                        string m = "Resolution of service '" + service + "' has no IP defined.\r\nUsing default ip: " + server_ip;
-                        Log.Error(m);
-                        InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
-                    }
-                    else
-                    {
-                        server_ip = zhs.Where(x => x.IPAddress != null).FirstOrDefault().IPAddress;
-                        Log.Inform("Service: " + service + " has been resolved to: " + server_ip);
-                    }
-
-                    IPAddress ip;
-                    if (!IPAddress.TryParse(server_ip, out ip))
-                        throw new Exception("Server IP is not valid: " + server_ip);
-                    TcpServer.Start(Settings.General.TcpServerPort, ip);
-                    
-                    string url = "http://" + server_ip + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
-                    Log.Inform("GETing: " + url);
-
-                    //WebClient wc = new WebClient();
-                    //wc.ti
-                    //string r =   wc.DownloadString(url);
-                    //if (r.Trim() != "OK")
-                    //    throw new Exception("Response: " + r);
-
-                    HttpClient hc = new HttpClient();
-                    HttpResponseMessage rm = hc.GetAsync(url).Result;
-                    if (!rm.IsSuccessStatusCode)
-                        throw new Exception(rm.ReasonPhrase);
-                    if (rm.Content == null)
-                        throw new Exception("Response is empty");
-                    string responseContent = rm.Content.ReadAsStringAsync().Result;
-                    if (responseContent.Trim() != "OK")
-                        throw new Exception("Response: " + responseContent);
-                }
-                catch (Exception e)
+                },
+                null,
+                () =>
                 {
-                    Log.Error(e);
-                    InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
+                    userLoggedOn_t = null;
                 }
-            });
+            );
         }
-        static string user_name;
+        static Thread userLoggedOn_t = null;
+        static string currentUserName;
         public static string UserName
         {
             get
             {
-                return user_name;
+                return currentUserName;
             }
         }
-        static string server_ip;
+        static string currentServerIp;
         public static string ServerIp
         {
             get
             {
-                return server_ip;
+                return currentServerIp;
             }
+        }
+
+        static void stop_userLoggedOn_t()
+        {
+            if (userLoggedOn_t != null)
+                while (userLoggedOn_t.IsAlive)
+                {
+                    userLoggedOn_t.Abort();
+                    userLoggedOn_t.Join(200);
+                }
         }
 
         static void userLoggedOff()
         {
             Log.Inform("User logged off");
+            stop_userLoggedOn_t();
             TcpServer.Stop();
             MpegStream.Stop();
+            currentUserName = null;
         }
 
         //static void userSessionEventHandler(int session_type)
