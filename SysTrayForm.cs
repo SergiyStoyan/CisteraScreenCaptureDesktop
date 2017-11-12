@@ -123,7 +123,7 @@ namespace Cliver.CisteraScreenCapture
             List<string> ls = new List<string>();
             ls.Add("Monitor: " + (Service.Running ? "started" : "stopped"));
             ls.Add("(The values are current and so may differ from those used by Service last time)\r\n");
-            ls.Add("Logged in user: " + WindowsUserRoutines.GetUserName());
+            ls.Add("Logged in user: " + Service.GetUserName());
 
             var domains = ZeroconfResolver.BrowseDomainsAsync().Result;
             var responses = ZeroconfResolver.ResolveAsync(domains.Select(g => g.Key)).Result;

@@ -52,9 +52,15 @@ namespace Cliver.CisteraScreenCapture
                     Log.Inform("Starting...");
                     
                     Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
-                    string user_name = WindowsUserRoutines.GetUserName();
+                    string user_name = GetUserName();
+                    Log.Inform("TEST user by WindowsUserRoutines.GetUserName:" + WindowsUserRoutines.GetUserName());
+                    Log.Inform("TEST user by WindowsUserRoutines.GetUserName2:" + WindowsUserRoutines.GetUserName2());
+                    Log.Inform("TEST user by WindowsUserRoutines.GetUserName3:" + WindowsUserRoutines.GetUserName3());
+                    Log.Inform("TEST user by WindowsUserRoutines.GetUserName4:" + WindowsUserRoutines.GetUserName4());
                     if (!string.IsNullOrWhiteSpace(user_name))
                         userLoggedOn();
+                    else
+                        Log.Warning("No user logged in.");
                 }
                 else
                 {
@@ -73,10 +79,15 @@ namespace Cliver.CisteraScreenCapture
         }
         static bool running = false;
 
+        static public string GetUserName()
+        {
+            return WindowsUserRoutines.GetUserName3();
+        }
+
         private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
         {
             //string user_name = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-            string user_name = WindowsUserRoutines.GetUserName();
+            string user_name = GetUserName();
             if (!string.IsNullOrWhiteSpace(user_name))
                 userLoggedOn();
             else
@@ -89,7 +100,7 @@ namespace Cliver.CisteraScreenCapture
             {
                 try
                 {
-                    string user_name = WindowsUserRoutines.GetUserName();
+                    string user_name = GetUserName();
                     if (user_name == null)
                     {
                         Log.Error("Session's user name is NULL.");
