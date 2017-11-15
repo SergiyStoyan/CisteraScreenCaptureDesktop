@@ -88,14 +88,14 @@ namespace Cliver.CisteraScreenCapture
                             System.Windows.Threading.Dispatcher.Run();
                         }
                     }, null, null, true, ApartmentState.STA);
+                    if (!SleepRoutines.WaitForCondition(() => { return dispatcher != null; }, 3000))
+                        throw new Exception("Could not get dispatcher.");
                 }
             }
-            if (dispatcher == null && !SleepRoutines.WaitForCondition(() => { return dispatcher != null; }, 3000))
-                throw new Exception("Could not get dispatcher.");
             dispatcher.Invoke(a);
             return w;
         }
-        static Thread t = null;
+        //static Thread t = null;
 
         InfoWindow()
         {
