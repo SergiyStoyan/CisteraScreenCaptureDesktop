@@ -112,15 +112,15 @@ namespace Cliver.CisteraScreenCapture
                 {
                     try
                     {
-                        if (SysTray.This.IsOnlyTCP)
-                        {
-                            Log.Warning("TEST MODE: IsOnlyTCP");
-                            IPAddress ip1;
-                            if (!IPAddress.TryParse(Settings.General.TcpClientDefaultIp, out ip1))
-                                throw new Exception("Server IP is not valid: " + Settings.General.TcpClientDefaultIp);
-                            TcpServer.Start(Settings.General.TcpServerPort, ip1);
-                            return;
-                        }
+                        //if (SysTray.This.IsOnlyTCP)
+                        //{
+                        //    Log.Warning("TEST MODE: IsOnlyTCP");
+                        //    IPAddress ip1;
+                        //    if (!IPAddress.TryParse(Settings.General.TcpClientDefaultIp, out ip1))
+                        //        throw new Exception("Server IP is not valid: " + Settings.General.TcpClientDefaultIp);
+                        //    TcpServer.Start(Settings.General.TcpServerPort, ip1);
+                        //    return;
+                        //}
 
                         if (string.IsNullOrWhiteSpace(user_name))
                         {

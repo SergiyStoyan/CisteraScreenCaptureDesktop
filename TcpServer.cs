@@ -27,14 +27,16 @@ namespace Cliver.CisteraScreenCapture
 
         static public void Start(int local_port, IPAddress destination_ip)
         {
-            if (thread != null && thread.IsAlive)
-                return;
-
-            Log.Inform("Starting TCP listener on " + local_port + " for " + destination_ip);
-
             if (!NetworkRoutines.IsNetworkAvailable())
                 throw new Exception("No network available.");
             IPAddress ipAddress = NetworkRoutines.GetLocalIpForDestination(destination_ip);
+
+            if (local_port == LocalPort && ipAddress.Equals(LocalIp))
+                return;
+            Stop();
+
+            Log.Inform("Starting TCP listener on " + local_port + " for " + destination_ip);
+
             //listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             //listeningSocket.Bind(localEndPoint);
             ////listeningSocket.Listen(100);
