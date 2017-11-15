@@ -161,5 +161,23 @@ namespace Cliver.CisteraScreenCapture
 
             Message.Inform(string.Join("\r\n", ls));
         }
+
+        private void testOnlyTCPToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            testOnlyTCPToolStripMenuItem.Checked = !testOnlyTCPToolStripMenuItem.Checked;
+            if( Service.Running)
+            {
+                Service.Running = false;
+                Service.Running = true;
+            }
+        }
+
+        public bool IsOnlyTCP
+        {
+            get
+            {
+                return (bool)this.Invoke(() => { return testOnlyTCPToolStripMenuItem.Checked; });
+            }
+        }
     }
 }

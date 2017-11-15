@@ -112,6 +112,16 @@ namespace Cliver.CisteraScreenCapture
                 {
                     try
                     {
+                        if (SysTray.This.IsOnlyTCP)
+                        {
+                            Log.Warning("TEST MODE: IsOnlyTCP");
+                            IPAddress ip1;
+                            if (!IPAddress.TryParse(Settings.General.TcpClientDefaultIp, out ip1))
+                                throw new Exception("Server IP is not valid: " + Settings.General.TcpClientDefaultIp);
+                            TcpServer.Start(Settings.General.TcpServerPort, ip1);
+                            return;
+                        }
+
                         if (string.IsNullOrWhiteSpace(user_name))
                         {
                             Log.Error("Session's user name is empty.");
@@ -123,14 +133,14 @@ namespace Cliver.CisteraScreenCapture
                         IReadOnlyList<IZeroconfHost> zhs = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10).Result;
                         if (zhs.Count < 1)
                         {
-                            currentServerIp = Settings.General.TcpClientDefaultIp.ToString();
+                            currentServerIp = Settings.General.TcpClientDefaultIp;
                             string m = "Service '" + service + "' could not be resolved.\r\nUsing default ip: " + currentServerIp;
                             Log.Warning(m);
                             InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
                         }
                         else if (zhs.Where(x => x.IPAddress != null).FirstOrDefault() == null)
                         {
-                            currentServerIp = Settings.General.TcpClientDefaultIp.ToString();
+                            currentServerIp = Settings.General.TcpClientDefaultIp;
                             string m = "Resolution of service '" + service + "' has no IP defined.\r\nUsing default ip: " + currentServerIp;
                             Log.Error(m);
                             InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
@@ -148,12 +158,6 @@ namespace Cliver.CisteraScreenCapture
 
                         string url = "http://" + currentServerIp + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
                         Log.Inform("GETing: " + url);
-
-                        //WebClient wc = new WebClient();
-                        //wc.ti
-                        //string r =   wc.DownloadString(url);
-                        //if (r.Trim() != "OK")
-                        //    throw new Exception("Response: " + r);
 
                         HttpClient hc = new HttpClient();
                         HttpResponseMessage rm = hc.GetAsync(url).Result;
