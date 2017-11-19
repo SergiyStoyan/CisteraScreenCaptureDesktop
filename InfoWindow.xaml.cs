@@ -69,7 +69,7 @@ namespace Cliver.CisteraScreenCapture
             {
                 if (dispatcher == null)
                 {//!!!the following code does not work in static constructor because creates a deadlock!!!
-                    Thread t = ThreadRoutines.StartTry(() =>
+                    dispatcher_t = ThreadRoutines.StartTry(() =>
                     {
                         if (invisible_owner_w == null)
                         {//this window is used to hide notification windows from Alt+Tab panel
@@ -84,7 +84,8 @@ namespace Cliver.CisteraScreenCapture
 
                         if (dispatcher == null)
                         {
-                            dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
+                            //dispatcher = System.Windows.Threading.Dispatcher.CurrentDispatcher;
+                            dispatcher = System.Windows.Threading.Dispatcher.FromThread(Thread.CurrentThread);
                             System.Windows.Threading.Dispatcher.Run();
                         }
                     }, null, null, true, ApartmentState.STA);
@@ -94,8 +95,8 @@ namespace Cliver.CisteraScreenCapture
             }
             dispatcher.Invoke(a);
             return w;
-        }
-        //static Thread t = null;
+        }        
+        static Thread dispatcher_t = null;
 
         InfoWindow()
         {

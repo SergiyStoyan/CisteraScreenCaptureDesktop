@@ -7,7 +7,6 @@ using System.Configuration;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Web.Script.Serialization;
 using System.Net;
 
 namespace Cliver.CisteraScreenCapture

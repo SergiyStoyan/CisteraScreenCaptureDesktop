@@ -25,6 +25,7 @@ namespace Cliver.CisteraScreenCapture
     {
         public const string FfmpegStart = "FfmpegStart";
         public const string FfmpegStop = "FfmpegStop";
+        public const string SslStart = "SslStart";
         public const string Success = "OK";
 
         public readonly ushort Size;
@@ -89,37 +90,37 @@ namespace Cliver.CisteraScreenCapture
             Encoding.ASCII.GetBytes(body).CopyTo(NameBodyAsBytes, i);
         }
 
-        static public TcpMessage Receive(Socket socket)
+        static public TcpMessage Receive(Stream stream)
         {
             byte[] message_size_buffer = new byte[2];
-            if (socket.Receive(message_size_buffer, message_size_buffer.Length, SocketFlags.None) < message_size_buffer.Length)
-                throw new Exception("Could not read from socket the required count of bytes: " + message_size_buffer.Length);
+            if (stream.Read(message_size_buffer, 0, message_size_buffer.Length) < message_size_buffer.Length)
+                throw new Exception("Could not read from stream the required count of bytes: " + message_size_buffer.Length);
             ushort message_size = BitConverter.ToUInt16(message_size_buffer, 0);
             byte[] message_buffer = new byte[message_size];
-            if (socket.Receive(message_buffer, message_buffer.Length, SocketFlags.None) < message_buffer.Length)
-                throw new Exception("Could not read from socket the required count of bytes: " + message_buffer.Length);
+            if (stream.Read(message_buffer, 0, message_buffer.Length) < message_buffer.Length)
+                throw new Exception("Could not read from stream the required count of bytes: " + message_buffer.Length);
             return new TcpMessage(message_buffer);
         }
 
-        public void Reply(Socket socket, string body)
+        public void Reply(Stream stream, string body)
         {
             TcpMessage m = new TcpMessage(Name, body);
-            m.send(socket);
+            m.send(stream);
         }
 
-        void send(Socket socket)
+        void send(Stream stream)
         {
             byte[] sizeAsBytes = BitConverter.GetBytes(Size);
-            if (socket.Send(sizeAsBytes) < sizeAsBytes.Length)
-                throw new Exception("Could not send to socket the required count of bytes: " + sizeAsBytes.Length);
-            if (socket.Send(NameBodyAsBytes) < NameBodyAsBytes.Length)
-                throw new Exception("Could not send to socket the required count of bytes: " + NameBodyAsBytes.Length);
+            stream.Write(sizeAsBytes, 0, sizeAsBytes.Length);
+            //throw new Exception("Could not send to stream the required count of bytes: " + sizeAsBytes.Length);
+            stream.Write(NameBodyAsBytes, 0, NameBodyAsBytes.Length);
+            //throw new Exception("Could not send to stream the required count of bytes: " + NameBodyAsBytes.Length);
         }
 
-        public TcpMessage SendAndReceiveReply(Socket socket)
+        public TcpMessage SendAndReceiveReply(Stream stream)
         {
-            send(socket);
-            return Receive(socket);
+            send(stream);
+            return Receive(stream);
         }
     }
 }
