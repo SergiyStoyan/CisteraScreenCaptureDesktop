@@ -47,9 +47,11 @@ namespace Cliver.CisteraScreenCapture
                     if (NameBodyAsBytes[i] == '\0')
                     {
                         i++;
-                        if (i < NameBodyAsBytes.Length)
-                            return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, i, NameBodyAsBytes.Length - i);
-                        return "";
+                        int c = 0;
+                        for (; i + c < NameBodyAsBytes.Length; c++)
+                            if (NameBodyAsBytes[i + c] == '\0')
+                                return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, i, c);
+                        return System.Text.Encoding.ASCII.GetString(NameBodyAsBytes, i, c);
                     }
                 return null;
             }

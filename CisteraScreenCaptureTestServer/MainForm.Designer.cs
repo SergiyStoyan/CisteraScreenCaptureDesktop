@@ -36,6 +36,7 @@
             this.mpegCommandLine = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.state = new System.Windows.Forms.TextBox();
+            this.bSsl = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // start
@@ -121,11 +122,23 @@
             this.state.TabIndex = 10;
             this.state.Text = "gddgrdfg";
             // 
+            // bSsl
+            // 
+            this.bSsl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bSsl.Location = new System.Drawing.Point(288, 312);
+            this.bSsl.Name = "bSsl";
+            this.bSsl.Size = new System.Drawing.Size(75, 23);
+            this.bSsl.TabIndex = 11;
+            this.bSsl.Text = "SSL";
+            this.bSsl.UseVisualStyleBackColor = true;
+            this.bSsl.Click += new System.EventHandler(this.bSsl_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(559, 366);
+            this.Controls.Add(this.bSsl);
             this.Controls.Add(this.state);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.mpegCommandLine);
@@ -151,5 +164,6 @@
         private System.Windows.Forms.TextBox mpegCommandLine;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox state;
+        private System.Windows.Forms.Button bSsl;
     }
 }

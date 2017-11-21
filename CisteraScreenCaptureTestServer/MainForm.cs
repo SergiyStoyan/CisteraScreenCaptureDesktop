@@ -14,6 +14,12 @@ using Cliver.CisteraScreenCapture;
 //using Bonjour;
 //using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.IO;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography;
+using System.Security.Authentication;
+
 
 namespace Cliver.CisteraScreenCaptureTestServer
 {
@@ -147,6 +153,9 @@ namespace Cliver.CisteraScreenCaptureTestServer
             }
             if(!socket.Connected || !socket.Poll(1000, SelectMode.SelectWrite))
                 socket.Connect(remoteHost, int.Parse(remotePort));
+            if (stream != null)
+                stream.Dispose();
+            stream = new NetworkStream(socket);
         }
 
         void disconnect_socket()
@@ -169,6 +178,11 @@ namespace Cliver.CisteraScreenCaptureTestServer
             {
                 socket = null;
             }
+            if (stream != null)
+            {
+                stream.Dispose();
+                stream = null;
+            }
         }
 
         private void start_Click(object sender, EventArgs e)
@@ -179,7 +193,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
 
                 connect_socket();
                 TcpMessage m = new TcpMessage(TcpMessage.FfmpegStart, mpegCommandLine.Text);
-                TcpMessage m2 = m.SendAndReceiveReply(socket);
+                TcpMessage m2 = m.SendAndReceiveReply(stream);
 
                 //Message.Inform("Response: " + m2.BodyAsText);
                 stateText = "MPEG started";
@@ -196,6 +210,8 @@ namespace Cliver.CisteraScreenCaptureTestServer
             }
         }
 
+        Stream stream = null;
+
         private void stop_Click(object sender, EventArgs e)
         {
             try
@@ -204,7 +220,7 @@ namespace Cliver.CisteraScreenCaptureTestServer
 
                 connect_socket();
                 TcpMessage m = new TcpMessage(TcpMessage.FfmpegStop, null);
-                TcpMessage m2 = m.SendAndReceiveReply(socket);
+                TcpMessage m2 = m.SendAndReceiveReply(stream);
 
                 //Message.Inform("Response: " + m2.BodyAsText);
                 stateText = "MPEG stopped";
@@ -251,6 +267,43 @@ namespace Cliver.CisteraScreenCaptureTestServer
                 {
                     stop.Enabled = value;
                 });
+            }
+        }
+
+        private void bSsl_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                stateText = "Starting SSL...";
+
+                connect_socket();
+                TcpMessage m = new TcpMessage(TcpMessage.SslStart, null);
+                TcpMessage m2 = m.SendAndReceiveReply(stream);
+                if (m2.BodyAsText.Trim() != TcpMessage.Success)
+                    throw new Exception(m2.BodyAsText);
+
+                //Message.Inform("Response: " + m2.BodyAsText);
+                stateText = "Starting SSL-2...";
+
+                SslStream sstream = new SslStream(stream, false);
+                stream = sstream;
+
+                byte[] certificateBuffer = SslRoutines.GetBytesFromPEM(File.ReadAllText("server_certificate.pem"), SslRoutines.PemStringType.Certificate);
+                X509Certificate2 certificate = new X509Certificate2(certificateBuffer);
+                byte[] keyBuffer = SslRoutines.GetBytesFromPEM(File.ReadAllText("server_key.pem"), SslRoutines.PemStringType.PrivateKey);
+                certificate.PrivateKey = SslRoutines.CreateRsaProviderFromPrivateKey(keyBuffer);
+
+                sstream.AuthenticateAsServer(certificate);
+
+                bSsl.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                Message.Error(ex);
+            }
+            finally
+            {
+                //disconnect_socket();
             }
         }
     }
