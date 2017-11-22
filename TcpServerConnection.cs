@@ -169,19 +169,9 @@ namespace Cliver.CisteraScreenCapture
         {
             SslStream sstream = new SslStream(stream, false, remoteCertificateValidationCallback);
             stream = sstream;
-
-            //byte[] certificateBuffer = SslRoutines.GetBytesFromPEM(File.ReadAllText(), SslRoutines.PemStringType.Certificate);
-            //X509Certificate2 certificate = new X509Certificate2(certificateBuffer);
-            //byte[] keyBuffer = SslRoutines.GetBytesFromPEM(File.ReadAllText(), SslRoutines.PemStringType.PrivateKey);
-            //RSACryptoServiceProvider prov = System.Web.Helpers.Crypto.DecodeRsaPrivateKey(keyBuffer);
-            //certificate.PrivateKey = prov;
-
-            //OpenSSL.X509Certificate2Provider.CertificateFromFileProvider cffp = new OpenSSL.X509Certificate2Provider.CertificateFromFileProvider(File.ReadAllText(SslCertificateFileName), File.ReadAllText(SslPrivateKeyFileName));
-            //X509Certificate certificate = new X509Certificate();
-            //sstream.AuthenticateAsServer((cffp.Certificate, false, SslProtocols.Ssl2 | SslProtocols.Ssl3 | SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, false);
             //sstream.AuthenticateAsClient("", ClientCertColl, SslProtocols.Tls, false);
             //sstream.AuthenticateAsClient(server, null, SslProtocols.Default, false);
-            sstream.AuthenticateAsClient(null);
+            sstream.AuthenticateAsClient("");
         }
 
         bool remoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
