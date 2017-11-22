@@ -77,9 +77,11 @@ SSL_CTX* createSslContext(bool server)
 
 	SSL_CTX_set_ecdh_auto(ctx, 1);
 
-	//StringStorage currentModuleFolderPath_;
-	//Environment::getCurrentModuleFolderPath(&currentModuleFolderPath_);
-	char currentModuleFolderPath[2000];
+	TCHAR currentModuleFolderPath[2000];
+	GetModuleFileName(NULL, currentModuleFolderPath, sizeof(currentModuleFolderPath));
+	//char *result = wstrstr(currentModuleFolderPath, "\\");
+	//int position = result - str;
+	//int substringLength = strlen(str) - position;
 #ifdef UNICODE
 	//TCHAR == WCHAR
 	//wcstombs(currentModuleFolderPath, currentModuleFolderPath_.getString(), sizeof(currentModuleFolderPath));
@@ -89,12 +91,12 @@ SSL_CTX* createSslContext(bool server)
 #endif
 	char buffer[2000];
 	sprintf(buffer, "%s\\%s", currentModuleFolderPath, "server_certificate.pem");
-	sprintf(buffer, "%s", "server_certificate.pem");
+	//sprintf(buffer, "%s", "server_certificate.pem");
 	if (SSL_CTX_use_certificate_file(ctx, buffer, SSL_FILETYPE_PEM) <= 0)
 		throwSslException();
 
-	//sprintf(buffer, "%s\\%s", currentModuleFolderPath, "server_key.pem");
-	sprintf(buffer, "%s", "server_key.pem");
+	sprintf(buffer, "%s\\%s", currentModuleFolderPath, "server_key.pem");
+	//sprintf(buffer, "%s", "server_key.pem");
 	if (SSL_CTX_use_PrivateKey_file(ctx, buffer, SSL_FILETYPE_PEM) <= 0)
 		throwSslException();
 
