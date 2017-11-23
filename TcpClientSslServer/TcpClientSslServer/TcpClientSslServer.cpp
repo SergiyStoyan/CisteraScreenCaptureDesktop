@@ -227,6 +227,15 @@ void destroySslSocket()
 		shutdownSsl();
 }
 
+void sendCommandAndReceiveReply(char* command, char *reply)
+{
+	char message_length[2] = { strlen(command) + 1,0 };
+	sendAll(message_length, 2, 0);
+	sendAll(command, message_length[0], 0);
+	recvAll(reply, 2, 0);
+	recvAll(reply, reply[0], 0);
+}
+
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_IP "127.0.0.1"
 #define DEFAULT_PORT "5900"
@@ -295,27 +304,12 @@ int __cdecl main(int argc, char **argv)
 		return 1;
 	}
 
-	{
-		char message_length[2] = { 9,0 };
-		sendAll(message_length, 2, 0);
-		sendAll("SslStart\0", 9, 0);
-		recvAll(recvbuf, 2, 0);
-		recvAll(recvbuf, recvbuf[0], 0);
-	}
+	sendCommandAndReceiveReply("SslStart", recvbuf);
 
-	if(recvbuf[9] == 'O' &&recvbuf[10] == 'K')//check if the command is OK
+	if(recvbuf[9] == 'O' &&recvbuf[10] == 'K')//check if reply is OK
 		createSslSocket(true);
-
-	/*recvAll(recvbuf, 2, 0);
-	recvAll(recvbuf, recvbuf[0], 0);*/
-
-	{
-		char message_length[2] = { 11,0 };
-		sendAll(message_length, 2, 0);
-		sendAll("FfmpegStop\0", 11, 0);
-		recvAll(recvbuf, 2, 0);
-		recvAll(recvbuf, recvbuf[0], 0);
-	}
+	
+	sendCommandAndReceiveReply("FfmpegStop", recvbuf);
 
 	// cleanup
 	closesocket(m_socket);
