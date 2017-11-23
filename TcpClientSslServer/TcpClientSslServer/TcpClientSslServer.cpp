@@ -237,16 +237,6 @@ int __cdecl main(int argc, char **argv)
 	std::string argv_str(argv[0]);
 	appDir = argv_str.substr(0, argv_str.find_last_of("\\"));
 
-	/*TCHAR currentModuleFolderPath[2000];
-	GetModuleFileName(NULL, currentModuleFolderPath, sizeof(currentModuleFolderPath));
-	char *result = strstr(currentModuleFolderPath, "\\");*/
-	//int position = result - str;
-	//int substringLength = strlen(str) - position;
-	//wcstombs(currentModuleFolderPath, currentModuleFolderPath_.getString(), sizeof(currentModuleFolderPath));
-
-
-
-
 	WSADATA wsaData;
 	struct addrinfo *result = NULL,
 		*ptr = NULL,
@@ -305,55 +295,27 @@ int __cdecl main(int argc, char **argv)
 		return 1;
 	}
 
-	char message_length[2] = { 9,0 };
-	char *message_name = "SslStart\0";
-	iResult = send(message_length, 2, 0);
-	iResult = send(message_name, 9, 0);
-	if (iResult == SOCKET_ERROR) {
-		printf("send failed with error: %d\n", WSAGetLastError());
-		closesocket(m_socket);
-		WSACleanup();
-		return 1;
+	{
+		char message_length[2] = { 9,0 };
+		sendAll(message_length, 2, 0);
+		sendAll("SslStart\0", 9, 0);
+		recvAll(recvbuf, 2, 0);
+		recvAll(recvbuf, recvbuf[0], 0);
 	}
 
-	printf("Bytes Sent: %ld\n", iResult);
+	if(recvbuf[9] == 'O' &&recvbuf[10] == 'K')//check if the command is OK
+		createSslSocket(true);
 
-	//// shutdown the connection since no more data will be sent
-	//iResult = shutdown(ConnectSocket, SD_SEND);
-	//if (iResult == SOCKET_ERROR) {
-	//	printf("shutdown failed with error: %d\n", WSAGetLastError());
-	//	closesocket(ConnectSocket);
-	//	WSACleanup();
-	//	return 1;
-	//}
-
-	// Receive until the peer closes the connection
-	//do {
-	/*iResult = recv(recvbuf, recvbuflen, 0);
-	if (iResult > 0)
-		printf("Bytes received: %d\n", iResult);
-	else if (iResult == 0)
-		printf("Connection closed\n");
-	else
-		printf("recv failed with error: %d\n", WSAGetLastError());*/
-	//} while (iResult > 0);
-
-	createSslSocket(true);
-
-	recvAll(recvbuf, 2, 0);
-	recvAll(recvbuf, recvbuf[0], 0);
+	/*recvAll(recvbuf, 2, 0);
+	recvAll(recvbuf, recvbuf[0], 0);*/
 
 	{
 		char message_length[2] = { 11,0 };
-		char *message_name = "FfmpegStop\0";
-		iResult = send(message_length, 2, 0);
-		iResult = send(message_name, 11, 0);
+		sendAll(message_length, 2, 0);
+		sendAll("FfmpegStop\0", 11, 0);
+		recvAll(recvbuf, 2, 0);
+		recvAll(recvbuf, recvbuf[0], 0);
 	}
-
-
-	recvAll(recvbuf, 2, 0);
-	recvAll(recvbuf, recvbuf[0], 0);
-
 
 	// cleanup
 	closesocket(m_socket);
