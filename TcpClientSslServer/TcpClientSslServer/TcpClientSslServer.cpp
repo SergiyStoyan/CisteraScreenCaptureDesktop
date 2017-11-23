@@ -30,7 +30,9 @@
 #pragma warning(disable:4996)
 
 
+#include <string>
 
+static std::string appDir;
 
 static SOCKET m_socket = INVALID_SOCKET;
 static SSL* m_ssl_socket = NULL;
@@ -77,26 +79,15 @@ SSL_CTX* createSslContext(bool server)
 
 	SSL_CTX_set_ecdh_auto(ctx, 1);
 
-	TCHAR currentModuleFolderPath[2000];
-	GetModuleFileName(NULL, currentModuleFolderPath, sizeof(currentModuleFolderPath));
-	//char *result = wstrstr(currentModuleFolderPath, "\\");
-	//int position = result - str;
-	//int substringLength = strlen(str) - position;
-#ifdef UNICODE
-	//TCHAR == WCHAR
-	//wcstombs(currentModuleFolderPath, currentModuleFolderPath_.getString(), sizeof(currentModuleFolderPath));
-#else
-	//TCHAR == char	
-	strcpy(currentModuleFolderPath, (char *)currentModuleFolderPath_.getString());
-#endif
+	/*const long flags = SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 | SSL_OP_NO_COMPRESSION;
+	SSL_CTX_set_options(ctx, flags);*/
+
 	char buffer[2000];
-	sprintf(buffer, "%s\\%s", currentModuleFolderPath, "server_certificate.pem");
-	//sprintf(buffer, "%s", "server_certificate.pem");
+	sprintf(buffer, "%s\\%s", appDir.c_str(), "server_certificate.pem");
 	if (SSL_CTX_use_certificate_file(ctx, buffer, SSL_FILETYPE_PEM) <= 0)
 		throwSslException();
 
-	sprintf(buffer, "%s\\%s", currentModuleFolderPath, "server_key.pem");
-	//sprintf(buffer, "%s", "server_key.pem");
+	sprintf(buffer, "%s\\%s", appDir.c_str(), "server_key.pem");
 	if (SSL_CTX_use_PrivateKey_file(ctx, buffer, SSL_FILETYPE_PEM) <= 0)
 		throwSslException();
 
@@ -240,8 +231,22 @@ void destroySslSocket()
 #define DEFAULT_IP "127.0.0.1"
 #define DEFAULT_PORT "5900"
 
+
 int __cdecl main(int argc, char **argv)
 {
+	std::string argv_str(argv[0]);
+	appDir = argv_str.substr(0, argv_str.find_last_of("\\"));
+
+	/*TCHAR currentModuleFolderPath[2000];
+	GetModuleFileName(NULL, currentModuleFolderPath, sizeof(currentModuleFolderPath));
+	char *result = strstr(currentModuleFolderPath, "\\");*/
+	//int position = result - str;
+	//int substringLength = strlen(str) - position;
+	//wcstombs(currentModuleFolderPath, currentModuleFolderPath_.getString(), sizeof(currentModuleFolderPath));
+
+
+
+
 	WSADATA wsaData;
 	struct addrinfo *result = NULL,
 		*ptr = NULL,
@@ -324,25 +329,30 @@ int __cdecl main(int argc, char **argv)
 
 	// Receive until the peer closes the connection
 	//do {
-	iResult = recv(recvbuf, recvbuflen, 0);
+	/*iResult = recv(recvbuf, recvbuflen, 0);
 	if (iResult > 0)
 		printf("Bytes received: %d\n", iResult);
 	else if (iResult == 0)
 		printf("Connection closed\n");
 	else
-		printf("recv failed with error: %d\n", WSAGetLastError());
+		printf("recv failed with error: %d\n", WSAGetLastError());*/
 	//} while (iResult > 0);
 
 	createSslSocket(true);
 
+	recvAll(recvbuf, 2, 0);
+	recvAll(recvbuf, recvbuf[0], 0);
+
 	{
-		char message_length[2] = { 9,0 };
-		char *message_name = "SslStart\0";
+		char message_length[2] = { 11,0 };
+		char *message_name = "FfmpegStop\0";
 		iResult = send(message_length, 2, 0);
-		iResult = send(message_name, 9, 0);
+		iResult = send(message_name, 11, 0);
 	}
 
 
+	recvAll(recvbuf, 2, 0);
+	recvAll(recvbuf, recvbuf[0], 0);
 
 
 	// cleanup

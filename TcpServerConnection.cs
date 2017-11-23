@@ -27,9 +27,6 @@ namespace Cliver.CisteraScreenCapture
 {
     public class TcpServerConnection : IDisposable
     {
-        //readonly static string SslCertificateFileName = Log.AppDir + "\\server_certificate.pem";
-        //readonly static string SslPrivateKeyFileName = Log.AppDir + "\\server_key.pem";
-
         public TcpServerConnection(Socket socket)
         {
             this.socket = socket;
@@ -147,8 +144,7 @@ namespace Cliver.CisteraScreenCapture
                             MpegStream.Stop();
                             break;
                         case TcpMessage.SslStart:
-                            if (stream is SslStream)
-                                throw new Exception("SSL is already started.");
+                            startSsl();
                             break;
                         default:
                             throw new Exception("Unknown message: " + m.Name);
@@ -160,16 +156,18 @@ namespace Cliver.CisteraScreenCapture
                 }
                 Log.Inform("Tcp message sending: " + m.Name + "\r\n" + reply);
                 m.Reply(stream, reply);
-                if(reply == TcpMessage.Success && m.Name == TcpMessage.SslStart && !(stream is SslStream))
-                    startSsl(); 
+                //if(reply == TcpMessage.Success && m.Name == TcpMessage.SslStart && !(stream is SslStream))
+                //    startSsl(); 
             }
         }
 
         void startSsl()
         {
+            if (stream is SslStream)
+                throw new Exception("SSL is already started.");
             SslStream sstream = new SslStream(stream, false, remoteCertificateValidationCallback);
             stream = sstream;
-            //sstream.AuthenticateAsClient("", ClientCertColl, SslProtocols.Tls, false);
+            //sstream.AuthenticateAsClient("", null, SslProtocols.Tls12, false);
             //sstream.AuthenticateAsClient(server, null, SslProtocols.Default, false);
             sstream.AuthenticateAsClient("");
         }
