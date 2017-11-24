@@ -3,41 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TcpClientSslServer", "TcpClientSslServer\TcpClientSslServer.vcxproj", "{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TcpClientSslServer", "TcpClientSslServer.vcxproj", "{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
-		DebugNoUnicode|x64 = DebugNoUnicode|x64
-		DebugNoUnicode|x86 = DebugNoUnicode|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-		ReleaseNoUnicode|x64 = ReleaseNoUnicode|x64
-		ReleaseNoUnicode|x86 = ReleaseNoUnicode|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.Debug|x64.ActiveCfg = Debug|x64
 		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.Debug|x64.Build.0 = Debug|x64
 		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.Debug|x86.ActiveCfg = Debug|Win32
 		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.Debug|x86.Build.0 = Debug|Win32
-		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.DebugNoUnicode|x64.ActiveCfg = Debug|x64
-		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.DebugNoUnicode|x64.Build.0 = Debug|x64
-		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.DebugNoUnicode|x86.ActiveCfg = Debug|Win32
-		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.DebugNoUnicode|x86.Build.0 = Debug|Win32
 		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.Release|x64.ActiveCfg = Release|x64
 		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.Release|x64.Build.0 = Release|x64
 		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.Release|x86.ActiveCfg = Release|Win32
 		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.Release|x86.Build.0 = Release|Win32
-		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.ReleaseNoUnicode|x64.ActiveCfg = Release|x64
-		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.ReleaseNoUnicode|x64.Build.0 = Release|x64
-		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.ReleaseNoUnicode|x86.ActiveCfg = Release|Win32
-		{B67E54F3-2B27-4B14-9E0B-795FD40CBE41}.ReleaseNoUnicode|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A4883C09-4722-41E9-A581-B698DED93889}
+		SolutionGuid = {80E9F03A-4BD2-47B0-A810-424392563190}
 	EndGlobalSection
 EndGlobal

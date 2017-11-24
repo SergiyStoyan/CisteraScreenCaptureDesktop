@@ -79,14 +79,6 @@
   <PropertyGroup />
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="OpenSSL.PrivateKeyDecoder, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\OpenSSL.PrivateKeyDecoder.1.0.1\lib\net45\OpenSSL.PrivateKeyDecoder.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="OpenSSL.X509Certificate2.Provider, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\OpenSSL.X509Certificate2.Provider.1.0.2\lib\net45\OpenSSL.X509Certificate2.Provider.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
