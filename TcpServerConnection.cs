@@ -144,19 +144,22 @@ namespace Cliver.CisteraScreenCapture
                             MpegStream.Stop();
                             break;
                         case TcpMessage.SslStart:
-                            break;
+                            if (stream is SslStream)
+                                throw new Exception("SSL is already started.");
+                            goto SSL_START;
                         default:
                             throw new Exception("Unknown message: " + m.Name);
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     reply = e.Message;
                 }
                 Log.Inform("Tcp message sending: " + m.Name + "\r\n" + reply);
                 m.Reply(stream, reply);
-                if (m.Name == TcpMessage.SslStart && reply == TcpMessage.Success)
-                    startSsl();
+                continue;
+                SSL_START:
+                startSsl();
             }
         }
 
