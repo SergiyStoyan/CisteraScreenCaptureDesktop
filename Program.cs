@@ -21,6 +21,7 @@ using Cliver;
 using System.Configuration;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using System.Diagnostics;
 
 /// <summary>
 /// TBD:
@@ -72,6 +73,31 @@ namespace Cliver.CisteraScreenCapture
         {
             try
             {
+                //try
+                //{
+                //    const string file = "cmd.exe";                   
+
+                //    var proc = new Process();
+                //    proc.StartInfo.UseShellExecute = false;
+                //    proc.StartInfo.WorkingDirectory = Path.GetDirectoryName(file);
+                //    proc.StartInfo.FileName = Path.GetFileName(file);
+                //    //proc.StartInfo.Domain = "WIN08";
+                //    proc.StartInfo.Arguments = "";
+                //    proc.StartInfo.UserName = "test";
+                //    var password = new System.Security.SecureString();
+                //    foreach (var c in "123")
+                //        password.AppendChar(c);
+                //    proc.StartInfo.Password = password;
+                //    proc.StartInfo.LoadUserProfile = false;
+                //    proc.Start();
+                //}
+                //catch (Exception e)
+                //{
+                //    Console.WriteLine(e);
+                //}
+
+
+
                 //MpegStream.Start("-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
                 //Thread.Sleep(2000);
                 //MpegStream.Stop();
