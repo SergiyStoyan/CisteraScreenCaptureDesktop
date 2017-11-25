@@ -74,22 +74,21 @@ namespace Cliver.CisteraScreenCapture
             try
             {
                 //try
-                //{
-                //    const string file = "cmd.exe";                   
-
-                //    var proc = new Process();
-                //    proc.StartInfo.UseShellExecute = false;
-                //    proc.StartInfo.WorkingDirectory = Path.GetDirectoryName(file);
-                //    proc.StartInfo.FileName = Path.GetFileName(file);
+                //{   
+                //    var p = new Process();
+                //    p.StartInfo.UseShellExecute = false;
+                //    const string file = "cmd.exe";  
+                //    p.StartInfo.WorkingDirectory = Path.GetDirectoryName(file);
+                //    p.StartInfo.FileName = Path.GetFileName(file);
                 //    //proc.StartInfo.Domain = "WIN08";
-                //    proc.StartInfo.Arguments = "";
-                //    proc.StartInfo.UserName = "test";
+                //    p.StartInfo.Arguments = "";
+                //    p.StartInfo.UserName = "test";
                 //    var password = new System.Security.SecureString();
                 //    foreach (var c in "123")
                 //        password.AppendChar(c);
-                //    proc.StartInfo.Password = password;
-                //    proc.StartInfo.LoadUserProfile = false;
-                //    proc.Start();
+                //    p.StartInfo.Password = password;
+                //    p.StartInfo.LoadUserProfile = false;
+                //    p.Start();
                 //}
                 //catch (Exception e)
                 //{
