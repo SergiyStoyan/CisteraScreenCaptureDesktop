@@ -18,8 +18,7 @@ namespace Cliver.CisteraScreenCaptureService
                 Log.Error(e);
             };            
 
-            Log.Initialize(Log.Mode.ONLY_LOG);
-            Log.Inform("Version: " + AssemblyRoutines.GetAppVersion());
+            Log.Initialize(Log.Mode.SESSIONS, Log.GetAppCommonDataDir());
 
             //Config.Initialize(new string[] { "General" });
             Cliver.Config.Reload();
@@ -29,6 +28,8 @@ namespace Cliver.CisteraScreenCaptureService
         {
             try
             {
+                Log.Inform("Version: " + AssemblyRoutines.GetAppVersion());
+
                 ServiceBase.Run(new Service());
             }
             catch(Exception e)

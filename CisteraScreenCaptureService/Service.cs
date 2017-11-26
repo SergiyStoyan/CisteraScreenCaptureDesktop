@@ -42,6 +42,33 @@ namespace Cliver.CisteraScreenCaptureService
         {
             Log.Inform("Starting...");
             CisteraScreenCaptureService.Events.Started();
+            
+            try
+            {
+                var p = new Process();
+                p.StartInfo.UseShellExecute = false;
+                const string file = "cmd.exe";
+                //const string file = @"psexec.exe";
+                p.StartInfo.WorkingDirectory = Path.GetDirectoryName(file);
+                p.StartInfo.FileName = Path.GetFileName(file);
+                //proc.StartInfo.Domain = "WIN08";
+                //p.StartInfo.Arguments = "-i -d -s cmd";
+                //p.StartInfo.UserName = "SYSTEM";
+                //var password = new System.Security.SecureString();
+                //foreach (var c in "123")
+                //    password.AppendChar(c);
+                //p.StartInfo.Password = password;
+                p.StartInfo.LoadUserProfile = false;
+                p.Start();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+
+
+
 
             string user_name = GetUserName();
             //Log.Inform("TEST user by WindowsUserRoutines.GetUserName:" + WindowsUserRoutines.GetUserName());
@@ -69,31 +96,7 @@ namespace Cliver.CisteraScreenCaptureService
 
         public delegate void OnStateChanged();
         public static event OnStateChanged StateChanged = null;
-
-        public static bool Running
-        {
-            set
-            {
-                if (running == value)
-                    return;
-                running = value;
-
-                if (value)
-                {
-                }
-                else
-                {
-                }
-
-                StateChanged?.Invoke();
-            }
-            get
-            {
-                return running;
-            }
-        }
-        static bool running = false;
-
+        
         static public string GetUserName()
         {
             return WindowsUserRoutines.GetUserName3();
@@ -101,8 +104,6 @@ namespace Cliver.CisteraScreenCaptureService
 
         private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
         {
-            if (!Running)
-                return;
             switch (e.Reason)
             {
                 case SessionSwitchReason.ConsoleConnect:
