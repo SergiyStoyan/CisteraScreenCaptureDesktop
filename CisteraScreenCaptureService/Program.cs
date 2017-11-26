@@ -6,21 +6,35 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
 
-namespace CisteraScreenCaptureService
+namespace Cliver.CisteraScreenCaptureService
 {
     static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
+        static Program()
+        {
+            AppDomain.CurrentDomain.UnhandledException += delegate (object sender, UnhandledExceptionEventArgs args)
+            {
+                Exception e = (Exception)args.ExceptionObject;
+                Log.Error(e);
+            };            
+
+            Log.Initialize(Log.Mode.ONLY_LOG);
+            Log.Inform("Version: " + AssemblyRoutines.GetAppVersion());
+
+            //Config.Initialize(new string[] { "General" });
+            Cliver.Config.Reload();
+        }
+
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
+            try
             {
-                new Service1()
-            };
-            ServiceBase.Run(ServicesToRun);
+                ServiceBase.Run(new Service());
+            }
+            catch(Exception e)
+            {
+                Log.Error(e);
+            }
         }
 
         //[ServiceContract(Namespace = "http://Microsoft.ServiceModel.Samples", SessionMode = SessionMode.Required, CallbackContract = typeof(IClientApi))]

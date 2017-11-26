@@ -1,6 +1,6 @@
-﻿namespace CisteraScreenCaptureService
+﻿namespace Cliver.CisteraScreenCaptureService
 {
-    partial class Service1
+    partial class Service
     {
         /// <summary> 
         /// Required designer variable.
