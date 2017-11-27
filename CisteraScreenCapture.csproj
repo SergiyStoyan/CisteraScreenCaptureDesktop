@@ -156,6 +156,7 @@
     <Compile Include="InfoControl.xaml.cs" />
     <Compile Include="InfoWindow.xaml.cs" />
     <Compile Include="MpegStream.cs" />
+    <Compile Include="MpegStream1.cs" />
     <Compile Include="Settings\General.cs" />
     <Compile Include="Settings\View.cs" />
     <Compile Include="TcpMessage.cs" />

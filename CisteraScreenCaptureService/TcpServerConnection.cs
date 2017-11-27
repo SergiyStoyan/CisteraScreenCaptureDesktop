@@ -33,7 +33,7 @@ namespace Cliver.CisteraScreenCaptureService
             stream = new NetworkStream(socket);
 
             Log.Inform("Starting connection from " + RemoteIp + ":" + RemotePort);
-            
+
             thread = ThreadRoutines.StartTry(
                 run,
                 (Exception e) =>
@@ -95,7 +95,7 @@ namespace Cliver.CisteraScreenCaptureService
             }
         }
 
-        public  IPAddress LocalIp
+        public IPAddress LocalIp
         {
             get
             {
@@ -105,7 +105,7 @@ namespace Cliver.CisteraScreenCaptureService
             }
         }
 
-        public  ushort LocalPort
+        public ushort LocalPort
         {
             get
             {
@@ -115,7 +115,7 @@ namespace Cliver.CisteraScreenCaptureService
             }
         }
 
-        public  IPAddress RemoteIp
+        public IPAddress RemoteIp
         {
             get
             {
@@ -125,7 +125,7 @@ namespace Cliver.CisteraScreenCaptureService
             }
         }
 
-        public  ushort RemotePort
+        public ushort RemotePort
         {
             get
             {
@@ -163,7 +163,7 @@ namespace Cliver.CisteraScreenCaptureService
                             throw new Exception("Unknown message: " + m.Name);
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     reply = e.Message;
                 }

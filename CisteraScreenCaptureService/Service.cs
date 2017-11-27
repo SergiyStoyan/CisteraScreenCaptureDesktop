@@ -45,7 +45,7 @@ namespace Cliver.CisteraScreenCaptureService
             
             try
             {
-                Win32Process.CreateProcessInConsoleSession("cmd", false);
+                //Win32Process.CreateProcessInConsoleSession("cmd");
                 //var p = new Process();
                 //p.StartInfo.UseShellExecute = false;
                 //const string file = "cmd.exe";

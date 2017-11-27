@@ -29,9 +29,9 @@ using System.Runtime.InteropServices;
 
 namespace Cliver.CisteraScreenCapture
 {
-    public class MpegStream
+    public class MpegStream1
     {
-        static MpegStream()
+        static MpegStream1()
         {
         }
 
@@ -63,33 +63,40 @@ namespace Cliver.CisteraScreenCapture
 
             Log.Inform("Launching:\r\n" + commandLine);
 
-            uint dwCreationFlags = 0;
-            if (!Settings.General.ShowMpegWindow)
-                dwCreationFlags |= Win32Process.dwCreationFlagValues.CREATE_NO_WINDOW;
-
-            Win32Process.STARTUPINFO startupInfo = new Win32Process.STARTUPINFO();
+            mpeg_stream_process = new Process();
+            mpeg_stream_process.StartInfo = new ProcessStartInfo("ffmpeg.exe", arguments)
+            {
+                ErrorDialog = false,
+                UseShellExecute = false,
+                CreateNoWindow = !Settings.General.ShowMpegWindow
+                //WindowStyle = ProcessWindowStyle.Hidden;
+            };
             if (Settings.General.WriteMpegOutput2Log)
             {
+                mpeg_stream_process.StartInfo.RedirectStandardOutput = true;
+                mpeg_stream_process.StartInfo.RedirectStandardError = true;
+
                 string file0 = Log.WorkDir + "\\ffmpeg_" + DateTime.Now.ToString("yyMMddHHmmss");
                 string file = file0;
                 for (int count = 1; File.Exists(file); count++)
                     file = file0 + "_" + count.ToString();
-                FileStream fs = new FileStream(file, FileMode.Create);
-                string s = "STARTED: " + DateTime.Now.ToString();
-                s+=">" + commandLine;
-                s += "\r\n";
-                byte[] bs = Encoding.ASCII.GetBytes(s);
-                fs.Write(bs, 0, bs.Length);
-                fs.FlushAsync();
-
-                IntPtr fh = fs.SafeFileHandle.DangerousGetHandle();
-                startupInfo.hStdError = fh;
-                startupInfo.hStdOutput = fh;
-                startupInfo.dwFlags |= Win32Process.STARTF_USESTDHANDLES;
+                TextWriter tw = new StreamWriter(file, false);
+                tw.WriteLine("STARTED: " + DateTime.Now.ToString());
+                tw.WriteLine(">" + commandLine);
+                tw.WriteLine("\r\n");
+                tw.FlushAsync();
+                mpeg_stream_process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
+                {
+                    tw.Write(e.Data);
+                    tw.FlushAsync();
+                };
+                mpeg_stream_process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
+                {
+                    tw.Write(e.Data);
+                    tw.FlushAsync();
+                };
             }
-            IntPtr processHandle = Win32Process.CreateProcessInConsoleSession(commandLine, dwCreationFlags, startupInfo);
-
-            mpeg_stream_process = Process.GetProcesses().Single(p => p.Id != 0 && p.Handle == processHandle);
+            mpeg_stream_process.Start();
             ProcessRoutines.AntiZombieTracker.Track(mpeg_stream_process);
         }
         static Process mpeg_stream_process = null;
