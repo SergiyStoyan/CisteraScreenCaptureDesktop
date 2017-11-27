@@ -97,7 +97,7 @@ namespace Cliver.CisteraScreenCaptureService
                 };
             }
             mpeg_stream_process.Start();
-            ProcessRoutines.AntiZombieTracker.Track(mpeg_stream_process);
+            ProcessRoutines.AntiZombieTracker.This.Track(mpeg_stream_process);
         }
         static Process mpeg_stream_process = null;
         static string commandLine = null;
@@ -110,7 +110,7 @@ namespace Cliver.CisteraScreenCaptureService
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
             }
-            ProcessRoutines.AntiZombieTracker.KillTrackedProcesses();//to close the job object
+            ProcessRoutines.AntiZombieTracker.This.KillTrackedProcesses();//to close the job object
             commandLine = null;
         }
 

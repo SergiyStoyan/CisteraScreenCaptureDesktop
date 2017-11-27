@@ -80,6 +80,7 @@ namespace Cliver.CisteraScreenCapture
                 string file = file0;
                 for (int count = 1; File.Exists(file); count++)
                     file = file0 + "_" + count.ToString();
+                file += ".log";
                 TextWriter tw = new StreamWriter(file, false);
                 tw.WriteLine("STARTED: " + DateTime.Now.ToString());
                 tw.WriteLine(">" + commandLine);
@@ -97,7 +98,7 @@ namespace Cliver.CisteraScreenCapture
                 };
             }
             mpeg_stream_process.Start();
-            ProcessRoutines.AntiZombieTracker.Track(mpeg_stream_process);
+            ProcessRoutines.AntiZombieTracker.This.Track(mpeg_stream_process);
         }
         static Process mpeg_stream_process = null;
         static string commandLine = null;
@@ -110,7 +111,7 @@ namespace Cliver.CisteraScreenCapture
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
             }
-            ProcessRoutines.AntiZombieTracker.KillTrackedProcesses();//to close the job object
+            ProcessRoutines.AntiZombieTracker.This.KillTrackedProcesses();//to close the job object
             commandLine = null;
         }
 

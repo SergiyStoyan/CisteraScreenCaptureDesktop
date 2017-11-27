@@ -74,10 +74,12 @@ namespace Cliver.CisteraScreenCapture
                 string file = file0;
                 for (int count = 1; File.Exists(file); count++)
                     file = file0 + "_" + count.ToString();
+                file += ".log";
                 FileStream fs = new FileStream(file, FileMode.Create);
-                string s = "STARTED: " + DateTime.Now.ToString();
-                s+=">" + commandLine;
-                s += "\r\n";
+                string s = @"STARTED: " + DateTime.Now.ToString() + @"
+>" + commandLine + @"
+
+";
                 byte[] bs = Encoding.ASCII.GetBytes(s);
                 fs.Write(bs, 0, bs.Length);
                 fs.FlushAsync();
@@ -87,10 +89,9 @@ namespace Cliver.CisteraScreenCapture
                 startupInfo.hStdOutput = fh;
                 startupInfo.dwFlags |= Win32Process.STARTF_USESTDHANDLES;
             }
-            IntPtr processHandle = Win32Process.CreateProcessInConsoleSession(commandLine, dwCreationFlags, startupInfo);
-
-            mpeg_stream_process = Process.GetProcesses().Single(p => p.Id != 0 && p.Handle == processHandle);
-            ProcessRoutines.AntiZombieTracker.Track(mpeg_stream_process);
+            uint processId = Win32Process.CreateProcessInConsoleSession(commandLine, dwCreationFlags, startupInfo);
+            mpeg_stream_process = Process.GetProcessById((int)processId);
+            ProcessRoutines.AntiZombieTracker.This.Track(mpeg_stream_process);
         }
         static Process mpeg_stream_process = null;
         static string commandLine = null;
@@ -103,7 +104,7 @@ namespace Cliver.CisteraScreenCapture
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
             }
-            ProcessRoutines.AntiZombieTracker.KillTrackedProcesses();//to close the job object
+            ProcessRoutines.AntiZombieTracker.This.KillTrackedProcesses();//to close the job object
             commandLine = null;
         }
 
