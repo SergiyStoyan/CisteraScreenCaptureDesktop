@@ -33,11 +33,20 @@ namespace Cliver.CisteraScreenCaptureService
             stream = new NetworkStream(socket);
 
             Log.Inform("Starting connection from " + RemoteIp + ":" + RemotePort);
-
+            
             thread = ThreadRoutines.StartTry(
                 run,
-                (Exception e) => { Log.Error(e); },
-                () => { Dispose(); }
+                (Exception e) =>
+                {
+                    if (socket != null && !socket.Connected)
+                        Log.Inform("Socket from " + RemoteIp + ":" + RemotePort + " has been disconnected.");
+                    else
+                        Log.Error(e);
+                },
+                () =>
+                {
+                    ThreadRoutines.StartTry(Dispose);
+                }
                 );
         }
         Socket socket = null;
@@ -51,27 +60,30 @@ namespace Cliver.CisteraScreenCaptureService
 
         public void Dispose()
         {
-            if (socket == null)
-                return;
+            lock (this)
+            {
+                if (socket == null)
+                    return;
 
-            Log.Inform("Closing connection from " + RemoteIp + ":" + RemotePort);
+                Log.Inform("Closing connection from " + RemoteIp + ":" + RemotePort);
 
-            if (socket != null)
-            {
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Disconnect(true);
-                socket.Close();
-                socket = null;
-            }
-            if (stream != null)
-            {
-                stream.Dispose();
-                stream = null;
-            }
-            if (thread != null)
-            {
-                thread.Abort();
-                thread = null;
+                if (socket != null)
+                {
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Disconnect(true);
+                    socket.Close();
+                    socket = null;
+                }
+                if (stream != null)
+                {
+                    stream.Dispose();
+                    stream = null;
+                }
+                if (thread != null)
+                {
+                    thread.Abort();
+                    thread = null;
+                }
             }
         }
 
