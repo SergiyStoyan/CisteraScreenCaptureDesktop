@@ -45,21 +45,22 @@ namespace Cliver.CisteraScreenCaptureService
             
             try
             {
-                var p = new Process();
-                p.StartInfo.UseShellExecute = false;
-                const string file = "cmd.exe";
-                //const string file = @"psexec.exe";
-                p.StartInfo.WorkingDirectory = Path.GetDirectoryName(file);
-                p.StartInfo.FileName = Path.GetFileName(file);
-                //proc.StartInfo.Domain = "WIN08";
-                //p.StartInfo.Arguments = "-i -d -s cmd";
-                //p.StartInfo.UserName = "SYSTEM";
-                //var password = new System.Security.SecureString();
-                //foreach (var c in "123")
-                //    password.AppendChar(c);
-                //p.StartInfo.Password = password;
-                p.StartInfo.LoadUserProfile = false;
-                p.Start();
+                Win32.ApplicationLauncher.CreateProcessInConsoleSession("cmd", false);
+                //var p = new Process();
+                //p.StartInfo.UseShellExecute = false;
+                //const string file = "cmd.exe";
+                ////const string file = @"psexec.exe";
+                //p.StartInfo.WorkingDirectory = Path.GetDirectoryName(file);
+                //p.StartInfo.FileName = Path.GetFileName(file);
+                ////proc.StartInfo.Domain = "WIN08";
+                ////p.StartInfo.Arguments = "-i -d -s cmd";
+                ////p.StartInfo.UserName = "SYSTEM";
+                ////var password = new System.Security.SecureString();
+                ////foreach (var c in "123")
+                ////    password.AppendChar(c);
+                ////p.StartInfo.Password = password;
+                //p.StartInfo.LoadUserProfile = false;
+                //p.Start();
             }
             catch (Exception e)
             {

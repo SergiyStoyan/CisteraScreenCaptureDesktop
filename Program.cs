@@ -73,6 +73,7 @@ namespace Cliver.CisteraScreenCapture
         {
             try
             {
+                //Win32.ApplicationLauncher.CreateProcessInConsoleSession("cmd", false);
                 //    try
                 //    {
                 //        var p = new Process();
