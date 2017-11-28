@@ -75,12 +75,12 @@ namespace Cliver.CisteraScreenCapture
                 for (int count = 1; File.Exists(file); count++)
                     file = file0 + "_" + count.ToString();
                 file += ".log";
-                FileStream fs = new FileStream(file, FileMode.Create);
+                FileStream fs = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.Write);
                 string s = @"STARTED: " + DateTime.Now.ToString() + @"
 >" + commandLine + @"
 
 ";
-                byte[] bs = Encoding.ASCII.GetBytes(s);
+                byte[] bs = Encoding.UTF8.GetBytes(s);
                 fs.Write(bs, 0, bs.Length);
                 fs.FlushAsync();
 
