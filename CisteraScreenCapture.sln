@@ -11,6 +11,8 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "CisteraScreenCaptureSetup",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CisteraScreenCaptureService", "CisteraScreenCaptureService\CisteraScreenCaptureService.csproj", "{EF4268D2-4794-4440-BC0C-43C6C9647974}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessStarter", "FfmpegStarter\ProcessStarter.csproj", "{94697992-513F-4368-A4B4-4D9758F12D1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,14 @@ Global
 		{EF4268D2-4794-4440-BC0C-43C6C9647974}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EF4268D2-4794-4440-BC0C-43C6C9647974}.Release|x86.ActiveCfg = Release|Any CPU
 		{EF4268D2-4794-4440-BC0C-43C6C9647974}.Release|x86.Build.0 = Release|Any CPU
+		{94697992-513F-4368-A4B4-4D9758F12D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94697992-513F-4368-A4B4-4D9758F12D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94697992-513F-4368-A4B4-4D9758F12D1E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{94697992-513F-4368-A4B4-4D9758F12D1E}.Debug|x86.Build.0 = Debug|Any CPU
+		{94697992-513F-4368-A4B4-4D9758F12D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94697992-513F-4368-A4B4-4D9758F12D1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94697992-513F-4368-A4B4-4D9758F12D1E}.Release|x86.ActiveCfg = Release|Any CPU
+		{94697992-513F-4368-A4B4-4D9758F12D1E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
