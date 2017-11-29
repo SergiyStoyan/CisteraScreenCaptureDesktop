@@ -73,7 +73,8 @@ namespace Cliver.CisteraScreenCapture
         {
             try
             {
-                //MpegStream.Start("");
+                uint dwSessionId = Win32Wts.WTSGetActiveConsoleSessionId();
+                MpegStream2.Start(dwSessionId, "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
                 //Process mpeg_stream_process;
                 //var processId = Win32Process.CreateProcessInConsoleSession("cmd");
                 //mpeg_stream_process = Process.GetProcessById((int)processId);

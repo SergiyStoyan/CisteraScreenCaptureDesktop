@@ -33,29 +33,30 @@ namespace Cliver.CisteraScreenCapture
 {
     public class MpegStream2
     {
-        public static void Start(string arguments)
+        public static void Start(uint sessionId, string arguments)
         {
             if (mpeg_stream_process != null)
                 Log.Main.Warning("The previous MpegStream was not stopped!");
             Stop();
 
-            int x = 0, y = 0, w = 0, h = 0;
-            Win32Monitor.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32Monitor.RECT lprcMonitor, IntPtr dwData) =>
+            if (string.IsNullOrWhiteSpace(Settings.General.CapturedMonitorDeviceName))
             {
-                Win32Monitor.MONITORINFOEX mi = new Win32Monitor.MONITORINFOEX();
-                mi.Size = Marshal.SizeOf(mi.GetType());
-                if (Win32Monitor.GetMonitorInfo(hMonitor, ref mi) && mi.DeviceName == Settings.General.CapturedMonitorDeviceName)
-                {
-                    x = lprcMonitor.Left;
-                    y = lprcMonitor.Top;
-                    w = lprcMonitor.Right - lprcMonitor.Left;
-                    h = lprcMonitor.Bottom - lprcMonitor.Top;
-                    return false;
-                }
-                return true;
-            };
-            Win32Monitor.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
-            string source = " -offset_x " + x + " -offset_y " + y + " -video_size " + w + "x" + h + " -show_region 1 -i desktop ";
+                Settings.General.CapturedMonitorDeviceName = MonitorRoutines.GetDefaultMonitorName();
+                if (string.IsNullOrWhiteSpace(Settings.General.CapturedMonitorDeviceName))
+                    throw new Exception("No monitor was found.");
+            }
+            Win32Monitor.RECT? an = MonitorRoutines.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
+            if (an == null)
+            {
+                Settings.General.CapturedMonitorDeviceName = MonitorRoutines.GetDefaultMonitorName();
+                Log.Main.Warning("Monitor '" + Settings.General.CapturedMonitorDeviceName + "' was not found. Using default one '" + Settings.General.CapturedMonitorDeviceName + "'");
+                an = MonitorRoutines.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
+                if (an == null)
+                    throw new Exception("Monitor '" + Settings.General.CapturedMonitorDeviceName + "' was not found.");
+            }
+            Win32Monitor.RECT a = (Win32Monitor.RECT)an;
+            string source = " -offset_x " + a.Left + " -offset_y " + a.Top + " -video_size " + (a.Right - a.Left) + "x" + (a.Bottom - a.Top) + " -show_region 1 -i desktop ";
+
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);
             commandLine = "ffmpeg.exe " + arguments;
 
@@ -69,7 +70,7 @@ namespace Cliver.CisteraScreenCapture
                 //startupInfo.wShowWindow = Win32Process.SW_HIDE;
             }
 
-            Win32Process.STARTUPINFO startupInfo = new Win32Process.STARTUPINFO();
+            Win32Process3.STARTUPINFO startupInfo = new Win32Process3.STARTUPINFO();
             if (Settings.General.WriteMpegOutput2Log)
             {
                 string file0 = Log.WorkDir + "\\ffmpeg_" + DateTime.Now.ToString("yyMMddHHmmss");
@@ -78,7 +79,7 @@ namespace Cliver.CisteraScreenCapture
                     file = file0 + "_" + count.ToString();
                 file += ".log";
 
-                FileStream fileStream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.Write);
+                fileStream = new FileStream(file, FileMode.Create, FileAccess.Write, FileShare.Write);
                 FileSecurity fileSecurity = File.GetAccessControl(file);
                 FileSystemAccessRule fileSystemAccessRule = new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.AppendData, AccessControlType.Allow);
                 fileSecurity.AddAccessRule(fileSystemAccessRule);
@@ -91,7 +92,7 @@ namespace Cliver.CisteraScreenCapture
 ";
                 byte[] bs = Encoding.UTF8.GetBytes(s);
                 fileStream.Write(bs, 0, bs.Length);
-                fileStream.FlushAsync();
+                fileStream.Flush();
 
                 //Win32File.SECURITY_ATTRIBUTES sa = new Win32File.SECURITY_ATTRIBUTES();
                 //sa.nLength = Marshal.SizeOf(sa);
@@ -104,14 +105,19 @@ namespace Cliver.CisteraScreenCapture
                 startupInfo.hStdError = fh;
                 startupInfo.hStdOutput = fh;
                 startupInfo.dwFlags |= Win32Process.STARTF_USESTDHANDLES;
-            }
+            }            
+            //uint dwSessionId = Win32Process3.WTSGetActiveConsoleSessionId();
+            //string active_user = Win32Process3.GetUsernameBySessionId(dwSessionId);
+            //if (sessionUserName != active_user)
+            //    throw new Exception("Active session user's name: '" + active_user + "' != '" + sessionUserName + "'");
             //uint processId = Win32Process.CreateProcessInConsoleSession("C:\\Windows\\System32\\cmd.exe /c " + commandLine, dwCreationFlags, startupInfo);
-            uint processId = Win32Process.CreateProcessInConsoleSession(commandLine, dwCreationFlags, startupInfo);
+            uint processId = Win32Process3.CreateProcessInSession(sessionId, commandLine, dwCreationFlags, startupInfo);
             mpeg_stream_process = Process.GetProcessById((int)processId);
             ProcessRoutines.AntiZombieTracker.This.Track(mpeg_stream_process);
         }
         static Process mpeg_stream_process = null;
         static string commandLine = null;
+        static FileStream fileStream = null;
 
         public static void Stop()
         {
@@ -120,6 +126,12 @@ namespace Cliver.CisteraScreenCapture
                 Log.Main.Inform("Terminating:\r\n" + commandLine);
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
+            }
+            if (fileStream != null)
+            {
+                fileStream.Flush();
+                fileStream.Dispose();
+                fileStream = null;
             }
             ProcessRoutines.AntiZombieTracker.This.KillTrackedProcesses();//to close the job object
             commandLine = null;

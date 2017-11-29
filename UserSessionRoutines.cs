@@ -43,13 +43,13 @@ namespace Cliver.CisteraScreenCapture
             internal WtsEventsListeningForm()
             {
                 //InitializeComponent();
-                if (!Cliver.Win32.WTSRegisterSessionNotification(this.Handle, Cliver.Win32.WTSRegisterSessionNotificationFlags.NOTIFY_FOR_ALL_SESSIONS))
+                if (!Win32Wts.WTSRegisterSessionNotification(this.Handle, Win32Wts.WTSRegisterSessionNotificationFlags.NOTIFY_FOR_ALL_SESSIONS))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
             protected override void OnClosing(CancelEventArgs e)
             {
-                if (!Cliver.Win32.WTSUnRegisterSessionNotification(this.Handle))
+                if (!Win32Wts.WTSUnRegisterSessionNotification(this.Handle))
                     throw new Win32Exception(Marshal.GetLastWin32Error());
                 base.OnClosing(e);
             }
