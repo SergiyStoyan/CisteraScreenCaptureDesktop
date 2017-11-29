@@ -49,6 +49,7 @@ namespace Cliver.CisteraScreenCapture
             Message.TopMost = true;
 
             Log.Initialize(Log.Mode.ONLY_LOG);
+            //Log.Initialize(Log.Mode.ONLY_LOG, Log.CliverSoftCommonDataDir);
             //Config.Initialize(new string[] { "General" });
             Cliver.Config.Reload();
 
@@ -73,8 +74,8 @@ namespace Cliver.CisteraScreenCapture
         {
             try
             {
-                //uint dwSessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
-                //MpegStream.Start(dwSessionId, "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
+                uint dwSessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
+                MpegStream.Start(dwSessionId, "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
                 //Process mpeg_stream_process;
                 //var processId = Win32Process.CreateProcessInConsoleSession("cmd");
                 //mpeg_stream_process = Process.GetProcessById((int)processId);

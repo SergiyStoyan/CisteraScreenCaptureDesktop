@@ -17,8 +17,8 @@ namespace Cliver.CisteraScreenCaptureService
                 Exception e = (Exception)args.ExceptionObject;
                 Log.Main.Error(e);
             };            
-
-            Log.Initialize(Log.Mode.SESSIONS, Log.GetAppCommonDataDir());
+            
+            Log.Initialize(Log.Mode.ONLY_LOG, Log.CliverSoftCommonDataDir);
 
             //Config.Initialize(new string[] { "General" });
             Cliver.Config.Reload();
