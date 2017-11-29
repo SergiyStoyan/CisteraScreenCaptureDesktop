@@ -36,11 +36,11 @@ namespace Cliver.CisteraScreenCaptureService
         {
             string last_mn = null;
             string default_mn = null;
-            Win32Monitor.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32Monitor.RECT lprcMonitor, IntPtr dwData) =>
+            WinApi.User32.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref WinApi.User32.RECT lprcMonitor, IntPtr dwData) =>
             {
-                Win32Monitor.MONITORINFOEX mi = new Win32Monitor.MONITORINFOEX();
+                WinApi.User32.MONITORINFOEX mi = new WinApi.User32.MONITORINFOEX();
                 mi.Size = Marshal.SizeOf(mi.GetType());
-                if (!Win32Monitor.GetMonitorInfo(hMonitor, ref mi))
+                if (!WinApi.User32.GetMonitorInfo(hMonitor, ref mi))
                     return true;
                 last_mn = mi.DeviceName;
                 if (mi.Monitor.Left == 0 && mi.Monitor.Top == 0)
@@ -50,40 +50,40 @@ namespace Cliver.CisteraScreenCaptureService
                 }
                 return true;
             };
-            Win32Monitor.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
+            WinApi.User32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
             return default_mn != null ? default_mn : last_mn;
         }
 
-        public static Win32Monitor.RECT? GetMonitorAreaByMonitorName(string name)
+        public static WinApi.User32.RECT? GetMonitorAreaByMonitorName(string name)
         {
-            Win32Monitor.RECT? a = null;
-            Win32Monitor.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32Monitor.RECT lprcMonitor, IntPtr dwData) =>
+            WinApi.User32.RECT? a = null;
+            WinApi.User32.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref WinApi.User32.RECT lprcMonitor, IntPtr dwData) =>
             {
-                Win32Monitor.MONITORINFOEX mi = new Win32Monitor.MONITORINFOEX();
+                WinApi.User32.MONITORINFOEX mi = new WinApi.User32.MONITORINFOEX();
                 mi.Size = Marshal.SizeOf(mi.GetType());
-                if (Win32Monitor.GetMonitorInfo(hMonitor, ref mi) && mi.DeviceName == name)
+                if (WinApi.User32.GetMonitorInfo(hMonitor, ref mi) && mi.DeviceName == name)
                 {
                     a = mi.Monitor;
                     return false;
                 }
                 return true;
             };
-            Win32Monitor.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
+            WinApi.User32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
             return a;
         }
 
         public static List<MonitorInfo> GetMonitorInfos()
         {
-            List<MonitorInfo> mis = new List<MonitorInfo>(); 
-            Win32Monitor.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32Monitor.RECT lprcMonitor, IntPtr dwData) =>
+            List<MonitorInfo> mis = new List<MonitorInfo>();
+            WinApi.User32.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref WinApi.User32.RECT lprcMonitor, IntPtr dwData) =>
             {
-                Win32Monitor.MONITORINFOEX mi = new Win32Monitor.MONITORINFOEX();
+                WinApi.User32.MONITORINFOEX mi = new WinApi.User32.MONITORINFOEX();
                 mi.Size = Marshal.SizeOf(mi.GetType());
-                if (!Win32Monitor.GetMonitorInfo(hMonitor, ref mi))
+                if (!WinApi.User32.GetMonitorInfo(hMonitor, ref mi))
                     return true;
-                Win32Monitor.DISPLAY_DEVICE dd = new Win32Monitor.DISPLAY_DEVICE();
+                WinApi.User32.DISPLAY_DEVICE dd = new WinApi.User32.DISPLAY_DEVICE();
                 dd.cb = Marshal.SizeOf(dd.GetType());
-                Win32Monitor.EnumDisplayDevices(mi.DeviceName, 0, ref dd, 0);
+                WinApi.User32.EnumDisplayDevices(mi.DeviceName, 0, ref dd, 0);
                 mis.Add(new MonitorInfo()
                 {
                     DeviceString = dd.DeviceString,
@@ -92,14 +92,14 @@ namespace Cliver.CisteraScreenCaptureService
                 });
                 return true;
             };
-            Win32Monitor.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
+            WinApi.User32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
             return mis;
         }
         public class MonitorInfo
         {
             public string DeviceString;
             public string DeviceName;
-            public Win32Monitor.RECT Area;
+            public WinApi.User32.RECT Area;
         }
     }
 }

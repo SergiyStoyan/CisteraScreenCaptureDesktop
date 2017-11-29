@@ -43,7 +43,7 @@ namespace Cliver.CisteraScreenCaptureService
                 if (string.IsNullOrWhiteSpace(Settings.General.CapturedMonitorDeviceName))
                     throw new Exception("No monitor was found.");
             }
-            Win32Monitor.RECT? an = MonitorRoutines.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
+            WinApi.User32.RECT? an = MonitorRoutines.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
             if (an == null)
             {
                 Settings.General.CapturedMonitorDeviceName = MonitorRoutines.GetDefaultMonitorName();
@@ -52,7 +52,7 @@ namespace Cliver.CisteraScreenCaptureService
                 if (an == null)
                     throw new Exception("Monitor '" + Settings.General.CapturedMonitorDeviceName + "' was not found.");
             }
-            Win32Monitor.RECT a = (Win32Monitor.RECT)an;
+            WinApi.User32.RECT a = (WinApi.User32.RECT)an;
             string source = " -offset_x " + a.Left + " -offset_y " + a.Top + " -video_size " + (a.Right - a.Left) + "x" + (a.Bottom - a.Top) + " -show_region 1 -i desktop ";
 
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);

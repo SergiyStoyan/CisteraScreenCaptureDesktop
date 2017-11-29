@@ -45,7 +45,7 @@ namespace Cliver.CisteraScreenCapture
                 if (string.IsNullOrWhiteSpace(Settings.General.CapturedMonitorDeviceName))
                     throw new Exception("No monitor was found.");
             }
-            Win32Monitor.RECT? an = MonitorRoutines.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
+            WinApi.User32.RECT? an = MonitorRoutines.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
             if (an == null)
             {
                 Settings.General.CapturedMonitorDeviceName = MonitorRoutines.GetDefaultMonitorName();
@@ -54,7 +54,7 @@ namespace Cliver.CisteraScreenCapture
                 if (an == null)
                     throw new Exception("Monitor '" + Settings.General.CapturedMonitorDeviceName + "' was not found.");
             }
-            Win32Monitor.RECT a = (Win32Monitor.RECT)an;
+            WinApi.User32.RECT a = (WinApi.User32.RECT)an;
             string source = " -offset_x " + a.Left + " -offset_y " + a.Top + " -video_size " + (a.Right - a.Left) + "x" + (a.Bottom - a.Top) + " -show_region 1 -i desktop ";
 
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);
@@ -70,7 +70,7 @@ namespace Cliver.CisteraScreenCapture
                 //startupInfo.wShowWindow = Win32Process.SW_HIDE;
             }
 
-            Win32Process3.STARTUPINFO startupInfo = new Win32Process3.STARTUPINFO();
+            WinApi.Advapi32.STARTUPINFO startupInfo = new WinApi.Advapi32.STARTUPINFO();
             if (Settings.General.WriteMpegOutput2Log)
             {
                 string file0 = Log.WorkDir + "\\ffmpeg_" + DateTime.Now.ToString("yyMMddHHmmss");
