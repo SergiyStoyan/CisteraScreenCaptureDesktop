@@ -177,6 +177,9 @@
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserSessionRoutines.cs" />
+    <Compile Include="Win32Process.cs" />
+    <Compile Include="Win32Process2.cs" />
+    <Compile Include="Win32UserSession.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
