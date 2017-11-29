@@ -67,6 +67,46 @@ namespace Cliver.CisteraScreenCapture
             set();
         }
 
+        public static string GetDefaultMonitorName()
+        {
+            string last_mn = null;
+            string default_mn = null;
+            Win32Monitor.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32Monitor.RECT lprcMonitor, IntPtr dwData) =>
+            {
+                Win32Monitor.MONITORINFOEX mi = new Win32Monitor.MONITORINFOEX();
+                mi.Size = Marshal.SizeOf(mi.GetType());
+                if (!Win32Monitor.GetMonitorInfo(hMonitor, ref mi))
+                    return true;
+                last_mn = mi.DeviceName;
+                if (mi.Monitor.Left == 0 && mi.Monitor.Top == 0)
+                {
+                    default_mn = mi.DeviceName;
+                    return false;
+                }
+                return true;
+            };
+            Win32Monitor.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
+            return default_mn != null ? default_mn : last_mn;
+        }
+
+        public static Win32Monitor.RECT? GetMonitorAreaByMonitorName(string name)
+        {
+            Win32Monitor.RECT? a = null;
+            Win32Monitor.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32Monitor.RECT lprcMonitor, IntPtr dwData) =>
+            {
+                Win32Monitor.MONITORINFOEX mi = new Win32Monitor.MONITORINFOEX();
+                mi.Size = Marshal.SizeOf(mi.GetType());
+                if (Win32Monitor.GetMonitorInfo(hMonitor, ref mi) && mi.DeviceName == name)
+                {
+                    a = mi.Monitor;
+                    return false;
+                }
+                return true;
+            };
+            Win32Monitor.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
+            return a;
+        }
+
         void set()
         { 
             //ServerDefaultPort.Text = Settings.General.TcpClientDefaultPort.ToString();
@@ -93,25 +133,25 @@ namespace Cliver.CisteraScreenCapture
             //}
             Monitors.DisplayMemberPath = "Text";
             Monitors.SelectedValuePath = "Value";
-            Win32.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32.RECT lprcMonitor, IntPtr dwData) =>
+            Win32Monitor.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32Monitor.RECT lprcMonitor, IntPtr dwData) =>
               {
-                  Win32.MONITORINFOEX mi = new Win32.MONITORINFOEX();
+                  Win32Monitor.MONITORINFOEX mi = new Win32Monitor.MONITORINFOEX();
                   mi.Size = Marshal.SizeOf(mi.GetType());
-                  if (Win32.GetMonitorInfo(hMonitor, ref mi))
+                  if (!Win32Monitor.GetMonitorInfo(hMonitor, ref mi))
+                      return true;
+                  Win32Monitor.DISPLAY_DEVICE dd = new Win32Monitor.DISPLAY_DEVICE();
+                  dd.cb = Marshal.SizeOf(dd.GetType());
+                  Win32Monitor.EnumDisplayDevices(mi.DeviceName, 0, ref dd, 0);
+                  Monitors.Items.Add(new
                   {
-                      Win32.DISPLAY_DEVICE dd = new Win32.DISPLAY_DEVICE();
-                      dd.cb = Marshal.SizeOf(dd.GetType());
-                      Win32.EnumDisplayDevices(mi.DeviceName, 0, ref dd, 0);
-                      Monitors.Items.Add(new {
-                          Text = dd.DeviceString + " (" + (lprcMonitor.Bottom - lprcMonitor.Top) + "x" + (lprcMonitor.Right - lprcMonitor.Left) + ")",
-                          Value = dd.DeviceName
-                      });
-                  }
+                      Text = dd.DeviceString + " (" + (lprcMonitor.Bottom - lprcMonitor.Top) + "x" + (lprcMonitor.Right - lprcMonitor.Left) + ")",
+                      Value = mi.DeviceName
+                  });
                   return true;
               };
-            Win32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
+            Win32Monitor.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
             if (Monitors.Items.Count > 0)
-                if (Settings.General.CapturedMonitorDeviceName != null)
+                if (!string.IsNullOrWhiteSpace(Settings.General.CapturedMonitorDeviceName))
                     Monitors.SelectedValue = Settings.General.CapturedMonitorDeviceName;
                 else
                     Monitors.SelectedIndex = 0;

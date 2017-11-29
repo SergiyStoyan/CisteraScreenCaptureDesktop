@@ -40,11 +40,11 @@ namespace Cliver.CisteraScreenCapture
             Stop();
 
             int x = 0, y = 0, w = 0, h = 0;
-            Win32.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32.RECT lprcMonitor, IntPtr dwData) =>
+            Win32Monitor.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32Monitor.RECT lprcMonitor, IntPtr dwData) =>
             {
-                Win32.MONITORINFOEX mi = new Win32.MONITORINFOEX();
+                Win32Monitor.MONITORINFOEX mi = new Win32Monitor.MONITORINFOEX();
                 mi.Size = Marshal.SizeOf(mi.GetType());
-                if (Win32.GetMonitorInfo(hMonitor, ref mi) && mi.DeviceName != Settings.General.CapturedMonitorDeviceName)
+                if (Win32Monitor.GetMonitorInfo(hMonitor, ref mi) && mi.DeviceName == Settings.General.CapturedMonitorDeviceName)
                 {
                     x = lprcMonitor.Left;
                     y = lprcMonitor.Top;
@@ -54,7 +54,7 @@ namespace Cliver.CisteraScreenCapture
                 }
                 return true;
             };
-            Win32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
+            Win32Monitor.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
             string source = " -offset_x " + x + " -offset_y " + y + " -video_size " + w + "x" + h + " -show_region 1 -i desktop ";
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);
             commandLine = "ffmpeg.exe " + arguments;

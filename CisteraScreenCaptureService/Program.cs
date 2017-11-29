@@ -30,6 +30,7 @@ namespace Cliver.CisteraScreenCaptureService
             {
                 Log.Main.Inform("Version: " + AssemblyRoutines.GetAppVersion());
 
+
                 ServiceBase.Run(new Service());
             }
             catch(Exception e)

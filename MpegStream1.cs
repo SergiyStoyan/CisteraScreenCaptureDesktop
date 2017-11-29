@@ -26,6 +26,7 @@ using System.Net.Http;
 using Zeroconf;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Drawing;
 
 namespace Cliver.CisteraScreenCapture
 {
@@ -37,23 +38,24 @@ namespace Cliver.CisteraScreenCapture
                 Log.Main.Warning("The previous MpegStream was not stopped!");
             Stop();
 
-            int x = 0, y = 0, w = 0, h = 0;
-            Win32.MonitorEnumDelegate callback = (IntPtr hMonitor, IntPtr hdcMonitor, ref Win32.RECT lprcMonitor, IntPtr dwData) =>
+            if (string.IsNullOrWhiteSpace(Settings.General.CapturedMonitorDeviceName))
             {
-                Win32.MONITORINFOEX mi = new Win32.MONITORINFOEX();
-                mi.Size = Marshal.SizeOf(mi.GetType());
-                if (Win32.GetMonitorInfo(hMonitor, ref mi) && mi.DeviceName != Settings.General.CapturedMonitorDeviceName)
-                {
-                    x = lprcMonitor.Left;
-                    y = lprcMonitor.Top;
-                    w = lprcMonitor.Right - lprcMonitor.Left;
-                    h = lprcMonitor.Bottom - lprcMonitor.Top;
-                    return false;
-                }
-                return true;
-            };
-            Win32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
-            string source = " -offset_x " + x + " -offset_y " + y + " -video_size " + w + "x" + h + " -show_region 1 -i desktop ";
+                Settings.General.CapturedMonitorDeviceName = SettingsWindow.GetDefaultMonitorName();
+                if (string.IsNullOrWhiteSpace(Settings.General.CapturedMonitorDeviceName))
+                    throw new Exception("No monitor was found.");
+            }
+            Win32Monitor.RECT? an = SettingsWindow.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
+            if (an == null)
+            {
+                Settings.General.CapturedMonitorDeviceName = SettingsWindow.GetDefaultMonitorName();
+                Log.Main.Warning("Monitor '" + Settings.General.CapturedMonitorDeviceName + "' was not found. Using default one '" + Settings.General.CapturedMonitorDeviceName + "'");
+                an = SettingsWindow.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
+                if (an == null)
+                    throw new Exception("Monitor '" + Settings.General.CapturedMonitorDeviceName + "' was not found.");
+            }
+            Win32Monitor.RECT a = (Win32Monitor.RECT)an;
+            string source = " -offset_x " + a.Left + " -offset_y " + a.Top + " -video_size " + (a.Right - a.Left) + "x" + (a.Bottom - a.Top) + " -show_region 1 -i desktop ";
+
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);
             commandLine = "ffmpeg.exe " + arguments;
 

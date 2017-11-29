@@ -48,7 +48,7 @@
 //            {
 //                Win32.MONITORINFOEX mi = new Win32.MONITORINFOEX();
 //                mi.Size = Marshal.SizeOf(mi.GetType());
-//                if (Win32.GetMonitorInfo(hMonitor, ref mi) && mi.DeviceName != Settings.General.CapturedMonitorDeviceName)
+//                if (Win32.GetMonitorInfo(hMonitor, ref mi) && mi.DeviceName == Settings.General.CapturedMonitorDeviceName)
 //                {
 //                    x = lprcMonitor.Left;
 //                    y = lprcMonitor.Top;

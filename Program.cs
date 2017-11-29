@@ -73,6 +73,7 @@ namespace Cliver.CisteraScreenCapture
         {
             try
             {
+                MpegStream.Start("");
                 //Process mpeg_stream_process;
                 //var processId = Win32Process.CreateProcessInConsoleSession("cmd");
                 //mpeg_stream_process = Process.GetProcessById((int)processId);
