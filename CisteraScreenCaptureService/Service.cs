@@ -45,22 +45,8 @@ namespace Cliver.CisteraScreenCaptureService
             
             try
             {
-                //Win32Process.CreateProcessInConsoleSession("cmd");
-                //var p = new Process();
-                //p.StartInfo.UseShellExecute = false;
-                //const string file = "cmd.exe";
-                ////const string file = @"psexec.exe";
-                //p.StartInfo.WorkingDirectory = Path.GetDirectoryName(file);
-                //p.StartInfo.FileName = Path.GetFileName(file);
-                ////proc.StartInfo.Domain = "WIN08";
-                ////p.StartInfo.Arguments = "-i -d -s cmd";
-                ////p.StartInfo.UserName = "SYSTEM";
-                ////var password = new System.Security.SecureString();
-                ////foreach (var c in "123")
-                ////    password.AppendChar(c);
-                ////p.StartInfo.Password = password;
-                //p.StartInfo.LoadUserProfile = false;
-                //p.Start();
+                uint dwSessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
+                MpegStream.Start(dwSessionId, "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
             }
             catch (Exception e)
             {

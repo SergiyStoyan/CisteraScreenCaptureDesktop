@@ -52,12 +52,6 @@ namespace Cliver.CisteraScreenCapture
             //Log.Initialize(Log.Mode.ONLY_LOG, Log.CliverSoftCommonDataDir);
             //Config.Initialize(new string[] { "General" });
             Cliver.Config.Reload();
-
-            //ProcessRoutines.CurrentProcessProtection.On = true;
-            //SystemEvents.SessionEnding += delegate
-            //  {
-            //      ProcessRoutines.CurrentProcessProtection.On = false;
-            //  };
         }
 
         //public class CommandLineParameters : ProgramRoutines.CommandLineParameters

@@ -58,10 +58,8 @@ namespace Cliver.CisteraScreenCaptureService
             string source = " -offset_x " + a.Left + " -offset_y " + a.Top + " -video_size " + (a.Right - a.Left) + "x" + (a.Bottom - a.Top) + " -show_region 1 -i desktop ";
 
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);
-            commandLine = "ffmpeg.exe " + arguments;
-
-            Log.Main.Inform("Launching:\r\n" + commandLine);
-
+            commandLine = "\"" + Log.AppDir + "\\ffmpeg.exe\" " + arguments;
+            
             WinApi.Advapi32.CreationFlags dwCreationFlags = 0;
             if (!Settings.General.ShowMpegWindow)
             {
@@ -92,6 +90,10 @@ namespace Cliver.CisteraScreenCaptureService
             }
             uint processId = createProcessInSession(sessionId, commandLine, dwCreationFlags, startupInfo);
             mpeg_stream_process = Process.GetProcessById((int)processId);
+            if (mpeg_stream_process == null)
+                throw new Exception("Could not find process #" + processId);
+            if (mpeg_stream_process.HasExited)
+                throw new Exception("Process #" + processId + " exited with code: " + mpeg_stream_process.ExitCode);
             if (antiZombieTracker != null)
                 antiZombieTracker.KillTrackedProcesses();
             antiZombieTracker = new ProcessRoutines.AntiZombieTracker();
@@ -103,6 +105,8 @@ namespace Cliver.CisteraScreenCaptureService
         static ProcessRoutines.AntiZombieTracker antiZombieTracker = null;
         static uint createProcessInSession(uint dwSessionId, String commandLine, WinApi.Advapi32.CreationFlags dwCreationFlags = 0, WinApi.Advapi32.STARTUPINFO? startupInfo = null, bool bElevate = false)
         {
+            Log.Main.Inform("Launching (in session " + dwSessionId + "):\r\n" + commandLine);
+
             IntPtr hUserToken = IntPtr.Zero;
             IntPtr hUserTokenDup = IntPtr.Zero;
             IntPtr hPToken = IntPtr.Zero;
