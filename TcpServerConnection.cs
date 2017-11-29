@@ -151,10 +151,10 @@ namespace Cliver.CisteraScreenCapture
                     {
                         case TcpMessage.FfmpegStart:
                             uint sessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
-                            MpegStream2.Start(sessionId, m.BodyAsText);
+                            MpegStream.Start(sessionId, m.BodyAsText);
                             break;
                         case TcpMessage.FfmpegStop:
-                            MpegStream2.Stop();
+                            MpegStream.Stop();
                             break;
                         case TcpMessage.SslStart:
                             if (stream is SslStream)

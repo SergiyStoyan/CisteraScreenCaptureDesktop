@@ -30,7 +30,7 @@ using System.Drawing;
 
 namespace Cliver.CisteraScreenCapture
 {
-    public class MpegStream
+    public class MpegStream1
     {
         public static void Start(string arguments)
         {
