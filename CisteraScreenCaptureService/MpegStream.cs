@@ -38,7 +38,7 @@ namespace Cliver.CisteraScreenCaptureService
         public static void Start(string arguments)
         {
             if (mpeg_stream_process != null)
-                Log.Warning("The previous MpegStream was not stopped!");
+                Log.Main.Warning("The previous MpegStream was not stopped!");
             Stop();
 
             int x = 0, y = 0, w = 0, h = 0;
@@ -61,7 +61,7 @@ namespace Cliver.CisteraScreenCaptureService
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);
             commandLine = "ffmpeg " + arguments;
 
-            Log.Inform("Launching:\r\n" + commandLine);
+            Log.Main.Inform("Launching:\r\n" + commandLine);
 
             mpeg_stream_process = new Process();
             mpeg_stream_process.StartInfo = new ProcessStartInfo("ffmpeg.exe", arguments)
@@ -106,7 +106,7 @@ namespace Cliver.CisteraScreenCaptureService
         {
             if (mpeg_stream_process != null)
             {
-                Log.Inform("Terminating:\r\n" + commandLine);
+                Log.Main.Inform("Terminating:\r\n" + commandLine);
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
             }

@@ -15,7 +15,7 @@ namespace Cliver.CisteraScreenCaptureService
             AppDomain.CurrentDomain.UnhandledException += delegate (object sender, UnhandledExceptionEventArgs args)
             {
                 Exception e = (Exception)args.ExceptionObject;
-                Log.Error(e);
+                Log.Main.Error(e);
             };            
 
             Log.Initialize(Log.Mode.SESSIONS, Log.GetAppCommonDataDir());
@@ -28,13 +28,13 @@ namespace Cliver.CisteraScreenCaptureService
         {
             try
             {
-                Log.Inform("Version: " + AssemblyRoutines.GetAppVersion());
+                Log.Main.Inform("Version: " + AssemblyRoutines.GetAppVersion());
 
                 ServiceBase.Run(new Service());
             }
             catch(Exception e)
             {
-                Log.Error(e);
+                Log.Main.Error(e);
             }
         }
 

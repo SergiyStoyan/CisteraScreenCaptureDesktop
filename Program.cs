@@ -105,7 +105,7 @@ namespace Cliver.CisteraScreenCapture
                 //Thread.Sleep(2000);
                 //MpegStream.Stop();
 
-                Log.Inform("Version: " + AssemblyRoutines.GetAppVersion());
+                Log.Main.Inform("Version: " + AssemblyRoutines.GetAppVersion());
 
                 ProcessRoutines.RunSingleProcessOnly();
 

@@ -49,21 +49,21 @@ namespace Cliver.CisteraScreenCapture
 
                 if (value)
                 {
-                    Log.Inform("Starting...");
+                    Log.Main.Inform("Starting...");
                     
                     string user_name = GetUserName();
-                    Log.Inform("TEST user by WindowsUserRoutines.GetUserName:" + WindowsUserRoutines.GetUserName());
-                    Log.Inform("TEST user by WindowsUserRoutines.GetUserName2:" + WindowsUserRoutines.GetUserName2());
-                    Log.Inform("TEST user by WindowsUserRoutines.GetUserName3:" + WindowsUserRoutines.GetUserName3());
-                    //Log.Inform("TEST user by WindowsUserRoutines.GetUserName4:" + WindowsUserRoutines.GetUserName4());
+                    Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName:" + WindowsUserRoutines.GetUserName());
+                    Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName2:" + WindowsUserRoutines.GetUserName2());
+                    Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName3:" + WindowsUserRoutines.GetUserName3());
+                    //Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName4:" + WindowsUserRoutines.GetUserName4());
                     if (!string.IsNullOrWhiteSpace(user_name))
                         userLoggedOn();
                     else
-                        Log.Warning("No user logged in.");
+                        Log.Main.Warning("No user logged in.");
                 }
                 else
                 {
-                    Log.Inform("Stopping...");
+                    Log.Main.Inform("Stopping...");
 
                     userLoggedOff();
                 }
@@ -113,7 +113,7 @@ namespace Cliver.CisteraScreenCapture
                     {
                         //if (SysTray.This.IsOnlyTCP)
                         //{
-                        //    Log.Warning("TEST MODE: IsOnlyTCP");
+                        //    Log.Main.Warning("TEST MODE: IsOnlyTCP");
                         //    IPAddress ip1;
                         //    if (!IPAddress.TryParse(Settings.General.TcpClientDefaultIp, out ip1))
                         //        throw new Exception("Server IP is not valid: " + Settings.General.TcpClientDefaultIp);
@@ -123,10 +123,10 @@ namespace Cliver.CisteraScreenCapture
 
                         if (string.IsNullOrWhiteSpace(user_name))
                         {
-                            Log.Error("Session's user name is empty.");
+                            Log.Main.Error("Session's user name is empty.");
                             return;
                         }
-                        Log.Inform("User logged in: " + user_name);
+                        Log.Main.Inform("User logged in: " + user_name);
 
                         string service = Settings.General.GetServiceName();
                         IReadOnlyList<IZeroconfHost> zhs = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10).Result;
@@ -134,20 +134,20 @@ namespace Cliver.CisteraScreenCapture
                         {
                             currentServerIp = Settings.General.TcpClientDefaultIp;
                             string m = "Service '" + service + "' could not be resolved.\r\nUsing default ip: " + currentServerIp;
-                            Log.Warning(m);
+                            Log.Main.Warning(m);
                             InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Yellow);
                         }
                         else if (zhs.Where(x => x.IPAddress != null).FirstOrDefault() == null)
                         {
                             currentServerIp = Settings.General.TcpClientDefaultIp;
                             string m = "Resolution of service '" + service + "' has no IP defined.\r\nUsing default ip: " + currentServerIp;
-                            Log.Error(m);
+                            Log.Main.Error(m);
                             InfoWindow.Create(m, null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
                         }
                         else
                         {
                             currentServerIp = zhs.Where(x => x.IPAddress != null).FirstOrDefault().IPAddress;
-                            Log.Inform("Service: " + service + " has been resolved to: " + currentServerIp);
+                            Log.Main.Inform("Service: " + service + " has been resolved to: " + currentServerIp);
                         }
 
                         IPAddress ip;
@@ -156,7 +156,7 @@ namespace Cliver.CisteraScreenCapture
                         TcpServer.Start(Settings.General.TcpServerPort, ip);
 
                         string url = "http://" + currentServerIp + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
-                        Log.Inform("GETing: " + url);
+                        Log.Main.Inform("GETing: " + url);
 
                         HttpClient hc = new HttpClient();
                         HttpResponseMessage rm = hc.GetAsync(url).Result;
@@ -170,7 +170,7 @@ namespace Cliver.CisteraScreenCapture
                     }
                     catch (Exception e)
                     {
-                        Log.Error(e);
+                        Log.Main.Error(e);
                         InfoWindow.Create(Log.GetExceptionMessage(e), null, "OK", null, Settings.View.ErrorSoundFile, System.Windows.Media.Brushes.WhiteSmoke, System.Windows.Media.Brushes.Red);
                     }
                 },
@@ -211,7 +211,7 @@ namespace Cliver.CisteraScreenCapture
 
         static void userLoggedOff()
         {
-            Log.Inform("User logged off");
+            Log.Main.Inform("User logged off");
             stop_userLoggedOn_t();
             TcpServer.Stop();
             MpegStream.Stop();

@@ -32,16 +32,16 @@ namespace Cliver.CisteraScreenCaptureService
             this.socket = socket;
             stream = new NetworkStream(socket);
 
-            Log.Inform("Starting connection from " + RemoteIp + ":" + RemotePort);
+            Log.Main.Inform("Starting connection from " + RemoteIp + ":" + RemotePort);
 
             thread = ThreadRoutines.StartTry(
                 run,
                 (Exception e) =>
                 {
                     if (socket != null && !socket.Connected)
-                        Log.Inform("Socket from " + RemoteIp + ":" + RemotePort + " has been disconnected.");
+                        Log.Main.Inform("Socket from " + RemoteIp + ":" + RemotePort + " has been disconnected.");
                     else
-                        Log.Error(e);
+                        Log.Main.Error(e);
                 },
                 () =>
                 {
@@ -65,7 +65,7 @@ namespace Cliver.CisteraScreenCaptureService
                 if (socket == null)
                     return;
 
-                Log.Inform("Closing connection from " + RemoteIp + ":" + RemotePort);
+                Log.Main.Inform("Closing connection from " + RemoteIp + ":" + RemotePort);
 
                 if (socket != null)
                 {
@@ -141,7 +141,7 @@ namespace Cliver.CisteraScreenCaptureService
             {
                 TcpMessage m = TcpMessage.Receive(stream);
 
-                Log.Inform("Tcp message received: " + m.Name + "\r\n" + m.BodyAsText);
+                Log.Main.Inform("Tcp message received: " + m.Name + "\r\n" + m.BodyAsText);
                 CisteraScreenCaptureService.Events.UiMessage.Info("Tcp message received: " + m.Name + "\r\n" + m.BodyAsText);
 
                 string reply = TcpMessage.Success;
@@ -166,8 +166,9 @@ namespace Cliver.CisteraScreenCaptureService
                 catch (Exception e)
                 {
                     reply = e.Message;
+                    Log.Main.Error("Tcp message processing: ", e);
                 }
-                Log.Inform("Tcp message sending: " + m.Name + "\r\n" + reply);
+                Log.Main.Inform("Tcp message sending: " + m.Name + "\r\n" + reply);
                 m.Reply(stream, reply);
                 if (m.Name == TcpMessage.SslStart && reply == TcpMessage.Success)
                     startSsl();

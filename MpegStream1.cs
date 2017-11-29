@@ -29,16 +29,12 @@ using System.Runtime.InteropServices;
 
 namespace Cliver.CisteraScreenCapture
 {
-    public class MpegStream1
+    public class MpegStream
     {
-        static MpegStream1()
-        {
-        }
-
         public static void Start(string arguments)
         {
             if (mpeg_stream_process != null)
-                Log.Warning("The previous MpegStream was not stopped!");
+                Log.Main.Warning("The previous MpegStream was not stopped!");
             Stop();
 
             int x = 0, y = 0, w = 0, h = 0;
@@ -59,17 +55,20 @@ namespace Cliver.CisteraScreenCapture
             Win32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, callback, IntPtr.Zero);
             string source = " -offset_x " + x + " -offset_y " + y + " -video_size " + w + "x" + h + " -show_region 1 -i desktop ";
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);
-            commandLine = "ffmpeg " + arguments;
+            commandLine = "ffmpeg.exe " + arguments;
 
-            Log.Inform("Launching:\r\n" + commandLine);
+            Log.Main.Inform("Launching:\r\n" + commandLine);
 
-            mpeg_stream_process = new Process();
+            mpeg_stream_process = new Process()
+            {
+                //EnableRaisingEvents = true,
+            };
             mpeg_stream_process.StartInfo = new ProcessStartInfo("ffmpeg.exe", arguments)
             {
                 ErrorDialog = false,
                 UseShellExecute = false,
-                CreateNoWindow = !Settings.General.ShowMpegWindow
-                //WindowStyle = ProcessWindowStyle.Hidden;
+                CreateNoWindow = !Settings.General.ShowMpegWindow,
+                //WindowStyle = ProcessWindowStyle.Hidden,
             };
             if (Settings.General.WriteMpegOutput2Log)
             {
@@ -85,19 +84,33 @@ namespace Cliver.CisteraScreenCapture
                 tw.WriteLine("STARTED: " + DateTime.Now.ToString());
                 tw.WriteLine(">" + commandLine);
                 tw.WriteLine("\r\n");
-                tw.FlushAsync();
+                tw.Flush();
                 mpeg_stream_process.OutputDataReceived += (object sender, DataReceivedEventArgs e) =>
                 {
-                    tw.Write(e.Data);
-                    tw.FlushAsync();
+                    lock (tw)
+                    {
+                        tw.WriteLine(e.Data);
+                        tw.Flush();
+                    }
                 };
                 mpeg_stream_process.ErrorDataReceived += (object sender, DataReceivedEventArgs e) =>
                 {
-                    tw.Write(e.Data);
-                    tw.FlushAsync();
+                    lock (tw)
+                    {
+                        //tw.WriteLine("ERROR: " + e.Data);//ffmpeg all the data sends to Error
+                        tw.WriteLine(e.Data);
+                        tw.Flush();
+                    }
                 };
             }
             mpeg_stream_process.Start();
+            if (Settings.General.WriteMpegOutput2Log)
+            {
+                mpeg_stream_process.BeginOutputReadLine();
+                mpeg_stream_process.BeginErrorReadLine();
+            }
+            if (!WindowsUserRoutines.CurrentUserIsAdministrator())
+                throw new Exception("!CurrentUserIsAdministrator. User's name: " + WindowsUserRoutines.GetUserName3());
             ProcessRoutines.AntiZombieTracker.This.Track(mpeg_stream_process);
         }
         static Process mpeg_stream_process = null;
@@ -107,7 +120,7 @@ namespace Cliver.CisteraScreenCapture
         {
             if (mpeg_stream_process != null)
             {
-                Log.Inform("Terminating:\r\n" + commandLine);
+                Log.Main.Inform("Terminating:\r\n" + commandLine);
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
             }

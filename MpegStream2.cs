@@ -31,12 +31,12 @@ using System.Security.Principal;
 
 namespace Cliver.CisteraScreenCapture
 {
-    public class MpegStream
+    public class MpegStream2
     {
         public static void Start(string arguments)
         {
             if (mpeg_stream_process != null)
-                Log.Warning("The previous MpegStream was not stopped!");
+                Log.Main.Warning("The previous MpegStream was not stopped!");
             Stop();
 
             int x = 0, y = 0, w = 0, h = 0;
@@ -59,7 +59,7 @@ namespace Cliver.CisteraScreenCapture
             arguments = Regex.Replace(arguments, @"-framerate\s+\d+", "$0" + source);
             commandLine = "ffmpeg.exe " + arguments;
 
-            Log.Inform("Launching:\r\n" + commandLine);
+            Log.Main.Inform("Launching:\r\n" + commandLine);
 
             uint dwCreationFlags = 0;
             if (!Settings.General.ShowMpegWindow)
@@ -117,7 +117,7 @@ namespace Cliver.CisteraScreenCapture
         {
             if (mpeg_stream_process != null)
             {
-                Log.Inform("Terminating:\r\n" + commandLine);
+                Log.Main.Inform("Terminating:\r\n" + commandLine);
                 ProcessRoutines.KillProcessTree(mpeg_stream_process.Id);
                 mpeg_stream_process = null;
             }

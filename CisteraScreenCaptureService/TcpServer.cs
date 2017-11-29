@@ -35,7 +35,7 @@ namespace Cliver.CisteraScreenCaptureService
                 return;
             Stop();
 
-            Log.Inform("Starting TCP listener on " + local_port + " for " + destination_ip);
+            Log.Main.Inform("Starting TCP listener on " + local_port + " for " + destination_ip);
 
             //listeningSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             //listeningSocket.Bind(localEndPoint);
@@ -47,11 +47,11 @@ namespace Cliver.CisteraScreenCaptureService
             {
                 if (e is SocketException)
                 {
-                    Log.Warning(e);
+                    Log.Main.Warning(e);
                 }
                 else
                 {
-                    Log.Error(e);
+                    Log.Main.Error(e);
                     CisteraScreenCaptureService.Events.UiMessage.Error(Log.GetExceptionMessage(e));
                 }
                 Stop();
@@ -64,7 +64,7 @@ namespace Cliver.CisteraScreenCaptureService
             if (server == null)
                 return;
 
-            Log.Inform("Stopping TCP listener on " + ((IPEndPoint)server.LocalEndpoint).Port);
+            Log.Main.Inform("Stopping TCP listener on " + ((IPEndPoint)server.LocalEndpoint).Port);
 
             //listeningSocket.Close(0);
             if (server != null)
