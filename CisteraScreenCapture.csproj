@@ -155,6 +155,7 @@
     <Compile Include="AboutForm.Designer.cs" />
     <Compile Include="InfoControl.xaml.cs" />
     <Compile Include="InfoWindow.xaml.cs" />
+    <Compile Include="MonitorRoutines.cs" />
     <Compile Include="MpegStream2.cs" />
     <Compile Include="MpegStream.cs" />
     <Compile Include="MpegStream1.cs" />

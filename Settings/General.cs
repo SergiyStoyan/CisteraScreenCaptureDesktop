@@ -39,7 +39,7 @@ namespace Cliver.CisteraScreenCapture
             public override void Loaded()
             {
                 if (string.IsNullOrWhiteSpace(CapturedMonitorDeviceName))
-                    Settings.General.CapturedMonitorDeviceName = SettingsWindow.GetDefaultMonitorName();
+                    Settings.General.CapturedMonitorDeviceName = MonitorRoutines.GetDefaultMonitorName();
             }
 
             public override void Saving()

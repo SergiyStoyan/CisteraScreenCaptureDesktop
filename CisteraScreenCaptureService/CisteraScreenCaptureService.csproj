@@ -81,6 +81,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MonitorRoutines.cs" />
     <Compile Include="MpegStream.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="ProjectInstaller.cs">

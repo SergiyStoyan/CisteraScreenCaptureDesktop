@@ -40,16 +40,16 @@ namespace Cliver.CisteraScreenCapture
 
             if (string.IsNullOrWhiteSpace(Settings.General.CapturedMonitorDeviceName))
             {
-                Settings.General.CapturedMonitorDeviceName = SettingsWindow.GetDefaultMonitorName();
+                Settings.General.CapturedMonitorDeviceName = MonitorRoutines.GetDefaultMonitorName();
                 if (string.IsNullOrWhiteSpace(Settings.General.CapturedMonitorDeviceName))
                     throw new Exception("No monitor was found.");
             }
-            Win32Monitor.RECT? an = SettingsWindow.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
+            Win32Monitor.RECT? an = MonitorRoutines.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
             if (an == null)
             {
-                Settings.General.CapturedMonitorDeviceName = SettingsWindow.GetDefaultMonitorName();
+                Settings.General.CapturedMonitorDeviceName = MonitorRoutines.GetDefaultMonitorName();
                 Log.Main.Warning("Monitor '" + Settings.General.CapturedMonitorDeviceName + "' was not found. Using default one '" + Settings.General.CapturedMonitorDeviceName + "'");
-                an = SettingsWindow.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
+                an = MonitorRoutines.GetMonitorAreaByMonitorName(Settings.General.CapturedMonitorDeviceName);
                 if (an == null)
                     throw new Exception("Monitor '" + Settings.General.CapturedMonitorDeviceName + "' was not found.");
             }
@@ -105,7 +105,8 @@ namespace Cliver.CisteraScreenCapture
                     }
                 };
             }
-            mpeg_stream_process.Start();
+            if (!mpeg_stream_process.Start())
+                throw new Exception("Cound not start the process: " + mpeg_stream_process.StartInfo.FileName + " " + mpeg_stream_process.StartInfo.Arguments);
             if (Settings.General.WriteMpegOutput2Log)
             {
                 mpeg_stream_process.BeginOutputReadLine();
