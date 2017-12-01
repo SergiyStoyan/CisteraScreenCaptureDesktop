@@ -77,7 +77,7 @@ namespace Cliver.CisteraScreenCaptureService
                     file = file0 + "_" + count.ToString();
                 file += ".log";
 
-                File.WriteAllText(file, @"STARTED: " + DateTime.Now.ToString() + @"
+                File.WriteAllText(file, @"STARTED AT " + DateTime.Now.ToString() + @":
 >" + commandLine + @"
 
 ", Encoding.UTF8);
@@ -85,9 +85,10 @@ namespace Cliver.CisteraScreenCaptureService
                 FileSystemAccessRule fileSystemAccessRule = new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.AppendData, AccessControlType.Allow);
                 fileSecurity.AddAccessRule(fileSystemAccessRule);
                 File.SetAccessControl(file, fileSecurity);
-
-                commandLine = Environment.SystemDirectory + "\\cmd.exe /c " + commandLine + " 1>>\"" + file + "\",2>&1";
+                
+                commandLine = Environment.SystemDirectory + "\\cmd.exe /c \"" + commandLine + " 1>>\"" + file + "\",2>&1\"";
             }
+
             uint processId = createProcessInSession(sessionId, commandLine, dwCreationFlags, startupInfo);
             mpeg_stream_process = Process.GetProcessById((int)processId);
             if (mpeg_stream_process == null)
@@ -106,51 +107,11 @@ namespace Cliver.CisteraScreenCaptureService
         static uint createProcessInSession(uint dwSessionId, String commandLine, WinApi.Advapi32.CreationFlags dwCreationFlags = 0, WinApi.Advapi32.STARTUPINFO? startupInfo = null, bool bElevate = false)
         {
             Log.Main.Inform("Launching (in session " + dwSessionId + "):\r\n" + commandLine);
-
-            IntPtr hUserToken = IntPtr.Zero;
-            IntPtr hUserTokenDup = IntPtr.Zero;
-            IntPtr hPToken = IntPtr.Zero;
-            IntPtr hProcess = IntPtr.Zero;
+            
+            IntPtr hNewProcessToken = IntPtr.Zero;
+            IntPtr hProcessToken = IntPtr.Zero;
             try
-            {
-                // Log the client on to the local computer.
-                //uint dwSessionId = WTSGetActiveConsoleSessionId();
-
-                //// Find the winlogon process
-                //var procEntry = new PROCESSENTRY32();
-
-                //uint hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-                //if (hSnap == INVALID_HANDLE_VALUE)
-                //    throw new Exception("CreateToolhelp32Snapshot == INVALID_HANDLE_VALUE. " + ErrorRoutines.GetLastError());
-
-                //procEntry.dwSize = (uint)Marshal.SizeOf(procEntry); //sizeof(PROCESSENTRY32);
-                //if (Process32First(hSnap, ref procEntry) == 0)
-                //    throw new Exception("Process32First == 0. " + ErrorRoutines.GetLastError());
-
-                //uint winlogonPid = 0;
-                //String strCmp = "explorer.exe";
-                //do
-                //{
-                //    if (strCmp.IndexOf(procEntry.szExeFile) == 0)
-                //    {
-                //        // We found a winlogon process...make sure it's running in the console session
-                //        uint winlogonSessId = 0;
-                //        if (ProcessIdToSessionId(procEntry.th32ProcessID, ref winlogonSessId) && winlogonSessId == dwSessionId)
-                //        {
-                //            winlogonPid = procEntry.th32ProcessID;
-                //            break;
-                //        }
-                //    }
-                //}
-                //while (Process32Next(hSnap, ref procEntry) != 0);
-                //if (winlogonPid == 0)
-                //    throw new Exception("winlogonPid == 0");
-
-                //Get the user token used by DuplicateTokenEx
-                //WTSQueryUserToken(dwSessionId, ref hUserToken);
-                //if (hUserToken == IntPtr.Zero)
-                //    throw new Exception("WTSQueryUserToken == 0. " + ErrorRoutines.GetLastError());
-
+            {                
                 WinApi.Advapi32.STARTUPINFO si;
                 if (startupInfo != null)
                     si = (WinApi.Advapi32.STARTUPINFO)startupInfo;
@@ -158,51 +119,20 @@ namespace Cliver.CisteraScreenCaptureService
                     si = new WinApi.Advapi32.STARTUPINFO();
                 si.cb = Marshal.SizeOf(si);
                 si.lpDesktop = "winsta0\\default";
-                //hProcess = OpenProcess(MAXIMUM_ALLOWED, false, winlogonPid);
-                //if (hProcess == IntPtr.Zero)
-                //    throw new Exception("OpenProcess == IntPtr.Zero. " + ErrorRoutines.GetLastError());
 
-                if (!WinApi.Advapi32.OpenProcessToken(Process.GetCurrentProcess().Handle, WinApi.Advapi32.DesiredAccess.MAXIMUM_ALLOWED, out hPToken))
-                    //if (!OpenProcessToken(hProcess, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_ASSIGN_PRIMARY | TOKEN_ADJUST_SESSIONID | TOKEN_READ | TOKEN_WRITE, ref hPToken))
+                if (!WinApi.Advapi32.OpenProcessToken(Process.GetCurrentProcess().Handle, WinApi.Advapi32.DesiredAccess.MAXIMUM_ALLOWED, out hProcessToken))
                     throw new Exception("!OpenProcessToken. " + ErrorRoutines.GetLastError());
-
-                //var luid = new LUID();
-                //if (!LookupPrivilegeValue(IntPtr.Zero, SE_DEBUG_NAME, ref luid))
-                //    throw new Exception("!LookupPrivilegeValue. " + ErrorRoutines.GetLastError());
-
+                
                 var sa = new WinApi.Advapi32.SECURITY_ATTRIBUTES();
                 sa.Length = Marshal.SizeOf(sa);
-                if (!WinApi.Advapi32.DuplicateTokenEx(hPToken, WinApi.Advapi32.DesiredAccess.MAXIMUM_ALLOWED, ref sa, WinApi.Advapi32.SECURITY_IMPERSONATION_LEVEL.SecurityIdentification, WinApi.Advapi32.TOKEN_TYPE.TokenPrimary, ref hUserTokenDup))
+                if (!WinApi.Advapi32.DuplicateTokenEx(hProcessToken, WinApi.Advapi32.DesiredAccess.MAXIMUM_ALLOWED, ref sa, WinApi.Advapi32.SECURITY_IMPERSONATION_LEVEL.SecurityIdentification, WinApi.Advapi32.TOKEN_TYPE.TokenPrimary, ref hNewProcessToken))
                     throw new Exception("!DuplicateTokenEx. " + ErrorRoutines.GetLastError());
 
-                //if (bElevate)
-                //{
-                //    var tp = new TOKEN_PRIVILEGES();
-                //    //tp.Privileges[0].Luid = luid;
-                //    //tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-                //    tp.PrivilegeCount = 1;
-                //    tp.Privileges = new int[3];
-                //    tp.Privileges[2] = SE_PRIVILEGE_ENABLED;
-                //    tp.Privileges[1] = luid.HighPart;
-                //    tp.Privileges[0] = luid.LowPart;
-
-                //    //Adjust Token privilege
-                //    if (!SetTokenInformation(hUserTokenDup, TOKEN_INFORMATION_CLASS.TokenSessionId, ref dwSessionId, (uint)IntPtr.Size))
-                //        throw new Exception("!SetTokenInformation. " + ErrorRoutines.GetLastError());
-                //    if (!AdjustTokenPrivileges(hUserTokenDup, false, ref tp, Marshal.SizeOf(tp), /*(PTOKEN_PRIVILEGES)*/IntPtr.Zero, IntPtr.Zero))
-                //        throw new Exception("!AdjustTokenPrivileges. " + ErrorRoutines.GetLastError());
-                //}
-
-                //dwCreationFlags |= dwCreationFlagValues.NORMAL_PRIORITY_CLASS| dwCreationFlagValues.CREATE_NEW_CONSOLE;
-                //IntPtr pEnv = IntPtr.Zero;
-                //if (CreateEnvironmentBlock(ref pEnv, hUserTokenDup, true))
-                //    dwCreationFlags |= dwCreationFlagValues.CREATE_UNICODE_ENVIRONMENT;
-                //else
-                //    pEnv = IntPtr.Zero;
-
-                // Launch the process in the client's logon session.
+                if (!WinApi.Advapi32.SetTokenInformation(hNewProcessToken, WinApi.Advapi32.TOKEN_INFORMATION_CLASS.TokenSessionId, ref dwSessionId, (uint)IntPtr.Size))
+                    throw new Exception("!SetTokenInformation. " + ErrorRoutines.GetLastError());
+             
                 WinApi.Advapi32.PROCESS_INFORMATION pi;
-                if (!WinApi.Advapi32.CreateProcessAsUser(hUserTokenDup, // client's access token
+                if (!WinApi.Advapi32.CreateProcessAsUser(hNewProcessToken, // client's access token
                     null, // file to execute
                     commandLine, // command line
                     ref sa, // pointer to process SECURITY_ATTRIBUTES
@@ -223,16 +153,10 @@ namespace Cliver.CisteraScreenCaptureService
             //}
             finally
             {
-                if (hProcess != IntPtr.Zero)
-                    WinApi.Kernel32.CloseHandle(hProcess);
-                if (hUserToken != IntPtr.Zero)
-                    WinApi.Kernel32.CloseHandle(hUserToken);
-                if (hUserTokenDup != IntPtr.Zero)
-                    WinApi.Kernel32.CloseHandle(hUserTokenDup);
-                if (hPToken != IntPtr.Zero)
-                    WinApi.Kernel32.CloseHandle(hPToken);
-                //if (pEnv != IntPtr.Zero)
-                //    DestroyEnvironmentBlock(pEnv);
+                if (hProcessToken != IntPtr.Zero)
+                    WinApi.Kernel32.CloseHandle(hProcessToken);
+                if (hNewProcessToken != IntPtr.Zero)
+                    WinApi.Kernel32.CloseHandle(hNewProcessToken);
             }
         }
 

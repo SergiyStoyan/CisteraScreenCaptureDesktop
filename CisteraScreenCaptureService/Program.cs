@@ -6,6 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
 
+//installing service:
+//"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\InstallUtil.exe" "d:\_d\_PROJECTS\CisteraScreenCapture\CisteraScreenCaptureService\bin\Debug\CisteraScreenCaptureService.exe"
+//"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\InstallUtil.exe" /u "d:\_d\_PROJECTS\CisteraScreenCapture\CisteraScreenCaptureService\bin\Debug\CisteraScreenCaptureService.exe"
+
 namespace Cliver.CisteraScreenCaptureService
 {
     static class Program
@@ -28,8 +32,20 @@ namespace Cliver.CisteraScreenCaptureService
         {
             try
             {
-                Log.Main.Inform("Version: " + AssemblyRoutines.GetAppVersion());
-
+                Log.Main.Inform("Application version: " + AssemblyRoutines.GetAppVersion());
+                
+                string m = "Appication user: " + WindowsUserRoutines.GetUserName3() + " (";
+                if (WindowsUserRoutines.CurrentUserIsAdministrator())
+                {
+                    m += "administrator";
+                    if (WindowsUserRoutines.CurrentUserHasElevatedPrivileges())
+                        m += ", elevated privileges";
+                    else
+                        m += ", not elevated privileges";
+                }
+                else
+                    m += "not administrator";
+                Log.Main.Inform(m + ")");
 
                 ServiceBase.Run(new Service());
             }

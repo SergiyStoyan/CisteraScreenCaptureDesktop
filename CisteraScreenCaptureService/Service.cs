@@ -58,10 +58,6 @@ namespace Cliver.CisteraScreenCaptureService
 
 
             string user_name = GetUserName();
-            //Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName:" + WindowsUserRoutines.GetUserName());
-            //Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName2:" + WindowsUserRoutines.GetUserName2());
-            //Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName3:" + WindowsUserRoutines.GetUserName3());
-            //Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName4:" + WindowsUserRoutines.GetUserName4());
             if (!string.IsNullOrWhiteSpace(user_name))
                 userLoggedOn();
             else

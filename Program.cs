@@ -103,6 +103,18 @@ namespace Cliver.CisteraScreenCapture
                 //MpegStream.Stop();
 
                 Log.Main.Inform("Version: " + AssemblyRoutines.GetAppVersion());
+                string m = "User: " + WindowsUserRoutines.GetUserName3() + "(";
+                if (WindowsUserRoutines.CurrentUserIsAdministrator())
+                {
+                    m += "administrator";
+                    if(WindowsUserRoutines.CurrentUserHasElevatedPrivileges())
+                        m +=", elevated privileges";
+                    else
+                        m +=", not elevated privileges";
+                }
+                else
+                    m += "not administrator";
+                Log.Main.Inform(m + ")");
 
                 ProcessRoutines.RunSingleProcessOnly();
 
