@@ -147,7 +147,7 @@ namespace Cliver.CisteraScreenCaptureService
                         TcpServer.Start(Settings.General.TcpServerPort, ip);
 
                         string url = "http://" + currentServerIp + "/screenCapture/register?username=" + currentUserName + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
-                        Log.Main.Inform("GETing: " + url);
+                        Log.Main.Inform("GETting: " + url);
 
                         HttpClient hc = new HttpClient();
                         HttpResponseMessage rm = hc.GetAsync(url).Result;
