@@ -54,7 +54,9 @@ namespace Cliver.CisteraScreenCaptureService
             //}
 
             uint sessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
-            if (sessionId != 0 && sessionId != 0xFFFFFFFF)
+            if (sessionId == 0 || sessionId == 0xFFFFFFFF)
+                Log.Main.Inform("No console user active.");
+            else
                 sessionChanged(sessionId, true);
         }
 
@@ -67,11 +69,12 @@ namespace Cliver.CisteraScreenCaptureService
 
         static Service()
         {
-            Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
+            //Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
         }
 
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
-        {         
+        {
+            Log.Main.Write("Session: " + changeDescription.SessionId + ":" + changeDescription.Reason);
             switch (changeDescription.Reason)
             {
                 case SessionChangeReason.ConsoleConnect:
@@ -87,21 +90,22 @@ namespace Cliver.CisteraScreenCaptureService
             base.OnSessionChange(changeDescription);
         }
 
-        private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
-        {
-            //switch (e.Reason)
-            //{
-            //    case SessionSwitchReason.ConsoleConnect:
-            //    case SessionSwitchReason.RemoteConnect:
-            //    case SessionSwitchReason.SessionUnlock:
-            //        userLoggedOn();
-            //        break;
-            //    default:
-            //        userLoggedOff();
-            //        break;
-            //}
-            //sessionChanged();
-        }
+        //private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
+        //{
+        //    Log.Main.Write("-" + e.Reason);
+        //    //switch (e.Reason)
+        //    //{
+        //    //    case SessionSwitchReason.ConsoleConnect:
+        //    //    case SessionSwitchReason.RemoteConnect:
+        //    //    case SessionSwitchReason.SessionUnlock:
+        //    //        userLoggedOn();
+        //    //        break;
+        //    //    default:
+        //    //        userLoggedOff();
+        //    //        break;
+        //    //}
+        //    //sessionChanged();
+        //}
 
         static void sessionChanged(uint sessionId, bool active)
         {
