@@ -52,9 +52,9 @@ namespace Cliver.CisteraScreenCapture
                     Log.Main.Inform("Starting...");
                     
                     string user_name = GetUserName();
-                    Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName:" + WindowsUserRoutines.GetUserName());
-                    Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName2:" + WindowsUserRoutines.GetUserName2());
-                    Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName3:" + WindowsUserRoutines.GetUserName3());
+                    //Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName:" + WindowsUserRoutines.GetUserName());
+                    //Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName2:" + WindowsUserRoutines.GetUserName2());
+                    //Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName3:" + WindowsUserRoutines.GetUserName3());
                     //Log.Main.Inform("TEST user by WindowsUserRoutines.GetUserName4:" + WindowsUserRoutines.GetUserName4());
                     if (!string.IsNullOrWhiteSpace(user_name))
                         userLoggedOn();
@@ -79,7 +79,7 @@ namespace Cliver.CisteraScreenCapture
 
         static public string GetUserName()
         {
-            return WindowsUserRoutines.GetUserName3();
+            return WindowsUserRoutines.GetCurrentUserName3();
         }
 
         private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)

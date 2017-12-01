@@ -103,7 +103,7 @@ namespace Cliver.CisteraScreenCapture
                 //MpegStream.Stop();
 
                 Log.Main.Inform("Version: " + AssemblyRoutines.GetAppVersion());
-                string m = "User: " + WindowsUserRoutines.GetUserName3() + "(";
+                string m = "User: " + WindowsUserRoutines.GetCurrentUserName3() + "(";
                 if (WindowsUserRoutines.CurrentUserIsAdministrator())
                 {
                     m += "administrator";

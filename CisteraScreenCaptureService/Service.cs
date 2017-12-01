@@ -53,7 +53,9 @@ namespace Cliver.CisteraScreenCaptureService
             //    Console.WriteLine(e);
             //}
 
-            sessionChanged();
+            uint sessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
+            if (sessionId != 0 && sessionId != 0xFFFFFFFF)
+                sessionChanged(sessionId, true);
         }
 
         protected override void OnStop()
@@ -66,12 +68,24 @@ namespace Cliver.CisteraScreenCaptureService
         static Service()
         {
             Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
-        }       
+        }
 
-        //protected override void OnSessionChange(SessionChangeDescription changeDescription)
-        //{
-        //    base.OnSessionChange(changeDescription);
-        //}
+        protected override void OnSessionChange(SessionChangeDescription changeDescription)
+        {         
+            switch (changeDescription.Reason)
+            {
+                case SessionChangeReason.ConsoleConnect:
+                case SessionChangeReason.RemoteConnect:
+                case SessionChangeReason.SessionUnlock:
+                    sessionChanged((uint)changeDescription.SessionId, true);
+                    break;
+                default:
+                    sessionChanged((uint)changeDescription.SessionId, false);
+                    break;
+            }
+
+            base.OnSessionChange(changeDescription);
+        }
 
         private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
         {
@@ -86,15 +100,14 @@ namespace Cliver.CisteraScreenCaptureService
             //        userLoggedOff();
             //        break;
             //}
-            sessionChanged();
+            //sessionChanged();
         }
 
-        static void sessionChanged()
+        static void sessionChanged(uint sessionId, bool active)
         {
             try
             {
-                uint sessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
-                if (sessionId == 0)
+                if (sessionId == 0 || !active)
                 {
                     Log.Main.Inform("User logged off: " + currentUserName);
                     stopServingUser();

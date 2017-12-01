@@ -113,7 +113,7 @@ namespace Cliver.CisteraScreenCapture
                 mpeg_stream_process.BeginErrorReadLine();
             }
             if (!WindowsUserRoutines.CurrentUserIsAdministrator())
-                throw new Exception("!CurrentUserIsAdministrator. User's name: " + WindowsUserRoutines.GetUserName3());
+                throw new Exception("!CurrentUserIsAdministrator. User's name: " + WindowsUserRoutines.GetCurrentUserName3());
             ProcessRoutines.AntiZombieTracker.This.Track(mpeg_stream_process);
         }
         static Process mpeg_stream_process = null;
