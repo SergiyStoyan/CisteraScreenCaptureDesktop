@@ -142,7 +142,7 @@ namespace Cliver.CisteraScreenCaptureService
                 TcpMessage m = TcpMessage.Receive(stream);
 
                 Log.Main.Inform("Tcp message received: " + m.Name + "\r\n" + m.BodyAsText);
-                CisteraScreenCaptureService.Events.UiMessage.Info("Tcp message received: " + m.Name + "\r\n" + m.BodyAsText);
+                CisteraScreenCaptureService.ExposedEvents.UiMessage.Info("Tcp message received: " + m.Name + "\r\n" + m.BodyAsText);
 
                 string reply = TcpMessage.Success;
                 try
@@ -150,8 +150,7 @@ namespace Cliver.CisteraScreenCaptureService
                     switch (m.Name)
                     {
                         case TcpMessage.FfmpegStart:
-                            uint sessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
-                            MpegStream.Start(sessionId, m.BodyAsText);
+                            MpegStream.Start(Service.UserSessionId, m.BodyAsText);
                             break;
                         case TcpMessage.FfmpegStop:
                             MpegStream.Stop();

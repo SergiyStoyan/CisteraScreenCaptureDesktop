@@ -35,6 +35,9 @@ namespace Cliver.CisteraScreenCaptureService
     {
         public static void Start(uint sessionId, string arguments)
         {
+            if(sessionId < 1)
+                throw new Exception("sessionId == " + sessionId);
+
             if (mpeg_stream_process != null)
                 Log.Main.Warning("The previous MpegStream was not stopped!");
             Stop();

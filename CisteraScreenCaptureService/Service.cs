@@ -41,94 +41,84 @@ namespace Cliver.CisteraScreenCaptureService
         protected override void OnStart(string[] args)
         {
             Log.Main.Inform("Starting...");
-            CisteraScreenCaptureService.Events.Started();
-            
-            try
-            {
-                uint dwSessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
-                MpegStream.Start(dwSessionId, "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            CisteraScreenCaptureService.ExposedEvents.Starting();
 
+            //try
+            //{
+            //    uint dwSessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
+            //    MpegStream.Start(dwSessionId, "-f gdigrab -framerate 10 -f rtp_mpegts -srtp_out_suite AES_CM_128_HMAC_SHA1_80 -srtp_out_params aMg7BqN047lFN72szkezmPyN1qSMilYCXbqP/sCt srtp://127.0.0.1:5920");
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e);
+            //}
 
-
-
-
-            string user_name = GetUserName();
-            if (!string.IsNullOrWhiteSpace(user_name))
-                userLoggedOn();
-            else
-                Log.Main.Warning("No user logged in.");
+            sessionChanged();
         }
 
         protected override void OnStop()
         {
             Log.Main.Inform("Stopping...");
-            CisteraScreenCaptureService.Events.Stopped();
-
-            userLoggedOff();
+            CisteraScreenCaptureService.ExposedEvents.Stopping();
+            stopServingUser();
         }
 
         static Service()
         {
             Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
-        }
+        }       
 
-        public delegate void OnStateChanged();
-        public static event OnStateChanged StateChanged = null;
-        
-        static public string GetUserName()
-        {
-            return WindowsUserRoutines.GetUserName3();
-        }
+        //protected override void OnSessionChange(SessionChangeDescription changeDescription)
+        //{
+        //    base.OnSessionChange(changeDescription);
+        //}
 
         private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
         {
-            switch (e.Reason)
-            {
-                case SessionSwitchReason.ConsoleConnect:
-                case SessionSwitchReason.RemoteConnect:
-                case SessionSwitchReason.SessionUnlock:
-                    userLoggedOn();
-                    break;
-                default:
-                    userLoggedOff();
-                    break;
-            }
+            //switch (e.Reason)
+            //{
+            //    case SessionSwitchReason.ConsoleConnect:
+            //    case SessionSwitchReason.RemoteConnect:
+            //    case SessionSwitchReason.SessionUnlock:
+            //        userLoggedOn();
+            //        break;
+            //    default:
+            //        userLoggedOff();
+            //        break;
+            //}
+            sessionChanged();
         }
 
-        static void userLoggedOn()
+        static void sessionChanged()
         {
-            string user_name = GetUserName();
-            if (currentUserName == user_name)
-                return;
-            stop_userLoggedOn_t();
-            currentUserName = user_name;
-            userLoggedOn_t = ThreadRoutines.StartTry(
-                () =>
+            try
+            {
+                uint sessionId = WinApi.Wts.WTSGetActiveConsoleSessionId();
+                if (sessionId == 0)
                 {
-                    try
+                    Log.Main.Inform("User logged off: " + currentUserName);
+                    stopServingUser();
+                    currentUserSessionId = 0;
+                    currentUserName = null;
+                    return;
+                }
+
+                string userName = WindowsUserRoutines.GetUserNameBySessionId(sessionId);
+                if (userName == currentUserName)
+                    return;
+
+                Log.Main.Inform("User logged in: " + userName);
+                stopServingUser();
+                currentUserSessionId = sessionId;
+                currentUserName = userName;
+                if (string.IsNullOrWhiteSpace(currentUserName))
+                {
+                    Log.Main.Error("Session's user name is empty.");
+                    return;
+                }
+                onNewUser_t = ThreadRoutines.StartTry(
+                    () =>
                     {
-                            //if (SysTray.This.IsOnlyTCP)
-                            //{
-                            //    Log.Main.Warning("TEST MODE: IsOnlyTCP");
-                            //    IPAddress ip1;
-                            //    if (!IPAddress.TryParse(Settings.General.TcpClientDefaultIp, out ip1))
-                            //        throw new Exception("Server IP is not valid: " + Settings.General.TcpClientDefaultIp);
-                            //    TcpServer.Start(Settings.General.TcpServerPort, ip1);
-                            //    return;
-                            //}
-
-                            if (string.IsNullOrWhiteSpace(user_name))
-                        {
-                            Log.Main.Error("Session's user name is empty.");
-                            return;
-                        }
-                        Log.Main.Inform("User logged in: " + user_name);
-
                         string service = Settings.General.GetServiceName();
                         IReadOnlyList<IZeroconfHost> zhs = ZeroconfResolver.ResolveAsync(service, TimeSpan.FromSeconds(3), 1, 10).Result;
                         if (zhs.Count < 1)
@@ -136,14 +126,14 @@ namespace Cliver.CisteraScreenCaptureService
                             currentServerIp = Settings.General.TcpClientDefaultIp;
                             string m = "Service '" + service + "' could not be resolved.\r\nUsing default ip: " + currentServerIp;
                             Log.Main.Warning(m);
-                            CisteraScreenCaptureService.Events.UiMessage.Warning(m);
+                            CisteraScreenCaptureService.ExposedEvents.UiMessage.Warning(m);
                         }
                         else if (zhs.Where(x => x.IPAddress != null).FirstOrDefault() == null)
                         {
                             currentServerIp = Settings.General.TcpClientDefaultIp;
                             string m = "Resolution of service '" + service + "' has no IP defined.\r\nUsing default ip: " + currentServerIp;
                             Log.Main.Error(m);
-                            CisteraScreenCaptureService.Events.UiMessage.Error(m);
+                            CisteraScreenCaptureService.ExposedEvents.UiMessage.Error(m);
                         }
                         else
                         {
@@ -156,7 +146,7 @@ namespace Cliver.CisteraScreenCaptureService
                             throw new Exception("Server IP is not valid: " + currentServerIp);
                         TcpServer.Start(Settings.General.TcpServerPort, ip);
 
-                        string url = "http://" + currentServerIp + "/screenCapture/register?username=" + user_name + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
+                        string url = "http://" + currentServerIp + "/screenCapture/register?username=" + currentUserName + "&ipaddress=" + TcpServer.LocalIp + "&port=" + TcpServer.LocalPort;
                         Log.Main.Inform("GETing: " + url);
 
                         HttpClient hc = new HttpClient();
@@ -168,27 +158,38 @@ namespace Cliver.CisteraScreenCaptureService
                         string responseContent = rm.Content.ReadAsStringAsync().Result;
                         if (responseContent.Trim() != "OK")
                             throw new Exception("Response: " + responseContent);
-                    }
-                    catch (Exception e)
+                    },
+                    (Exception e) =>
                     {
                         Log.Main.Error(e);
-                        CisteraScreenCaptureService.Events.UiMessage.Error(Log.GetExceptionMessage(e));
+                        CisteraScreenCaptureService.ExposedEvents.UiMessage.Error(Log.GetExceptionMessage(e));
+                    },
+                    () =>
+                    {
+                        onNewUser_t = null;
                     }
-                },
-                null,
-                () =>
-                {
-                    userLoggedOn_t = null;
-                }
-            );
+                );
+            }
+            catch(Exception e)
+            {
+                Log.Main.Error(e);
+            }
         }
-        static Thread userLoggedOn_t = null;
+        static Thread onNewUser_t = null;
         static string currentUserName;
         public static string UserName
         {
             get
             {
                 return currentUserName;
+            }
+        }
+        static uint currentUserSessionId;
+        public static uint UserSessionId
+        {
+            get
+            {
+                return currentUserSessionId;
             }
         }
         static string currentServerIp;
@@ -200,36 +201,20 @@ namespace Cliver.CisteraScreenCaptureService
             }
         }
 
-        static void stop_userLoggedOn_t()
+        static void stopServingUser()
         {
-            if (userLoggedOn_t != null)
-                while (userLoggedOn_t.IsAlive)
+            if (onNewUser_t != null)
+            {
+                while (onNewUser_t.IsAlive)
                 {
-                    userLoggedOn_t.Abort();
-                    userLoggedOn_t.Join(200);
+                    Log.Main.Write("Terminating onNewUser_t...");
+                    onNewUser_t.Abort();
+                    onNewUser_t.Join(200);
                 }
-        }
-
-        static void userLoggedOff()
-        {
-            Log.Main.Inform("User logged off");
-            stop_userLoggedOn_t();
+                onNewUser_t = null;
+            }
             TcpServer.Stop();
             MpegStream.Stop();
-            currentUserName = null;
         }
-
-        //static void userSessionEventHandler(int session_type)
-        //{
-        //    switch (session_type)
-        //    {
-        //        case Cliver.Win32.WtsEvents.WTS_SESSION_LOGON:
-        //            userLoggedOn();
-        //            break;
-        //        case Cliver.Win32.WtsEvents.WTS_SESSION_LOGOFF:
-        //            userLoggedOff();
-        //            break;
-        //    }
-        //}
     }
 }

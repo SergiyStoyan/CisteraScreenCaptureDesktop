@@ -52,7 +52,7 @@ namespace Cliver.CisteraScreenCaptureService
                 else
                 {
                     Log.Main.Error(e);
-                    CisteraScreenCaptureService.Events.UiMessage.Error(Log.GetExceptionMessage(e));
+                    CisteraScreenCaptureService.ExposedEvents.UiMessage.Error(Log.GetExceptionMessage(e));
                 }
                 Stop();
             });

@@ -8,7 +8,7 @@ using System.ServiceModel;
 
 namespace Cliver.CisteraScreenCaptureService
 {
-    static class Events
+    static class ExposedEvents
     {
         internal static class UiMessage
         {
@@ -26,11 +26,11 @@ namespace Cliver.CisteraScreenCaptureService
             }
         }
 
-        static internal void Started()
+        static internal void Starting()
         {
         }
 
-        static internal void Stopped()
+        static internal void Stopping()
         {
         }
     }

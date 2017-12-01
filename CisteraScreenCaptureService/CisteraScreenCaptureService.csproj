@@ -83,7 +83,7 @@
   <ItemGroup>
     <Compile Include="MonitorRoutines.cs" />
     <Compile Include="MpegStream.cs" />
-    <Compile Include="Events.cs" />
+    <Compile Include="ExposedEvents.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
