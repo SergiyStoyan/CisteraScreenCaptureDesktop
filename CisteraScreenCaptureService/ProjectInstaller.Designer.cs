@@ -42,6 +42,7 @@
             this.serviceInstaller1.Description = "Streams desktop to Cistera server";
             this.serviceInstaller1.DisplayName = "Cistera Screen Capture Service";
             this.serviceInstaller1.ServiceName = "Cistera Screen Capture Service";
+            this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
             // 
