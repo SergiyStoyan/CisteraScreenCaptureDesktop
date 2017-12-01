@@ -39,9 +39,9 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.Description = "CisteraScreenCapture";
-            this.serviceInstaller1.DisplayName = "CisteraScreenCapture";
-            this.serviceInstaller1.ServiceName = "CisteraScreenCapture";
+            this.serviceInstaller1.Description = "Streams desktop to Cistera server";
+            this.serviceInstaller1.DisplayName = "Cistera Screen Capture Service";
+            this.serviceInstaller1.ServiceName = "Cistera Screen Capture Service";
             // 
             // ProjectInstaller
             // 

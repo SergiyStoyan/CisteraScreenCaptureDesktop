@@ -36,6 +36,8 @@ namespace Cliver.CisteraScreenCaptureService
         public Service()
         {
             InitializeComponent();
+
+            CanHandleSessionChangeEvent = true;
         }
 
         protected override void OnStart(string[] args)
@@ -67,11 +69,6 @@ namespace Cliver.CisteraScreenCaptureService
             stopServingUser();
         }
 
-        static Service()
-        {
-            //Microsoft.Win32.SystemEvents.SessionSwitch += SystemEvents_SessionSwitch;
-        }
-
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
         {
             Log.Main.Write("Session: " + changeDescription.SessionId + ":" + changeDescription.Reason);
@@ -89,23 +86,6 @@ namespace Cliver.CisteraScreenCaptureService
 
             base.OnSessionChange(changeDescription);
         }
-
-        //private static void SystemEvents_SessionSwitch(object sender, Microsoft.Win32.SessionSwitchEventArgs e)
-        //{
-        //    Log.Main.Write("-" + e.Reason);
-        //    //switch (e.Reason)
-        //    //{
-        //    //    case SessionSwitchReason.ConsoleConnect:
-        //    //    case SessionSwitchReason.RemoteConnect:
-        //    //    case SessionSwitchReason.SessionUnlock:
-        //    //        userLoggedOn();
-        //    //        break;
-        //    //    default:
-        //    //        userLoggedOff();
-        //    //        break;
-        //    //}
-        //    //sessionChanged();
-        //}
 
         static void sessionChanged(uint sessionId, bool active)
         {
